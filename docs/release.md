@@ -65,4 +65,4 @@ scripts/release.sh --skip-notarize
 
 Das Skript bricht ab, wenn eines der mitgelieferten Programme nicht mit Developer ID, "hardened runtime" und Zeitstempel signiert ist.
 
-Auch der Probelauf braucht die Hinweise in beiden Sprachen. Solange im Projekt noch 0.1.0 steht, bricht er deshalb ab, ebenso `--install`: Diese Version gibt es nur auf Deutsch. Mit der nächsten Version (`cut` und `MARKETING_VERSION`) läuft er wieder.
+Auch der Probelauf braucht die Hinweise in beiden Sprachen. Solange im Projekt noch 0.1.0 steht, bricht er deshalb ab, ebenso `--install`: Diese Version gibt es nur auf Deutsch. Mit der nächsten Version läuft er wieder: nach `cut`, mit der neuen Nummer in `MARKETING_VERSION` und in `Cargo.toml`.
