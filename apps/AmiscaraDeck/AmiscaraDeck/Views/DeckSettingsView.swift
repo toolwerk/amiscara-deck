@@ -149,6 +149,7 @@ struct UpdateSection: View {
 
     var body: some View {
         Section("Updates") {
+            UpdateBanner(updater: updater, inset: false)
             if updater.isAvailable {
                 Toggle("Automatisch nach Updates suchen", isOn: $updater.automaticallyChecks)
                 Button("Jetzt suchen …") { updater.checkForUpdates() }

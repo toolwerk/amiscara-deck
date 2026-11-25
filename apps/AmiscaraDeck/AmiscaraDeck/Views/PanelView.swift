@@ -5,6 +5,7 @@ struct PanelView: View {
     let model: DeckModel
     var openWindow: () -> Void = {}
     var openSettings: () -> Void = {}
+    var updater: UpdaterController = .shared
     /// A fixed "now" and no scrolling, for drawing the panel into a picture in
     /// tests (a scroll view and a timeline do not draw there).
     var staticNowMs: UInt64?
@@ -45,6 +46,7 @@ struct PanelView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
             }
+            UpdateBanner(updater: updater)
             Divider().overlay(Theme.line)
             footer
         }
