@@ -1,0 +1,22 @@
+# Changelog
+
+All notable changes are listed here, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow SemVer.
+
+Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.md).
+
+## [Unreleased]
+
+### Added
+
+- Deck speaks English: app, notifications, icon menu, Focus filter and command line follow the language of macOS or of the environment. The texts come from `po/deck.pot` and `po/de.po`, `scripts/i18n.py check` finds missing translations
+- The English README shows English pictures
+
+### Changed
+
+- The README leads to the download of the ready made version
+- The daemon sends activity and history as data, every interface words them in its own language, also for agents on other computers. Protocol 2: update daemon and app on other computers at the same time
+- The output of `amiscara-deck list --json` and `watch --json` changes for scripts: `activity` is an object (`kind` and value), a history entry has `event` instead of `text`, the further details of a request are in `extra` instead of the text `full`
+- After the update the settings are kept, running agents show up again with their next event, their history so far is dropped
+- The command line writes minutes as "min", like the app
+- After a denial in Deck the agent reads "Denied in Amiscara Deck" instead of a German sentence
+- The release notes in the update dialog appear in the language of the app, German or English

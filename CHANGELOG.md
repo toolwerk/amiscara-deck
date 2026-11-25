@@ -17,6 +17,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 - Nach dem Update bleiben die Einstellungen erhalten, laufende Agenten erscheinen mit ihrem nächsten Ereignis wieder, ihr bisheriger Verlauf fällt weg
 - Die Befehlszeile schreibt Minuten als "min" wie die App
 - Nach einer Ablehnung in Deck liest der Agent "Denied in Amiscara Deck" statt eines deutschen Satzes
+- Die Versionshinweise im Update-Dialog erscheinen in der Sprache der App, auf Deutsch oder Englisch
 
 ## [0.1.0] - 2026-11-25
 
