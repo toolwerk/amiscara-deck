@@ -55,11 +55,11 @@ fn runtime() -> std::io::Result<tokio::runtime::Runtime> {
 
 fn explain(e: &Error, socket: &std::path::Path) -> String {
     match e {
-        Error::NoDaemon(_) => view::no_daemon(socket),
-        Error::VersionMismatch { daemon, ours } => t_with(
+        Error::NoDaemon(_) => view::error(&view::no_daemon(socket)),
+        Error::VersionMismatch { daemon, ours } => view::error(&t_with(
             "The daemon speaks protocol {daemon}, this program {ours}. Restart the daemon.",
             &[("daemon", &daemon.to_string()), ("ours", &ours.to_string())],
-        ),
+        )),
         other => view::error(other),
     }
 }
