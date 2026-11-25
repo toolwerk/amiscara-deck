@@ -100,6 +100,12 @@ class Extract(unittest.TestCase):
             ("Usage:more", None),
         ])
 
+    def test_quotes_in_comments_and_raw_strings_do_not_hide_texts(self):
+        swift = 'let a = #"a " quote"#\n/* odd " quote */\nlet b = """\n"one" "\n"""\nlet c = L10n.t("Kept")\nlet d = /*i18n*/"Marked"'
+        rust = 'let a = r#"odd " quote"#;\n/* odd " */\nlet b = t("Also kept");\nlet c = "t(\\"no\\")";'
+        got = [e.msgid for e in i18n.extract(tree(swift=swift, rust=rust, template=False))]
+        self.assertEqual(got, ["Kept", "Marked", "Also kept"])
+
     def test_a_call_without_a_literal_fails(self):
         with self.assertRaises(i18n.Failure):
             i18n.extract(tree(swift='let x = L10n.t(key)', template=False))

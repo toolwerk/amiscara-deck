@@ -123,11 +123,39 @@ def _strip_comments(text, rust):
     out = []
     strings = []
     i = 0
+    def blank(a, b):
+        out.append(re.sub(r"[^\n]", " ", text[a:b]))
+
+    def literal(a, b):
+        out.append(text[a:b])
+        strings.append((a, b))
+
     while i < len(text):
+        word_before = i > 0 and (text[i - 1].isalnum() or text[i - 1] == "_")
+        raw = None if word_before else (
+            re.match(r'b?r(#*)"', text[i:]) if rust else re.match(r'(#+)"', text[i:])
+        )
         if text.startswith("//", i):
             j = text.find("\n", i)
             j = len(text) if j < 0 else j
-            out.append(" " * (j - i))
+            blank(i, j)
+            i = j
+        elif text.startswith("/*", i) and not text.startswith("/*i18n*/", i):
+            j = text.find("*/", i + 2)
+            j = len(text) if j < 0 else j + 2
+            blank(i, j)
+            i = j
+        elif raw:
+            # A raw string: it ends at a quote with as many hashes.
+            end = '"' + raw.group(1)
+            j = text.find(end, i + len(raw.group(0)))
+            j = len(text) if j < 0 else j + len(end)
+            literal(i, j)
+            i = j
+        elif not rust and text.startswith('"""', i):
+            j = text.find('"""', i + 3)
+            j = len(text) if j < 0 else j + 3
+            literal(i, j)
             i = j
         elif text.startswith('"', i):
             j = i + 1
