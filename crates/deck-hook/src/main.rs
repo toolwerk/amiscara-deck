@@ -11,6 +11,7 @@ fn main() {
             deck_proto::agent::Tool::Claude
         };
         let Some(opts) = deck_hook::Options::from_env(tool) else {
+            drain();
             return;
         };
         let env = |k: &str| std::env::var(k).ok();
@@ -21,7 +22,15 @@ fn main() {
             let _ = stdout.write_all(b"\n");
             let _ = stdout.flush();
         }
+        drain();
     });
+}
+
+/// Read what is left of the input: the caller must never write into a closed
+/// pipe, whatever made this program do nothing.
+#[cfg(unix)]
+fn drain() {
+    let _ = std::io::copy(&mut std::io::stdin().lock(), &mut std::io::sink());
 }
 
 #[cfg(not(unix))]

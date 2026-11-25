@@ -10,6 +10,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Fixed
 
+- The hook program reads its whole input also when it has nothing to do, so the caller never writes into a closed pipe
 - A request card showed only the command or path of a known tool: any other field of the call, such as a Bash call asking to run without its sandbox, stayed unseen and could still be allowed. Every such field is now shown under "Weitere Angaben" and makes the card one that has to be expanded first (security review)
 - Deck could not stay quiet in a Focus mode: macOS tells it nothing without a permission it does not have. Deck now brings a Focus filter ("Amiscara Deck", "Still bleiben") the user adds to a Focus; the settings explain it and show when it is active (found in the hand test)
 - After a restart of the daemon, a request that had already been answered where the agent runs stayed on the card until the end of the turn
