@@ -36,6 +36,7 @@ OUTPUT_PATH="$appcast" VERSION="$version" BUILD="$build" \
     ZIP_LENGTH="$length" ZIP_ED_SIGNATURE="$ed_signature" \
     MIN_SYSTEM="$(sed -n 's/^ *macOS: "\(.*\)"$/\1/p' "$spec" | head -1)" \
     NOTES_EN_PATH="$out/notes-en.md" NOTES_DE_PATH="$out/notes-de.md" \
+    RELEASE_URL="https://github.com/toolwerk/amiscara-deck/releases/tag/$tag" \
     PUB_DATE="$(LC_ALL=C date -u '+%a, %d %b %Y %H:%M:%S +0000')" \
     python3 scripts/appcast.py
 step "Feed: $appcast (for release $tag)"

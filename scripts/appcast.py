@@ -3,8 +3,9 @@
 
 Called by scripts/sparkle-feed.sh; the values come as environment variables:
 OUTPUT_PATH, VERSION, BUILD, ZIP_URL, ZIP_LENGTH, ZIP_ED_SIGNATURE,
-MIN_SYSTEM, PUB_DATE, NOTES_EN_PATH and NOTES_DE_PATH. The last two name
-Markdown files with the release notes; the feed carries their text.
+MIN_SYSTEM, PUB_DATE, RELEASE_URL, NOTES_EN_PATH and NOTES_DE_PATH. The
+last two name Markdown files with the release notes; the feed carries their
+text. RELEASE_URL is the page of the release.
 """
 import os
 import sys
@@ -55,6 +56,8 @@ def feed(env) -> ET.ElementTree:
             XML_LANG: lang,
             f"{{{SPARKLE_NS}}}format": "markdown",
         }).text = read_notes(env, name)
+    # Behind "Version History" in the dialog that says the app is up to date.
+    ET.SubElement(item, f"{{{SPARKLE_NS}}}fullReleaseNotesLink").text = required(env, "RELEASE_URL")
     ET.SubElement(item, "enclosure", {
         "url": required(env, "ZIP_URL"),
         f"{{{SPARKLE_NS}}}edSignature": required(env, "ZIP_ED_SIGNATURE"),
