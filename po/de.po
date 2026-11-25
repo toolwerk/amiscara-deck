@@ -1,0 +1,869 @@
+# German translation of Amiscara Deck.
+# One entry per text of po/deck.pot. `python3 scripts/i18n.py check` finds gaps.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "running: {command}"
+msgstr "führt aus: {command}"
+
+msgid "running a command"
+msgstr "führt einen Befehl aus"
+
+msgid "editing {path}"
+msgstr "bearbeitet {path}"
+
+msgid "editing a file"
+msgstr "bearbeitet eine Datei"
+
+msgid "reading {path}"
+msgstr "liest {path}"
+
+msgid "reading a file"
+msgstr "liest eine Datei"
+
+msgid "searching {pattern}"
+msgstr "sucht {pattern}"
+
+msgid "searching"
+msgstr "sucht"
+
+msgid "starting a subagent"
+msgstr "startet einen Subagenten"
+
+msgid "fetching from the web"
+msgstr "ruft das Netz ab"
+
+msgid "compacting"
+msgstr "komprimiert"
+
+msgid "Session started"
+msgstr "Sitzung gestartet"
+
+msgid "Task received"
+msgstr "Auftrag erhalten"
+
+msgid "Approval requested"
+msgstr "Freigabe angefragt"
+
+msgid "Compacting context"
+msgstr "Kontext wird komprimiert"
+
+msgid "Turn ended"
+msgstr "Zug beendet"
+
+msgid "Turn ended with an error"
+msgstr "Zug mit Fehler beendet"
+
+msgid "Session ended"
+msgstr "Sitzung beendet"
+
+msgid "Approval allowed"
+msgstr "Freigabe erlaubt"
+
+msgid "Approval denied"
+msgstr "Freigabe abgelehnt"
+
+msgid "Question answered"
+msgstr "Frage beantwortet"
+
+msgid "further details"
+msgstr "Weitere Angaben"
+
+msgid "content"
+msgstr "Inhalt"
+
+msgid "old"
+msgstr "alt"
+
+msgid "new"
+msgstr "neu"
+
+msgid "options"
+msgstr "Optionen"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Waiting"
+msgstr "Wartet"
+
+msgid "Working"
+msgstr "Arbeitet"
+
+msgid "Done"
+msgstr "Fertig"
+
+msgid "Other"
+msgstr "Sonstige"
+
+msgid "{used} of {window}"
+msgstr "{used} von {window}"
+
+msgid "{n}K"
+msgstr "{n} Tsd."
+
+msgid "{n}M"
+msgstr "{n} Mio."
+
+msgid "{whole}.{tenth}M"
+msgstr "{whole},{tenth} Mio."
+
+msgid "paused"
+msgstr "pausiert"
+
+msgid "working"
+msgstr "arbeitet"
+
+msgid "waiting"
+msgstr "wartet"
+
+msgid "done"
+msgstr "fertig"
+
+msgid "no task"
+msgstr "ohne Auftrag"
+
+msgid "error"
+msgstr "Fehler"
+
+msgid "ended"
+msgstr "beendet"
+
+msgid "only in this session"
+msgstr "nur in dieser Sitzung"
+
+msgid "only on this machine (.claude/settings.local.json)"
+msgstr "nur auf diesem Rechner (.claude/settings.local.json)"
+
+msgid "in the repo for everyone who uses it (.claude/settings.json)"
+msgstr "im Repo für alle, die es nutzen (.claude/settings.json)"
+
+msgid "for all projects (~/.claude/settings.json)"
+msgstr "für alle Projekte (~/.claude/settings.json)"
+
+msgid "Target: {target}"
+msgstr "Ziel: {target}"
+
+msgid "Target unknown"
+msgstr "Ziel unbekannt"
+
+msgid "In Deck"
+msgstr "Im Deck"
+
+msgid "Automatic"
+msgstr "Automatik"
+
+msgid "In Terminal"
+msgstr "Im Terminal"
+
+msgid "Notifies you about every approval."
+msgstr "Meldet sich bei jeder Freigabe."
+
+msgid "Notifies you when you are not at the terminal."
+msgstr "Meldet sich, wenn Sie nicht am Terminal sind."
+
+msgid "Deck holds nothing. Answers only in the terminal."
+msgstr "Deck hält nichts. Antworten gibt es nur im Terminal."
+
+msgid "{n} s"
+msgstr "{n} s"
+
+msgid "{n} min"
+msgstr "{n} min"
+
+msgid "{minutes} min {seconds} s"
+msgstr "{minutes} min {seconds} s"
+
+msgid "macOS shows no notifications of Amiscara Deck. Allow them in System Settings."
+msgstr "macOS zeigt keine Mitteilungen von Amiscara Deck. Erlauben Sie sie in den Systemeinstellungen."
+
+msgid "Notifications do not appear as alerts. In System Settings, choose “Banners” or “Alerts”."
+msgstr "Mitteilungen erscheinen nicht als Hinweis. Stellen Sie in den Systemeinstellungen „Banner“ oder „Hinweise“ ein."
+
+msgid "$0.00"
+msgstr "0,00 $"
+
+msgid "< $0.01"
+msgstr "< 0,01 $"
+
+msgid "${dollars}.{cents}"
+msgstr "{dollars},{cents} $"
+
+msgid "Today ≈ {amount}"
+msgstr "Heute ≈ {amount}"
+
+msgid "Estimate of Claude Code, not a billed amount."
+msgstr "Schätzwert von Claude Code, kein Abrechnungsbetrag."
+
+msgid "Deck stays quiet in this Focus: no notification, no window, no sound."
+msgstr "Deck meldet sich in diesem Fokus nicht: keine Mitteilung, kein Fenster, kein Ton."
+
+msgid "Stay quiet"
+msgstr "Still bleiben"
+
+msgid "Deck stays quiet"
+msgstr "Deck bleibt still"
+
+msgid "Deck speaks up"
+msgstr "Deck meldet sich"
+
+msgid "The hook program is missing from the app."
+msgstr "Das Hook-Programm fehlt in der App."
+
+msgid "The hook program is not executable."
+msgstr "Das Hook-Programm ist nicht ausführbar."
+
+msgid "Installed ({installed} of {total} events)."
+msgstr "Eingebaut ({installed} von {total} Ereignissen)."
+
+msgid "Outdated: {count} entries point to another place. Reinstalling fixes it."
+msgstr "Veraltet: {count} Einträge zeigen auf einen anderen Ort. Neu einbauen behebt das."
+
+msgid "Not installed. Agents appear only after installing."
+msgstr "Nicht eingebaut. Agenten erscheinen erst nach dem Einbau."
+
+msgid "Partly installed ({installed} of {total} events)."
+msgstr "Teilweise eingebaut ({installed} von {total} Ereignissen)."
+
+msgid "{count} entries of other programs stay untouched."
+msgstr "{count} Einträge anderer Programme bleiben unberührt."
+
+msgid "Claude Code {version} is older than the tested version 2.1.331. Hooks may be missing or work differently."
+msgstr "Claude Code {version} ist älter als die geprüfte Version 2.1.331. Hooks können fehlen oder anders arbeiten."
+
+msgid "Claude Code not found"
+msgstr "Claude Code nicht gefunden"
+
+msgid "After installing, confirm the hooks once in Codex with /hooks. Without approvals Deck only shows the sessions."
+msgstr "Nach dem Einbau müssen Sie die Hooks in Codex einmal über /hooks bestätigen. Ohne Freigaben zeigt Deck die Sitzungen nur an."
+
+msgid "Codex shows its dialog only once Deck lets the request go. So Deck holds it only when it would show a notification, and lets it go as soon as you are back at the terminal. Codex has no \"Always allow\"."
+msgstr "Codex zeigt seinen Dialog erst, wenn Deck die Anfrage freigibt. Deck hält sie deshalb nur, wenn es eine Mitteilung zeigen würde, und gibt sie frei, sobald Sie wieder am Terminal sind. \"Immer erlauben\" gibt es bei Codex nicht."
+
+msgid "{n} day"
+msgid_plural "{n} days"
+msgstr[0] "{n} Tag"
+msgstr[1] "{n} Tage"
+
+msgid "{name} has a question"
+msgstr "{name} hat eine Frage"
+
+msgid "{name} is waiting for approval"
+msgstr "{name} wartet auf Freigabe"
+
+msgid "{start}…\nLong: view it first, then allow."
+msgstr "{start}…\nLang: erst ansehen, dann erlauben."
+
+msgid "{name} is waiting in the terminal"
+msgstr "{name} wartet im Terminal"
+
+msgid "Answer there. Deck does not hold this request."
+msgstr "Antworten Sie dort. Deck hält diese Anfrage nicht."
+
+msgid "{name} is done"
+msgstr "{name} ist fertig"
+
+msgid "Branch {branch}"
+msgstr "Branch {branch}"
+
+msgid "The agent is waiting for a new task."
+msgstr "Der Agent wartet auf einen neuen Auftrag."
+
+msgid "Allow"
+msgstr "Erlauben"
+
+msgid "Deny"
+msgstr "Ablehnen"
+
+msgid "View"
+msgstr "Ansehen"
+
+msgid "{n} h"
+msgstr "{n} Std."
+
+msgid "{n} d"
+msgstr "{n} Tg."
+
+msgid "The connection was closed."
+msgstr "Die Verbindung wurde beendet."
+
+msgid "The key of {host} has changed (now {fingerprint})."
+msgstr "Der Schlüssel von {host} hat sich geändert (jetzt {fingerprint})."
+
+msgid "No daemon at {path}."
+msgstr "Kein Dienst unter {path}."
+
+msgid "Amiscara Deck, {n} agents waiting"
+msgstr "Amiscara Deck, {n} Agenten warten"
+
+msgid "Amiscara Deck, one agent waiting"
+msgstr "Amiscara Deck, ein Agent wartet"
+
+msgid "Version {version} is ready."
+msgstr "Version {version} ist bereit."
+
+msgid "Version {version} is available."
+msgstr "Version {version} ist verfügbar."
+
+msgid "Restart now"
+msgstr "Jetzt neu starten"
+
+msgid "Codex · read only"
+msgstr "Codex · nur lesend"
+
+msgid "Context {percent} %"
+msgstr "Kontext {percent} %"
+
+msgid "Context {percent} percent full"
+msgstr "Kontext zu {percent} Prozent gefüllt"
+
+msgid "Waiting for you"
+msgstr "Wartet auf Sie"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Nobody is waiting."
+msgstr "Niemand wartet."
+
+msgid "Approvals"
+msgstr "Freigaben"
+
+msgid "Status unknown."
+msgstr "Status unbekannt."
+
+msgid "Reinstall"
+msgstr "Neu einbauen"
+
+msgid "Install"
+msgstr "Einbauen"
+
+msgid "Installed."
+msgstr "Eingebaut."
+
+msgid "Uninstall"
+msgstr "Ausbauen"
+
+msgid "Uninstalled."
+msgstr "Ausgebaut."
+
+msgid "Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."
+msgstr "Vor jeder Änderung legt Deck eine Sicherung der Datei an. Laufende Sitzungen übernehmen neue Hooks beim nächsten Ereignis."
+
+msgid "Approvals for Codex"
+msgstr "Freigaben für Codex"
+
+msgid "Installed. Please confirm in Codex with /hooks."
+msgstr "Eingebaut. Bitte in Codex über /hooks bestätigen."
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start at login"
+msgstr "Beim Anmelden starten"
+
+msgid "History"
+msgstr "Verlauf"
+
+msgid "Keep"
+msgstr "Aufbewahren"
+
+msgid "Delete history …"
+msgstr "Verlauf löschen …"
+
+msgid "Delete history and decision log?"
+msgstr "Verlauf und Entscheidungslog löschen?"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "This cannot be undone."
+msgstr "Das lässt sich nicht rückgängig machen."
+
+msgid "Nothing to change."
+msgstr "Nichts zu ändern."
+
+msgid "Error: {error}"
+msgstr "Fehler: {error}"
+
+msgid "Start at login: {error}"
+msgstr "Autostart: {error}"
+
+msgid "Check for updates automatically"
+msgstr "Automatisch nach Updates suchen"
+
+msgid "Check now …"
+msgstr "Jetzt suchen …"
+
+msgid "This app was built locally and does not update itself."
+msgstr "Diese App wurde selbst gebaut und aktualisiert sich nicht."
+
+msgid "No agent yet. Start Claude Code in a terminal."
+msgstr "Noch kein Agent da. Starten Sie Claude Code in einem Terminal."
+
+msgid "No agent in this selection."
+msgstr "Kein Agent in dieser Auswahl."
+
+msgid "Last task"
+msgstr "Letzter Auftrag"
+
+msgid "Key figures"
+msgstr "Kennzahlen"
+
+msgid "Context"
+msgstr "Kontext"
+
+msgid "unknown"
+msgstr "unbekannt"
+
+msgid "Turns"
+msgstr "Züge"
+
+msgid "Subagents"
+msgstr "Subagenten"
+
+msgid "Cost (estimate)"
+msgstr "Kosten (Schätzung)"
+
+msgid "Nothing recorded yet."
+msgstr "Noch nichts aufgezeichnet."
+
+msgid "Answer approvals"
+msgstr "Freigaben beantworten"
+
+msgid "Wait time for a request"
+msgstr "Wartezeit für eine Anfrage"
+
+msgid "Wait time"
+msgstr "Wartezeit"
+
+msgid "After that the request stays in the terminal."
+msgstr "Danach bleibt die Anfrage im Terminal."
+
+msgid "Open System Settings"
+msgstr "Systemeinstellungen öffnen"
+
+msgid "Quiet right now: a Focus with the filter of Deck is on."
+msgstr "Gerade still: Ein Fokus mit dem Filter von Deck ist an."
+
+msgid "To keep Deck quiet in “Do Not Disturb” or another Focus: in System Settings, at the Focus choose “Add Filter”, pick “Amiscara Deck” and switch on “Stay quiet”. Without the filter Deck does not see a Focus; macOS then only holds back the notifications."
+msgstr "Damit Deck in „Nicht stören“ oder einem anderen Fokus still bleibt: in den Systemeinstellungen beim Fokus „Filter hinzufügen“, „Amiscara Deck“ wählen und „Still bleiben“ einschalten. Ohne den Filter erkennt Deck keinen Fokus; macOS hält dann nur die Mitteilungen zurück."
+
+msgid "Getting your attention"
+msgstr "Aufmerksam machen"
+
+msgid "Open a window when asked"
+msgstr "Fenster bei Rückfrage öffnen"
+
+msgid "Sound when asked"
+msgstr "Ton bei Rückfrage"
+
+msgid "Remind again after 1 minute"
+msgstr "Nach 1 Minute noch einmal erinnern"
+
+msgid "Number at the menu bar symbol"
+msgstr "Zahl am Menüleisten-Symbol"
+
+msgid "Symbol pulses while someone waits"
+msgstr "Symbol pulsiert, solange jemand wartet"
+
+msgid "Open Focus settings"
+msgstr "Fokus-Einstellungen öffnen"
+
+msgid "Window, sound and reminder come when Deck would also send a notification: in “Automatic” only when you are not at the terminal."
+msgstr "Fenster, Ton und Erinnerung kommen, wenn Deck auch eine Mitteilung schicken würde: in „Automatik“ nur, wenn Sie nicht am Terminal sind."
+
+msgid "{n} waiting"
+msgstr "{n} wartet"
+
+msgid "{n} agent"
+msgid_plural "{n} agents"
+msgstr[0] "{n} Agent"
+msgstr[1] "{n} Agenten"
+
+msgid "Connecting to the daemon …"
+msgstr "Verbinde mit dem Dienst …"
+
+msgid "The daemon is not running. Deck starts it."
+msgstr "Der Dienst läuft nicht. Deck startet ihn."
+
+msgid "The daemon is from another version. Please restart."
+msgstr "Der Dienst ist von einer anderen Version. Bitte neu starten."
+
+msgid "Open window"
+msgstr "Fenster öffnen"
+
+msgid "Quit"
+msgstr "Beenden"
+
+msgid "Question {index} of {count}"
+msgstr "Frage {index} von {count}"
+
+msgid "Back"
+msgstr "Zurück"
+
+msgid "Answer"
+msgstr "Antworten"
+
+msgid "Next"
+msgstr "Weiter"
+
+msgid "To give an answer of your own, type it in the program the agent runs in."
+msgstr "Eine eigene Antwort tippen Sie im Programm, in dem der Agent läuft."
+
+msgid "Several possible"
+msgstr "Mehrere möglich"
+
+msgid "{name}: connecting …"
+msgstr "{name}: verbinde …"
+
+msgid "{name}: machine not reachable"
+msgstr "{name}: Rechner nicht erreichbar"
+
+msgid "{name}: key must be confirmed (Settings)"
+msgstr "{name}: Schlüssel muss bestätigt werden (Einstellungen)"
+
+msgid "{name}: key has changed (Settings)"
+msgstr "{name}: Schlüssel hat sich geändert (Einstellungen)"
+
+msgid "{name}: daemon is from another version"
+msgstr "{name}: Dienst ist von einer anderen Version"
+
+msgid "Connected."
+msgstr "Verbunden."
+
+msgid "Connecting …"
+msgstr "Verbinde …"
+
+msgid "Not reachable: {reason}"
+msgstr "Nicht erreichbar: {reason}"
+
+msgid "Unknown key, fingerprint {fingerprint}."
+msgstr "Unbekannter Schlüssel, Fingerabdruck {fingerprint}."
+
+msgid "The daemon there speaks protocol {version}. Please bring both to the same version."
+msgstr "Der Dienst dort spricht Protokoll {version}. Bitte beide auf denselben Stand bringen."
+
+msgid "Other machines"
+msgstr "Andere Rechner"
+
+msgid "None. Deck can show the agents of another machine and give approvals there, over SSH."
+msgstr "Keine. Deck kann die Agenten eines anderen Rechners zeigen und dort Freigaben geben, über SSH."
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Trust this key"
+msgstr "Diesem Schlüssel vertrauen"
+
+msgid "Add machine"
+msgstr "Rechner hinzufügen"
+
+msgid "Name (shown on the cards)"
+msgstr "Name (steht auf den Karten)"
+
+msgid "Host"
+msgstr "Host"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Key file (empty: SSH agent)"
+msgstr "Schlüsseldatei (leer: SSH-Agent)"
+
+msgid "Socket there (empty: usual place)"
+msgstr "Socket dort (leer: üblicher Ort)"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Wants to run a command"
+msgstr "Möchte einen Befehl ausführen"
+
+msgid "Wants to write a file"
+msgstr "Möchte eine Datei schreiben"
+
+msgid "Wants to change a file"
+msgstr "Möchte eine Datei ändern"
+
+msgid "Wants to change a notebook"
+msgstr "Möchte ein Notebook ändern"
+
+msgid "Wants to read a file"
+msgstr "Möchte eine Datei lesen"
+
+msgid "Wants to fetch a web page"
+msgstr "Möchte eine Webseite abrufen"
+
+msgid "Wants to search the web"
+msgstr "Möchte im Netz suchen"
+
+msgid "Has a question for you"
+msgstr "Hat eine Frage an Sie"
+
+msgid "Presents a plan for approval"
+msgstr "Legt einen Plan zur Freigabe vor"
+
+msgid "Wants to use {tool}"
+msgstr "Möchte {tool} verwenden"
+
+msgid "Answer in the program the agent runs in. Deck does not approve plans."
+msgstr "Antworten Sie im Programm, in dem der Agent läuft. Pläne gibt Deck nicht frei."
+
+msgid "Deck does not hold this question. Answer in the program the agent runs in."
+msgstr "Diese Frage hält Deck nicht. Antworten Sie im Programm, in dem der Agent läuft."
+
+msgid "Deck does not hold this request. Answer in the terminal."
+msgstr "Deck hält diese Anfrage nicht. Antworten Sie im Terminal."
+
+msgid "Answered"
+msgstr "Beantwortet"
+
+msgid "Full text"
+msgstr "Ganzer Text"
+
+msgid "Shortened. Allow works only after you have seen everything."
+msgstr "Gekürzt. Erlauben geht erst, nachdem Sie alles gesehen haben."
+
+msgid "Hidden characters appear as ⟦U+202E⟧. A typed ⟦ appears twice."
+msgstr "Unsichtbare Zeichen erscheinen als ⟦U+202E⟧. Ein getipptes ⟦ steht doppelt."
+
+msgid "Always allow: "
+msgstr "Immer erlauben: "
+
+msgid "Check for updates …"
+msgstr "Nach Updates suchen …"
+
+msgid "Settings …"
+msgstr "Einstellungen …"
+
+msgid "Quit Amiscara Deck"
+msgstr "Amiscara Deck beenden"
+
+msgid "Usage: amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--socket <file>]"
+msgstr "Aufruf: amiscara-deck answer <Anfrage> allow|deny [--always <Nr>] [--message <Text>] [--socket <Datei>]"
+
+msgid "--always needs a number."
+msgstr "--always braucht eine Zahl."
+
+msgid "Unknown option: {option}"
+msgstr "Unbekannte Option: {option}"
+
+msgid "--message only goes with deny."
+msgstr "--message gibt es nur bei deny."
+
+msgid "--always only goes with allow."
+msgstr "--always gibt es nur bei allow."
+
+msgid "Use allow or deny."
+msgstr "Erlaubt sind allow und deny."
+
+msgid "No home folder found: please give --socket."
+msgstr "Kein Home-Ordner gefunden: bitte --socket angeben."
+
+msgid "Error: no runtime."
+msgstr "Fehler: keine Laufzeit."
+
+msgid "No request with the id {id}."
+msgstr "Keine Anfrage mit der Kennung {id}."
+
+msgid "The request {id} is not held, it waits in the terminal."
+msgstr "Die Anfrage {id} wird nicht gehalten, sie wartet im Terminal."
+
+msgid "This is a question. Answer it in Deck or where the agent runs."
+msgstr "Das ist eine Frage. Beantworten Sie sie im Deck oder dort, wo der Agent läuft."
+
+msgid "The request is shortened. The whole text:\n\n{text}\n\nNothing allowed. After reading, allow with --seen."
+msgstr "Die Anfrage ist gekürzt. Der ganze Text:\n\n{text}\n\nNichts erlaubt. Nach dem Lesen mit --seen erlauben."
+
+msgid "none"
+msgstr "keine"
+
+msgid "This rule is not offered. Offered: {offered}"
+msgstr "Diese Regel wird nicht angeboten. Angeboten: {offered}"
+
+msgid "Error: the answer could not be sent."
+msgstr "Fehler: Antwort konnte nicht gesendet werden."
+
+msgid "Allowed."
+msgstr "Erlaubt."
+
+msgid "Denied."
+msgstr "Abgelehnt."
+
+msgid "No confirmation: the request was already answered or ran out."
+msgstr "Keine Bestätigung: Die Anfrage war schon beantwortet oder abgelaufen."
+
+msgid "Paths not found: please give --program, --data-dir and --plist."
+msgstr "Pfade nicht ermittelbar: bitte --program, --data-dir und --plist angeben."
+
+msgid "Unknown command: {command}"
+msgstr "Unbekannter Befehl: {command}"
+
+msgid "The daemon is missing or not executable: {path}\nNothing set up."
+msgstr "Der Dienst fehlt oder ist nicht ausführbar: {path}\nNichts eingerichtet."
+
+msgid "Already set up: {path}"
+msgstr "Schon eingerichtet: {path}"
+
+msgid "Written: {path}"
+msgstr "Geschrieben: {path}"
+
+msgid "User id not found, launchctl not called."
+msgstr "Benutzerkennung nicht ermittelbar, launchctl nicht aufgerufen."
+
+msgid "The daemon now starts at login and is already running."
+msgstr "Der Dienst startet ab jetzt bei der Anmeldung und läuft schon."
+
+msgid "launchctl bootstrap failed. The file is in place, the daemon starts at the next login."
+msgstr "launchctl bootstrap ist fehlgeschlagen. Die Datei liegt bereit, der Dienst startet bei der nächsten Anmeldung."
+
+msgid "Removed: {path}"
+msgstr "Entfernt: {path}"
+
+msgid "Nothing set up, nothing removed."
+msgstr "Nichts eingerichtet, nichts entfernt."
+
+msgid "set up"
+msgstr "eingerichtet"
+
+msgid "set up, but different (install brings it in line)"
+msgstr "eingerichtet, aber anders (install gleicht es an)"
+
+msgid "not set up"
+msgstr "nicht eingerichtet"
+
+msgid "Start at login: {state} ({path})"
+msgstr "Start bei der Anmeldung: {state} ({path})"
+
+msgid "(missing)"
+msgstr "(fehlt)"
+
+msgid "Daemon: {path}{missing}"
+msgstr "Dienst: {path}{missing}"
+
+msgid "No home folder found: please give --settings."
+msgstr "Kein Home-Ordner gefunden: bitte --settings angeben."
+
+msgid "Hook program not found: please give --program."
+msgstr "Hook-Programm nicht gefunden: bitte --program angeben."
+
+msgid "The hook program is missing or not executable: {path}\nNothing installed. Install anyway with --force."
+msgstr "Das Hook-Programm fehlt oder ist nicht ausführbar: {path}\nNichts eingebaut. Mit --force trotzdem einbauen."
+
+msgid "Hooks installed in {path}"
+msgstr "Hooks eingebaut in {path}"
+
+msgid "Backup: {path}"
+msgstr "Sicherung: {path}"
+
+msgid "Running sessions with project settings pick them up at once; with the user settings, restart a session when in doubt."
+msgstr "Laufende Sitzungen mit Projekt-Einstellungen greifen sie sofort, bei den Benutzer-Einstellungen im Zweifel eine Sitzung neu starten."
+
+msgid "Already installed, nothing changed."
+msgstr "Schon eingebaut, nichts geändert."
+
+msgid "Hooks removed from {path}"
+msgstr "Hooks ausgebaut aus {path}"
+
+msgid "Nothing of Deck found, nothing changed."
+msgstr "Nichts von Deck gefunden, nichts geändert."
+
+msgid "Settings: {path}{missing}"
+msgstr "Einstellungen: {path}{missing}"
+
+msgid "present"
+msgstr "vorhanden"
+
+msgid "present, but not executable"
+msgstr "vorhanden, aber nicht ausführbar"
+
+msgid "missing"
+msgstr "fehlt"
+
+msgid "Hook program: {path} ({state})"
+msgstr "Hook-Programm: {path} ({state})"
+
+msgid "installed"
+msgstr "eingebaut"
+
+msgid "outdated (install fixes it)"
+msgstr "veraltet (install behebt es)"
+
+msgid "Hooks of other programs (left alone): {count}"
+msgstr "Hooks anderer Programme (unberührt): {count}"
+
+msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
+msgstr "Amiscara Deck\n\nAufruf:\n  amiscara-deck answer <Anfrage> allow|deny [--always <Nr>] [--message <Text>] [--seen] [--socket <Datei>]\n  amiscara-deck sim [Szenario] [--speed <Faktor>] [--wait <Sekunden>] [--list] [--socket <Datei>]\n  amiscara-deck list  [--socket <Datei>] [--json]\n  amiscara-deck watch [--socket <Datei>] [--json]\n  amiscara-deck hooks install   [--settings <Datei>] [--program <Pfad>] [--force]\n  amiscara-deck hooks uninstall [--settings <Datei>] [--program <Pfad>]\n  amiscara-deck hooks status    [--settings <Datei>] [--program <Pfad>]\n\n  --socket    Socket des Dienstes (Vorgabe: im Datenordner von Amiscara Deck)\n  --speed     sim: Abspielgeschwindigkeit (1 = Echtzeit)\n  --wait      sim: wie lange eine Anfrage auf Antwort wartet (Vorgabe 60)\n  --json      Ausgabe als JSON (watch: eine Zeile je Nachricht)\n  --settings  Einstellungsdatei von Claude Code (Vorgabe: ~/.claude/settings.json)\n  --program   Pfad des Hook-Programms (Vorgabe: deck-hook neben diesem Programm)\n  --force     Auch einbauen, wenn das Hook-Programm fehlt oder nicht ausführbar ist\n\nBeendigungscodes: 0 erledigt, 1 Fehler, 2 falscher Aufruf,\n3 (status) nicht alle Hooks eingebaut.\n"
+
+msgid "The daemon speaks protocol {daemon}, this program {ours}. Restart the daemon."
+msgstr "Der Dienst spricht Protokoll {daemon}, dieses Programm {ours}. Dienst neu starten."
+
+msgid "The daemon closed the connection."
+msgstr "Der Dienst hat die Verbindung beendet."
+
+msgid "{name}: removed"
+msgstr "{name}: entfernt"
+
+msgid "--speed needs a number above 0."
+msgstr "--speed braucht eine Zahl größer als 0."
+
+msgid "--wait needs a number of seconds."
+msgstr "--wait braucht eine Zahl in Sekunden."
+
+msgid "Unknown scenario: {name}. Available: {list}"
+msgstr "Unbekanntes Szenario: {name}. Vorhanden: {list}"
+
+msgid "{session}: request allowed"
+msgstr "{session}: Anfrage erlaubt"
+
+msgid "{session}: request denied"
+msgstr "{session}: Anfrage abgelehnt"
+
+msgid "{session}: request goes on without an answer (terminal)"
+msgstr "{session}: Anfrage weiter ohne Antwort (Terminal)"
+
+msgid "No daemon reachable. Start it with amiscara-deckd."
+msgstr "Kein Dienst erreichbar. Starten mit amiscara-deckd."
+
+msgid "No daemon reachable at {socket}. Start it with amiscara-deckd."
+msgstr "Kein Dienst unter {socket} erreichbar. Starten mit amiscara-deckd."
+
+msgid "No agents."
+msgstr "Keine Agenten."
+
+msgid "STATUS"
+msgstr "STATUS"
+
+msgid "TOOL"
+msgstr "WERKZEUG"
+
+msgid "PROJECT"
+msgstr "PROJEKT"
+
+msgid "BRANCH"
+msgstr "BRANCH"
+
+msgid "ACTIVITY"
+msgstr "TÄTIGKEIT"
+
+msgid "SINCE"
+msgstr "SEIT"
+
+msgid "asks: {summary} [{id}]"
+msgstr "fragt: {summary} [{id}]"
+
+msgid "{name}: new, {status}"
+msgstr "{name}: neu, {status}"
+
+msgid "asks: {summary}"
+msgstr "fragt: {summary}"
