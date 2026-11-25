@@ -1,0 +1,27 @@
+{
+ "event": "Stop",
+ "input": {
+  "session_id": "01a2148a-7572-7b81-aead-5e4c007491c7",
+  "turn_id": "01a2148c-4b4b-7562-abf9-6e3ad300e076",
+  "transcript_path": "/Users/example/.codex/sessions/2026/11/25/rollout-2026-11-25T22-09-08-01a2148a-7572-7b81-aead-5e4c007491c7.jsonl",
+  "cwd": "/work/project",
+  "hook_event_name": "Stop",
+  "model": "gpt-6.2-sol",
+  "permission_mode": "default",
+  "stop_hook_active": false,
+  "last_assistant_message": "ok"
+ },
+ "env": {
+  "TERM_PROGRAM": "claude-desktop",
+  "PWD": "/work/project"
+ },
+ "parents": [
+  "codex",
+  "Python",
+  "zsh",
+  "claude",
+  "zsh",
+  "Claude Helper",
+  "Claude"
+ ]
+}

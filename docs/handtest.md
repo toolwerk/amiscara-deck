@@ -2,7 +2,7 @@
 
 Für Stufe 1 (M3-09) und die Nachträge aus M5 und M6. Abarbeiten mit echten Sitzungen, ein Haken je Zeile.
 
-Stand 2026-11-25, Claude Code 2.1.331: Der skriptbare Teil ist gelaufen (`spikes/m1/e2e.py` für die Szenarien A bis D, `spikes/handtest/auto.py`), mit eigenem Datenordner und eigener Einstellungsdatei. Dazu der erste Durchgang von Hand an der installierten App (PRs 120 bis 123). Offen sind die Zeilen ohne Ergebnis und alles, was noch als "von Hand" vermerkt ist: weitere Terminals, tmux, Codex, zwei Rechner.
+Stand 2026-11-25, Claude Code 2.1.331: Der skriptbare Teil ist gelaufen (`spikes/m1/e2e.py` für die Szenarien A bis D, `spikes/handtest/auto.py`), mit eigenem Datenordner und eigener Einstellungsdatei. Dazu der erste Durchgang von Hand an der installierten App (PRs 120 bis 123). Offen sind die Zeilen ohne Ergebnis und alles, was noch als "von Hand" vermerkt ist: weitere Terminals, tmux, bei Codex C1, C2, C8 und C9, zwei Rechner. C3 bis C7 für Codex laufen per Skript (`spikes/m5/handtest-codex.py`, Codex CLI 0.171.0).
 
 App bauen:
 
@@ -69,14 +69,14 @@ Je Terminal einmal: Terminal (macOS), iTerm2, Ghostty, Terminal im Editor (VS Co
 | Nr | Schritt | Erwartet | Ergebnis |
 |---|---|---|---|
 | C1 | Einstellungen, Codex, "Einbauen" | Hinweis, die Hooks in Codex über `/hooks` zu bestätigen | |
-| C2 | In Codex `/hooks` bestätigen, eine Sitzung starten | Agent erscheint mit "Codex · nur lesend" | |
-| C3 | Freigaben für Codex aus: Codex fragt eine Freigabe an | der Dialog steht sofort im Terminal, Deck zeigt "wartet im Terminal" und entscheidet nie | |
-| C5 | Freigaben für Codex an, "Automatik", eine andere App ist vorn | Mitteilung; Erlauben lässt den Befehl laufen, kein Dialog in Codex | |
-| C6 | Wie C5, aber vor dem Antworten ins Terminal wechseln | innerhalb weniger Sekunden (nächste Anwesenheitsmeldung) erscheint der Dialog in Codex | |
-| C7 | Freigaben an, Sie sitzen am Terminal | der Dialog steht sofort da, keine Wartezeit | |
+| C2 | In Codex `/hooks` bestätigen, eine Sitzung starten und einen Auftrag geben | Agent erscheint mit dem ersten Auftrag, mit "Codex · nur lesend" (Codex meldet den Start erst dann) | |
+| C3 | Freigaben für Codex aus: Codex fragt eine Freigabe an | der Dialog steht sofort im Terminal, Deck zeigt "wartet im Terminal" und entscheidet nie | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Dialog sofort, nie gehalten |
+| C5 | Freigaben für Codex an, "Automatik", eine andere App ist vorn | Mitteilung; Erlauben lässt den Befehl laufen, kein Dialog in Codex | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): gehalten, Mitteilung, Erlauben über das Protokoll. Knopf der Mitteilung von Hand |
+| C6 | Wie C5, aber vor dem Antworten ins Terminal wechseln | innerhalb weniger Sekunden (nächste Anwesenheitsmeldung) erscheint der Dialog in Codex | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Dialog 0,7 s nach der Anwesenheitsmeldung |
+| C7 | Freigaben an, Sie sitzen am Terminal | der Dialog steht sofort da, keine Wartezeit | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): nicht gehalten, Dialog sofort |
 | C8 | Nach einem Ein- und Ausbau mit fremden Einträgen dahinter | die fremden Hooks laufen ohne neue Bestätigung in /hooks | |
 | C9 | `timeout` oder Befehl eines Eintrags ändern | Codex verlangt neues Vertrauen | |
-| C4 | Ereignisse aufzeichnen (`amiscara-deck watch`) und mit dem Datenmodell vergleichen | Projekt, Auftrag und Status stimmen; abweichende Felder als Fehler eintragen (M3-07) | |
+| C4 | Ereignisse aufzeichnen (`amiscara-deck watch`) und mit dem Datenmodell vergleichen | Projekt, Auftrag und Status stimmen; abweichende Felder als Fehler eintragen (M3-07) | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Projekt, Zweig, Auftrag, Tätigkeit und Status stimmen, auch nach `/exit` und `resume`. Abweichung behoben: `apply_patch` erscheint als "bearbeitet" mit Pfad (`docs/befunde-m5.md`) |
 
 ## Bekannte Grenzen
 

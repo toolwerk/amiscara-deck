@@ -1,4 +1,4 @@
-# Befunde aus M5-01: PermissionRequest in Codex
+# Befunde aus M5-01: PermissionRequest in Codex, und die Ereignisse (M3-07)
 
 Stand 2026-11-25, Codex CLI 0.171.0, macOS. Skripte in `spikes/m5/`. Eigener `CODEX_HOME` im Wegwerf-Ordner, nur die Anmeldedatei wurde kopiert und danach gelöscht. `~/.codex` blieb unberührt. Gestartet mit `-a on-request -s read-only --dangerously-bypass-hook-trust`: Das Vertrauen der Hooks ist damit nicht geprüft (siehe unten).
 
@@ -35,7 +35,34 @@ Codex speichert das Vertrauen in `config.toml` unter `[hooks.state."<Datei>:<ere
 - Jede Änderung eines Eintrags (auch des `timeout`) verlangt ein neues "Vertrauen" über `/hooks`. Der Eintrag soll also stabil bleiben: `timeout` für PermissionRequest gleich auf die größte Wartezeit setzen.
 - Der Schlüssel hängt an der **Position**. Entfernt Deck eine Gruppe, die vor anderen steht, rücken fremde Einträge nach und verlieren ihr Vertrauen. Deck lässt dann eine leere Gruppe `{"hooks": []}` stehen (Codex nimmt sie an, geprüft).
 
+## Ereignisse einer ganzen Sitzung (M3-07)
+
+Stand 2026-11-25, Codex CLI 0.171.0. Aufgezeichnet mit `spikes/m5/record-events.py`, bereinigt mit `export-testdata.py` nach `testdata/hooks-codex/` (gleichnamige Ereignisse mit Nummer, `PostToolUse-Bash-2`; `replay.rs` spielt sie in dieser Folge ab). Geprüft gegen Deck mit `handtest-codex.py c4`. Ablauf: eine Sitzung mit `workspace-write` liest eine Datei, ändert eine Zeile, führt einen Befehl außerhalb des Arbeitsordners aus (Dialog, im Terminal erlaubt) und endet mit `/exit`. Danach `codex resume --last` mit einem Auftrag.
+
+Felder, die alle Ereignisse tragen: `session_id`, `transcript_path` (unter `$CODEX_HOME/sessions/`), `cwd`, `hook_event_name`. Alle außer SessionEnd tragen dazu `model` und `permission_mode` (auch bei `workspace-write` immer `default`). Ab dem ersten Auftrag kommt `turn_id` dazu.
+
+| Ereignis | Eigene Felder | In Deck |
+|---|---|---|
+| SessionStart | `source`: `startup` oder `resume` | Idle, Auftrag leer |
+| UserPromptSubmit | `prompt` | Working, Auftrag |
+| PreToolUse | `tool_name`, `tool_input`, `tool_use_id` | Tätigkeit |
+| PostToolUse | wie PreToolUse und `tool_response` (Text) | Working, offene Anfrage weg |
+| PermissionRequest | `tool_name`, `tool_input` (`command`, `description`) | Blocked |
+| Stop | `stop_hook_active`, `last_assistant_message` | Done |
+| SessionEnd | `reason` (`other` bei `/exit`) | Exited |
+
+Was dabei auffiel:
+
+- **SessionStart kommt erst mit dem ersten Auftrag**, unmittelbar vor UserPromptSubmit, nicht beim Start des Programms. Eine offene, noch unbenutzte Codex-Sitzung zeigt Deck also nicht.
+- **Werkzeuge:** Befehle heißen `Bash` (`tool_input.command`). Dateien ändert Codex mit `apply_patch`; der Patch steht in `tool_input.command`, einen Pfad als eigenes Feld gibt es nicht. **Abweichung, behoben:** Deck zeigte dafür das Werkzeug `apply_patch`. Jetzt "bearbeitet" mit dem ersten Pfad aus `*** Add|Update|Delete File:`.
+- Lesen läuft über `Bash` (`cat`), ein eigenes Lese-Werkzeug gibt es nicht. Deck zeigt dann den Befehl.
+- **Ende:** `/exit` schickt SessionEnd, Deck zeigt "beendet". Die beendete Sitzung bleibt nicht als laufend stehen.
+- **Fortsetzen:** `codex resume --last` behält die `session_id`. Deck führt sie als denselben Agenten weiter: Idle ohne Auftrag, mit dem nächsten Auftrag wieder Working. Die Zahl der Züge beginnt neu.
+- Ein Befehl, den die Sandbox scheitern lässt, kommt als PostToolUse an, die Fehlermeldung steht in `tool_response`. Ob Codex zusätzlich PostToolUseFailure schickt, ist offen: Das Ereignis war nicht eingetragen. Codex fragt danach mit PreToolUse und PermissionRequest neu.
+- Der Zweig kommt wie bei Claude Code aus `.git/HEAD` des Arbeitsordners, nicht aus dem Ereignis.
+
 ## Offen
 
 - Das Vertrauen selbst (Bestätigung über `/hooks`, Verhalten nach einer Änderung) bleibt ein Handtest.
 - Ob die `deny`-Meldung das Modell erreicht, ist nicht geprüft.
+- Eine Freigabe-Anfrage für `apply_patch` ist nicht aufgezeichnet: Unter `workspace-write` änderte Codex die Datei ohne Rückfrage. Wie die Karte einer solchen Anfrage aussieht, ist ungeprüft.

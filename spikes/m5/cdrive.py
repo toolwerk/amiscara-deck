@@ -9,7 +9,7 @@ WORK = os.path.join(OUT, "work")
 ANSI = re.compile(r"\x1b\[[0-9;?<>=]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(\x07|\x1b\\)|\x1b[()][A-Z0-9]|\x1b[=>78]|\r")
 
 class Codex:
-    def __init__(self, name="probe", args=()):
+    def __init__(self, name="probe", args=(), sandbox="read-only"):
         os.makedirs(WORK, exist_ok=True)
         self.buf, self.mark_pos = "", 0
         self.log = open(os.path.join(OUT, f"tui-{name}.log"), "wb")
@@ -18,7 +18,7 @@ class Codex:
         self.pid, self.fd = pty.fork()
         if self.pid == 0:
             os.chdir(WORK)
-            os.execvpe("codex", ["codex", "-a", "on-request", "-s", "read-only", "--dangerously-bypass-hook-trust", *args], env)
+            os.execvpe("codex", ["codex", "-a", "on-request", "-s", sandbox, "--dangerously-bypass-hook-trust", *args], env)
         fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack("HHHH", 45, 140, 0, 0))
 
     def pump(self, secs=0.3):

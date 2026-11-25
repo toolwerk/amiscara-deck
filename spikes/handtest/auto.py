@@ -14,13 +14,18 @@ sys.path.insert(0, os.path.join(ROOT, "spikes", "m1"))
 import e2e  # noqa: E402
 from e2e import Env, ask, check, dialog_shown  # noqa: E402
 
+def protocol():
+    """The protocol number of this source tree, so the UI matches its daemon."""
+    src = open(os.path.join(ROOT, "crates", "deck-proto", "src", "lib.rs")).read()
+    return int(re.search(r"PROTOCOL_VERSION: u32 = (\d+);", src).group(1))
+
 class Ui:
     def __init__(self, env):
         self.s = socket.socket(socket.AF_UNIX)
         self.s.connect(os.path.join(env.data, "deckd.sock"))
         self.buf = b""
         self.agents, self.seen = {}, []
-        self.send({"type": "hello", "protocol": 1, "name": "handtest"})
+        self.send({"type": "hello", "protocol": protocol(), "name": "handtest"})
         w = self.read(5)
         assert w and w["type"] == "welcome", w
         self.welcome = w

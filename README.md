@@ -210,7 +210,7 @@ Kennt Deck ein Modell noch nicht, rechnet es mit 200.000 Tokens. Die richtige Gr
 
 ## Codex
 
-Deck zeigt Codex-Sitzungen an. Das ist weniger erprobt als Claude Code.
+Deck zeigt Codex-Sitzungen an. Geprüft ist Codex CLI 0.171.0: Projekt, Zweig, Auftrag, Tätigkeit und Status stimmen, auch nach dem Beenden und Fortsetzen einer Sitzung. Codex meldet eine Sitzung erst mit dem ersten Auftrag, vorher zeigt Deck sie nicht.
 
 1. In den Einstellungen unter "Codex" auf "Einbauen". Der Abschnitt erscheint, wenn Codex installiert ist.
 2. In Codex einmal `/hooks` aufrufen und die Einträge bestätigen.
