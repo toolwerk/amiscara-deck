@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 
 use deck_daemon::{Config, Daemon};
 use deck_proto::PROTOCOL_VERSION;
-use deck_proto::agent::{Agent, RequestState, Status, Tool};
+use deck_proto::agent::{Agent, HistoryEvent, RequestState, Status, Tool};
 use deck_proto::message::{
     AnswerVia, ApprovalMode, DaemonMessage, Decision, HookEnv, HookMessage, HookReply, Settings,
     UiMessage, decode_line, encode_line,
@@ -658,7 +658,7 @@ async fn every_answer_is_logged_privately_and_clearing_empties_the_log() {
         .await
         .expect("answered");
     let a = ui.card(RequestState::Answered).await;
-    assert!(a.history.iter().any(|h| h.text == "Freigabe abgelehnt"));
+    assert!(a.history.iter().any(|h| h.event == HistoryEvent::Denied));
 
     let text = std::fs::read_to_string(&log).expect("log");
     let line: Value = serde_json::from_str(text.lines().next().expect("line")).expect("json");

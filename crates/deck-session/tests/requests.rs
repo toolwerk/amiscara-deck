@@ -591,7 +591,12 @@ fn a_multi_edit_shows_every_change() {
         "MultiEdit",
     );
     assert!(truncated);
-    for t in ["1 alt", "1 neu", "2 alt", "2 neu"] {
+    for t in [
+        "--- 1 old ---",
+        "--- 1 new ---",
+        "--- 2 old ---",
+        "--- 2 new ---",
+    ] {
         assert!(full.contains(t), "{t} in {full}");
     }
 }
@@ -727,10 +732,10 @@ fn replace_all_of_a_single_edit_in_a_multi_edit_is_shown() {
         "MultiEdit",
     );
     assert!(
-        full.contains("2 Optionen") && full.contains("replace_all=true"),
+        full.contains("--- 2 options ---") && full.contains("replace_all=true"),
         "{full}"
     );
-    assert!(!full.contains("1 Optionen"), "{full}");
+    assert!(!full.contains("1 options"), "{full}");
 }
 
 #[test]
@@ -1294,20 +1299,28 @@ fn rendered(tool: &str, input: Value) -> (bool, String) {
         true,
     );
     let r = st.get(S).and_then(|a| a.request.clone()).expect("request");
-    (r.truncated, r.full)
+    // The extra fields come after the text, as the UIs show them.
+    let mut full = r.full;
+    for e in &r.extra {
+        full.push('\n');
+        full.push_str(e);
+    }
+    (r.truncated, full)
 }
 
 #[test]
 fn a_field_the_card_does_not_name_is_shown_and_needs_expanding() {
-    let (truncated, full) = rendered(
-        "Bash",
-        json!({"command": "ls", "dangerouslyDisableSandbox": true}),
+    let mut st = Store::new("work");
+    ask(
+        &mut st,
+        json!({"tool_name": "Bash", "tool_input": {"command": "ls", "dangerouslyDisableSandbox": true}}),
+        1000,
+        true,
     );
-    assert!(truncated);
-    assert_eq!(
-        full,
-        "ls\n--- Weitere Angaben ---\ndangerouslyDisableSandbox=true"
-    );
+    let r = st.get(S).and_then(|a| a.request.clone()).expect("request");
+    assert!(r.truncated, "a single line, shortened for its extra field");
+    assert_eq!(r.full, "ls", "the UI adds the heading in its own language");
+    assert_eq!(r.extra, ["dangerouslyDisableSandbox=true"]);
 
     let (truncated, full) = rendered("Bash", json!({"command": "ls", "run_in_background": true}));
     assert!(truncated);

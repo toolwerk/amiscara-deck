@@ -1,7 +1,8 @@
 use std::collections::BTreeMap;
 
 use deck_proto::agent::{
-    Agent, ContextUsage, HistoryEntry, Location, Request, RequestState, Status, Tool,
+    Activity, Agent, ContextUsage, HistoryEntry, HistoryEvent, Location, Request, RequestState,
+    Status, Tool,
 };
 use deck_proto::hook::{HookEvent, HookInput, PermissionAnswer};
 use deck_proto::message::Decision;
@@ -92,7 +93,8 @@ pub struct Answered {
     pub agent_id: String,
     pub project: Option<String>,
     pub tool_name: String,
-    /// The whole text the user decided on (escaped like on the card).
+    /// The whole text the user decided on (escaped like on the card), with
+    /// the extra fields after it.
     pub full: String,
     pub kind: AnswerKind,
     /// The rules of "always allow", as shown on the card.
@@ -169,11 +171,11 @@ fn clean_prompt(raw: &str) -> String {
 }
 
 /// Add a line to the history: consecutive duplicates collapse, old lines go.
-fn push_history(h: &mut Vec<HistoryEntry>, at_ms: u64, text: String, retention_days: u32) {
-    if h.last().is_some_and(|l| l.text == text) {
+fn push_history(h: &mut Vec<HistoryEntry>, at_ms: u64, event: HistoryEvent, retention_days: u32) {
+    if h.last().is_some_and(|l| l.event == event) {
         return;
     }
-    h.push(HistoryEntry { at_ms, text });
+    h.push(HistoryEntry { at_ms, event });
     prune_history(h, at_ms, retention_days);
 }
 
@@ -450,6 +452,7 @@ impl Store {
                     summary: shown.summary,
                     truncated: shown.truncated,
                     full: shown.full,
+                    extra: shown.extra,
                     always_allow: always_allow(&req.permission_suggestions),
                     state: if held {
                         RequestState::Held
@@ -498,7 +501,7 @@ impl Store {
                 a.subagents = a.subagents.saturating_sub(1);
             }
             HookEvent::PreCompact(_) => {
-                a.activity = Some("komprimiert".into());
+                a.activity = Some(Activity::Compacting);
                 status = Status::Working;
             }
             HookEvent::PostCompact(_) => {
@@ -533,18 +536,18 @@ impl Store {
         }
         self.clock_ms = inc.now_ms;
         let note = match &inc.input.event {
-            HookEvent::SessionStart(_) => Some("Sitzung gestartet".to_owned()),
-            HookEvent::UserPromptSubmit(_) => Some("Auftrag erhalten".to_owned()),
-            HookEvent::PreToolUse(_) => a.activity.clone(),
-            HookEvent::PermissionRequest(_) => Some("Freigabe angefragt".to_owned()),
-            HookEvent::PreCompact(_) => Some("Kontext wird komprimiert".to_owned()),
-            HookEvent::Stop(_) if !from_subagent => Some("Zug beendet".to_owned()),
-            HookEvent::StopFailure(_) => Some("Zug mit Fehler beendet".to_owned()),
-            HookEvent::SessionEnd(_) => Some("Sitzung beendet".to_owned()),
+            HookEvent::SessionStart(_) => Some(HistoryEvent::SessionStarted),
+            HookEvent::UserPromptSubmit(_) => Some(HistoryEvent::PromptReceived),
+            HookEvent::PreToolUse(_) => a.activity.clone().map(HistoryEvent::Activity),
+            HookEvent::PermissionRequest(_) => Some(HistoryEvent::PermissionRequested),
+            HookEvent::PreCompact(_) => Some(HistoryEvent::Compacting),
+            HookEvent::Stop(_) if !from_subagent => Some(HistoryEvent::TurnEnded),
+            HookEvent::StopFailure(_) => Some(HistoryEvent::TurnFailed),
+            HookEvent::SessionEnd(_) => Some(HistoryEvent::SessionEnded),
             _ => None,
         };
-        if let Some(text) = note {
-            push_history(&mut a.history, inc.now_ms, text, self.retention_days);
+        if let Some(event) = note {
+            push_history(&mut a.history, inc.now_ms, event, self.retention_days);
         }
 
         let mut changes = Vec::new();
@@ -651,22 +654,32 @@ impl Store {
         };
         req.state = RequestState::Answered;
         req.deadline_ms = None;
-        let (tool_name, full) = (req.tool_name.clone(), req.full.clone());
+        let tool_name = req.tool_name.clone();
+        // The log keeps everything that was decided on, the extra fields too.
+        let full = if req.extra.is_empty() {
+            req.full.clone()
+        } else {
+            format!(
+                "{}\n--- further details ---\n{}",
+                req.full,
+                req.extra.join("\n")
+            )
+        };
         // The agent goes on. Its next event may be a while away (a long
         // command), and until then it must not look like it still waits.
         if agent.status == Status::Blocked {
             agent.status = Status::Working;
             agent.status_since_ms = self.clock_ms;
         }
-        let text = match kind {
-            AnswerKind::Deny => "Freigabe abgelehnt",
-            AnswerKind::Answer => "Frage beantwortet",
-            _ => "Freigabe erlaubt",
+        let event = match kind {
+            AnswerKind::Deny => HistoryEvent::Denied,
+            AnswerKind::Answer => HistoryEvent::Answered,
+            _ => HistoryEvent::Allowed,
         };
         push_history(
             &mut agent.history,
             self.clock_ms,
-            text.to_owned(),
+            event,
             self.retention_days,
         );
         Ok(Answered {

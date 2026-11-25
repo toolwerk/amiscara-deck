@@ -1,7 +1,7 @@
 //! Replays the real hook inputs recorded in M0 (`testdata/hooks`) through the
 //! state machine, in order, repeated, shuffled and interleaved.
 
-use deck_proto::agent::{Location, Status, Tool};
+use deck_proto::agent::{Activity, Location, Status, Tool};
 use deck_proto::hook::HookInput;
 use deck_proto::message::Decision;
 use deck_session::{Change, Incoming, Store};
@@ -69,14 +69,10 @@ fn a_whole_session_with_an_approval_in_deck() {
     r.feed("UserPromptSubmit", S);
     assert_eq!(r.status(S), Status::Working);
     r.feed("PreToolUse-Bash", S);
-    assert!(
-        r.store
-            .get(S)
-            .expect("agent")
-            .activity
-            .as_deref()
-            .is_some_and(|a| a.starts_with("führt aus: "))
-    );
+    assert!(matches!(
+        r.store.get(S).expect("agent").activity,
+        Some(Activity::Run { command: Some(_) })
+    ));
 
     r.feed("PermissionRequest-Bash-addRules", S);
     let a = r.store.get(S).expect("agent");
@@ -153,8 +149,8 @@ fn a_subagent_run_counts_and_does_not_end_the_main_agent() {
     r.feed("UserPromptSubmit", S);
     r.feed("PreToolUse-Agent", S);
     assert_eq!(
-        r.store.get(S).expect("agent").activity.as_deref(),
-        Some("startet einen Subagenten")
+        r.store.get(S).expect("agent").activity,
+        Some(Activity::Subagent)
     );
     r.feed("SubagentStart", S);
     assert_eq!(r.store.get(S).expect("agent").subagents, 1);

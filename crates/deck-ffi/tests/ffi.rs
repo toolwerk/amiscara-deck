@@ -6,9 +6,10 @@ use std::time::{Duration, Instant};
 
 use deck_daemon::{Config, Daemon};
 use deck_ffi::{
-    AgentStatus, AgentView, AnswerViaKind, ApprovalModeKind, DeckConnection, DeckError,
-    DeckObserver, NotifyKindView, PresenceReport, RemoteConfig, RequestStateKind, SettingsView,
-    default_socket_path, hooks_status, install_hooks, protocol_version, uninstall_hooks,
+    ActivityView, AgentStatus, AgentView, AnswerViaKind, ApprovalModeKind, DeckConnection,
+    DeckError, DeckObserver, NotifyKindView, PresenceReport, RemoteConfig, RequestStateKind,
+    SettingsView, default_socket_path, hooks_status, install_hooks, protocol_version,
+    uninstall_hooks,
 };
 use deck_proto::PROTOCOL_VERSION;
 use deck_proto::agent::Tool;
@@ -187,11 +188,10 @@ async fn connect_gives_the_full_state_first_and_then_every_change() {
     let a = rec.agent(|a| a.id == "s1");
     assert_eq!(a.status, AgentStatus::Working);
     assert_eq!(a.host, "ffihost");
-    assert!(
-        a.activity
-            .as_deref()
-            .is_some_and(|t| t.starts_with("führt aus"))
-    );
+    assert!(matches!(
+        a.activity,
+        Some(ActivityView::Run { command: Some(_) })
+    ));
     d.stop().await;
 }
 

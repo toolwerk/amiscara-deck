@@ -1,4 +1,4 @@
-use deck_proto::agent::{Location, Status, Tool};
+use deck_proto::agent::{Activity, HistoryEvent, Location, Status, Tool};
 use deck_proto::hook::HookInput;
 use deck_session::{Change, EXITED_VISIBLE_MS, Incoming, Store};
 use serde_json::{Value, json};
@@ -65,8 +65,11 @@ fn a_session_walks_through_its_states() {
         3000,
     );
     assert_eq!(
-        st.get(S).expect("agent").activity.as_deref(),
-        Some("bearbeitet src/import.rs")
+        st.get(S).expect("agent").activity,
+        Some(Activity::Edit {
+            path: Some("src/import.rs".into())
+        }),
+        "a path inside the working folder is relative"
     );
 
     send(
@@ -153,8 +156,10 @@ fn an_event_for_an_unknown_session_creates_the_agent() {
     assert_eq!(changes.len(), 1);
     assert_eq!(status(&st), Status::Working);
     assert_eq!(
-        st.get(S).expect("agent").activity.as_deref(),
-        Some("führt aus: cargo test")
+        st.get(S).expect("agent").activity,
+        Some(Activity::Run {
+            command: Some("cargo test".into())
+        })
     );
 }
 
@@ -230,8 +235,8 @@ fn compaction_shows_as_activity() {
     let mut st = Store::new("work");
     send(&mut st, "PreCompact", json!({}), 1000);
     assert_eq!(
-        st.get(S).expect("agent").activity.as_deref(),
-        Some("komprimiert")
+        st.get(S).expect("agent").activity,
+        Some(Activity::Compacting)
     );
     send(&mut st, "PostCompact", json!({}), 2000);
     assert_eq!(st.get(S).expect("agent").activity, None);
@@ -303,13 +308,11 @@ fn long_commands_are_shortened_to_one_line() {
         json!({"tool_name": "Bash", "tool_input": {"command": long}}),
         1000,
     );
-    let act = st
-        .get(S)
-        .expect("agent")
-        .activity
-        .clone()
-        .expect("activity");
-    assert!(act.chars().count() <= 95 && !act.contains('\n'), "{act}");
+    let Some(Activity::Run { command: Some(act) }) = st.get(S).expect("agent").activity.clone()
+    else {
+        panic!("a command");
+    };
+    assert!(act.chars().count() <= 80 && !act.contains('\n'), "{act}");
     assert!(act.ends_with('…'));
 }
 
@@ -327,16 +330,27 @@ fn the_history_records_the_steps_and_collapses_repeats() {
         );
     }
     send(&mut st, "Stop", json!({}), 4000);
-    let texts: Vec<String> = st
+    let events: Vec<HistoryEvent> = st
         .get(S)
         .expect("agent")
         .history
         .iter()
-        .map(|e| e.text.clone())
+        .map(|e| e.event.clone())
         .collect();
-    assert_eq!(texts.first().map(String::as_str), Some("Sitzung gestartet"));
-    assert_eq!(texts.last().map(String::as_str), Some("Zug beendet"));
-    assert_eq!(texts.len(), 5, "{texts:?}");
+    assert_eq!(
+        events,
+        [
+            HistoryEvent::SessionStarted,
+            HistoryEvent::PromptReceived,
+            HistoryEvent::Activity(Activity::Read {
+                path: Some("a".into())
+            }),
+            HistoryEvent::Activity(Activity::Read {
+                path: Some("b".into())
+            }),
+            HistoryEvent::TurnEnded,
+        ]
+    );
 }
 
 #[test]

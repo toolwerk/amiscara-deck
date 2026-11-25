@@ -9,7 +9,7 @@ pub mod text;
 
 /// Version of the protocol between hook program, daemon and UIs.
 /// Raised on every incompatible change; the app restarts a daemon that does not match.
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 2;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

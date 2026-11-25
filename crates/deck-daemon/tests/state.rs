@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use deck_daemon::{Config, Daemon};
 use deck_proto::PROTOCOL_VERSION;
-use deck_proto::agent::{RequestState, Status, Tool};
+use deck_proto::agent::{Activity, RequestState, Status, Tool};
 use deck_proto::message::{
     ApprovalMode, DaemonMessage, HookEnv, HookMessage, Settings, UiMessage, decode_line,
     encode_line,
@@ -139,12 +139,10 @@ async fn agents_come_back_after_a_restart() {
     assert_eq!(agents[0].id, "s1");
     assert_eq!(agents[0].last_prompt.as_deref(), Some("Fix the import"));
     assert_eq!(agents[0].status, Status::Working);
-    assert!(
-        agents[0]
-            .activity
-            .as_deref()
-            .is_some_and(|t| t.starts_with("führt aus"))
-    );
+    assert!(matches!(
+        agents[0].activity,
+        Some(Activity::Run { command: Some(_) })
+    ));
     b.stop().await;
 }
 
@@ -330,6 +328,51 @@ async fn a_broken_or_foreign_state_file_means_an_empty_start_not_a_crash() {
         assert_eq!(b.welcome().await.2.len(), 1, "{name}");
         b.stop().await;
     }
+}
+
+/// A file of the first version holds activity and history as German
+/// sentences. Its settings stay, its agents come back with their next event.
+#[tokio::test]
+async fn a_state_of_version_1_keeps_its_settings_and_starts_without_agents() {
+    let d = dir();
+    let data = d.path().join("deck");
+    std::fs::create_dir_all(&data).expect("mkdir");
+    let old = json!({
+        "version": 1,
+        "settings": {"mode": "deck", "wait_secs": 300, "retention_days": 30, "codex_approvals": true},
+        "next_request": 7,
+        "agents": [{
+            "id": "s1", "host": "work", "tool": "claude", "cwd": "/w/app", "project": "app",
+            "branch": null, "title": null, "status": "working", "paused": false,
+            "status_since_ms": 1, "activity": "führt aus: ls", "last_prompt": "x",
+            "context": null, "turns": 1, "subagents": 0, "location": {"kind": "unknown"},
+            "request": null, "history": [{"at_ms": 1, "text": "Auftrag erhalten"}]
+        }]
+    });
+    std::fs::write(data.join("state.json"), old.to_string()).expect("write");
+    let a = start_in(&data, "work").await;
+    let (_, settings, agents) = a.welcome().await;
+    assert!(agents.is_empty());
+    assert_eq!(settings.mode, ApprovalMode::Deck);
+    assert_eq!(
+        (
+            settings.wait_secs,
+            settings.retention_days,
+            settings.codex_approvals
+        ),
+        (300, 30, true)
+    );
+    a.event("UserPromptSubmit", "s1", json!({})).await;
+    a.stop().await;
+    let saved: Value =
+        serde_json::from_str(&std::fs::read_to_string(data.join("state.json")).expect("read"))
+            .expect("json");
+    assert_eq!(saved["version"], 2, "written in the new form");
+    let b = start_in(&data, "work").await;
+    let (_, settings, agents) = b.welcome().await;
+    assert_eq!(agents.len(), 1);
+    assert_eq!(settings.wait_secs, 300);
+    b.stop().await;
 }
 
 #[tokio::test]
