@@ -1,8 +1,14 @@
 name: CI
 
-# Runs on the hosted runners of GitHub (free for public repositories). Pull
-# requests use `pull_request`, never `pull_request_target`: code from a fork
-# runs without secrets and with a read-only token. No job uses a secret.
+# Pushes to main and pull requests from branches of this repository run on the
+# runners of the organization (ci-lin-01, ci-mac-01). Pull requests from forks
+# run on the hosted runners of GitHub.
+#
+# This is only a default: a fork can change this file. What protects the own
+# machines is the setting "require approval for all external contributors".
+# Before approving a run from outside, read every change under .github/.
+# Pull requests use `pull_request`, never `pull_request_target`. No job uses
+# a secret.
 on:
   pull_request:
   push:
@@ -19,7 +25,7 @@ concurrency:
 jobs:
   lint:
     name: Format and clippy
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","Linux"]') || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,8 +43,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        include:
+          - os: Linux
+            hosted: ubuntu-latest
+          - os: macOS
+            hosted: macos-latest
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(format('["self-hosted","{0}"]', matrix.os)) || matrix.hosted }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,7 +61,7 @@ jobs:
   app:
     name: Mac app
     # macOS 27 SDK.
-    runs-on: xcode-27
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","macOS"]') || 'xcode-27' }}
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
