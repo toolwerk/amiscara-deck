@@ -23,7 +23,7 @@ Die Hinweise stehen zweimal da: Deutsch in `CHANGELOG.md`, Englisch in `CHANGELO
 python3 scripts/release-notes.py check
 ```
 
-`check` vergleicht "Unreleased" und alle Versionen nach 0.1.0: gleiche Überschriften, gleiche Abschnitte und je Abschnitt gleich viele Einträge. Die CI ruft das bei jedem Pull Request auf. Den Wortlaut prüft es nicht.
+`check` vergleicht "Unreleased" und alle Versionen nach 0.1.0: gleiche Überschriften, gleiche Abschnitte und je Abschnitt gleich viele Einträge. Die CI ruft das bei jedem Pull Request auf. Reihenfolge und Wortlaut prüft es nicht.
 
 `scripts/release.sh` bricht ab, bevor es baut, wenn der Version eine der beiden Fassungen fehlt.
 
@@ -64,3 +64,5 @@ scripts/release.sh --skip-notarize
 ```
 
 Das Skript bricht ab, wenn eines der mitgelieferten Programme nicht mit Developer ID, "hardened runtime" und Zeitstempel signiert ist.
+
+Auch der Probelauf braucht die Hinweise in beiden Sprachen. Solange im Projekt noch 0.1.0 steht, bricht er deshalb ab, ebenso `--install`: Diese Version gibt es nur auf Deutsch. Mit der nächsten Version (`cut` und `MARKETING_VERSION`) läuft er wieder.

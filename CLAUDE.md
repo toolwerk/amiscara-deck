@@ -8,7 +8,7 @@ Persönliche, nicht eingecheckte Ergänzungen gehören in `CLAUDE.local.md` (ste
 
 ## Arbeitsweise
 
-- Ein Issue je Aufgabe, Branch `feature/<n>-slug` oder `fix/<n>-slug`, Squash-Merge, `Closes #<n>` im PR, je Merge ein Eintrag in `CHANGELOG.md` und derselbe auf Englisch in `CHANGELOG.en.md` (gleicher Abschnitt, gleiche Reihenfolge, geprüft mit `python3 scripts/release-notes.py check`).
+- Ein Issue je Aufgabe, Branch `feature/<n>-slug` oder `fix/<n>-slug`, Squash-Merge, `Closes #<n>` im PR, je Merge ein Eintrag in `CHANGELOG.md` und derselbe auf Englisch in `CHANGELOG.en.md` (gleicher Abschnitt, gleiche Reihenfolge; `python3 scripts/release-notes.py check` prüft Abschnitte und Anzahl).
 - Commit-Messages auf Englisch, Conventional Commits.
 - Kein Code von anderen Projekten übernehmen, wenn keine Lizenz dabeisteht.
 - Texte für Menschen: README und `po/de.po` Deutsch, kein Em-Dash, kurze Sätze. Texte der Oberfläche und der Befehlszeile stehen englisch im Code (`L10n.t` in Swift, `t`/`t_with`/`plural` aus `deck-i18n` in Rust) und werden in `po/de.po` übersetzt. Nach einer Textänderung `python3 scripts/i18n.py extract` und `check`. Das README gibt es zusätzlich auf Englisch (`README.en.md`), beide Fassungen werden zusammen geändert. Fremde Produkte werden nicht als Vorbild genannt.
