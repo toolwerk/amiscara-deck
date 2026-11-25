@@ -62,3 +62,44 @@ extension Color {
         })
     }
 }
+
+extension EnvironmentValues {
+    /// The share of the normal text size (`TextSize.scale`) for everything below.
+    @Entry var deckScale: CGFloat = 1.0
+}
+
+/// A system font in the size of Deck: the normal size times the chosen share.
+struct DeckFont: ViewModifier {
+    let size: CGFloat
+    var weight: Font.Weight?
+    var design: Font.Design?
+    @Environment(\.deckScale) private var scale
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: size * scale, weight: weight, design: design))
+    }
+}
+
+/// Sets the text size of the user for a window or panel, with a base font for
+/// the plain labels of forms. System buttons and switches ignore a font: they
+/// get a larger control size from "Large" on.
+struct DeckTextSize: ViewModifier {
+    let model: DeckModel
+
+    func body(content: Content) -> some View {
+        content
+            .deckFont(13)
+            .controlSize(model.textSize.scale > 1 ? .large : .regular)
+            .environment(\.deckScale, model.textSize.scale)
+    }
+}
+
+extension View {
+    func deckFont(_ size: CGFloat, weight: Font.Weight? = nil, design: Font.Design? = nil) -> some View {
+        modifier(DeckFont(size: size, weight: weight, design: design))
+    }
+
+    func deckTextSize(_ model: DeckModel) -> some View {
+        modifier(DeckTextSize(model: model))
+    }
+}

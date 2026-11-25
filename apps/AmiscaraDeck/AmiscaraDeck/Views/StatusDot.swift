@@ -7,6 +7,7 @@ struct StatusDot: View {
     let status: AgentStatus
     /// Waiting in the terminal: dashed instead of filled.
     var inTerminal = false
+    @Environment(\.deckScale) private var scale
 
     var body: some View {
         let color = Theme.color(status)
@@ -23,14 +24,14 @@ struct StatusDot: View {
             case .done:
                 Circle().strokeBorder(color, lineWidth: 2)
             case .error:
-                Rectangle().fill(color).frame(width: 8, height: 8).rotationEffect(.degrees(45))
+                Rectangle().fill(color).frame(width: 8 * scale, height: 8 * scale).rotationEffect(.degrees(45))
             case .idle:
-                Capsule().fill(color).frame(width: 10, height: 3)
+                Capsule().fill(color).frame(width: 10 * scale, height: 3 * scale)
             case .exited:
                 Circle().strokeBorder(color.opacity(0.5), lineWidth: 1.5)
             }
         }
-        .frame(width: 10, height: 10)
+        .frame(width: 10 * scale, height: 10 * scale)
         .accessibilityHidden(true)
     }
 }

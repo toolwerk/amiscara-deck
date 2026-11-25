@@ -3,6 +3,7 @@ import SwiftUI
 /// "In Deck | Automatic | In Terminal", with a sentence about the chosen one.
 struct ModeSwitchView: View {
     let model: DeckModel
+    @Environment(\.deckScale) private var scale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -11,9 +12,9 @@ struct ModeSwitchView: View {
                     let selected = model.settings.mode == mode
                     Button(ApprovalWording.title(mode)) { model.setMode(mode) }
                         .buttonStyle(.plain)
-                        .font(.system(size: 13, weight: selected ? .semibold : .medium))
+                        .deckFont(13, weight: selected ? .semibold : .medium)
                         .foregroundStyle(selected ? Theme.text : Theme.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .frame(maxWidth: .infinity, minHeight: 44 * scale)
                         .background(selected ? Theme.line : Color.clear, in: RoundedRectangle(cornerRadius: 7))
                         .accessibilityAddTraits(selected ? .isSelected : [])
                 }
@@ -25,7 +26,7 @@ struct ModeSwitchView: View {
             .accessibilityLabel(L10n.t("Answer approvals"))
 
             Text(ApprovalWording.caption(model.settings.mode))
-                .font(.system(size: 11))
+                .deckFont(11)
                 .foregroundStyle(Theme.secondary)
                 .padding(.horizontal, 4)
         }
@@ -45,7 +46,7 @@ struct WaitTimeSlider: View {
                 Spacer()
                 Text(WaitTime.label(model.settings.waitSecs)).monospacedDigit()
             }
-            .font(.system(size: 14))
+            .deckFont(14)
             .foregroundStyle(Theme.text)
             Slider(
                 value: Binding(
@@ -63,10 +64,10 @@ struct WaitTimeSlider: View {
                 Spacer()
                 Text(WaitTime.label(WaitTime.range.upperBound))
             }
-            .font(.system(size: 11))
+            .deckFont(11)
             .foregroundStyle(Theme.secondary)
             Text(L10n.t("After that the request stays in the terminal."))
-                .font(.system(size: 12))
+                .deckFont(12)
                 .foregroundStyle(Theme.secondary)
         }
     }

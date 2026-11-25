@@ -20,11 +20,13 @@ final class PanelRenderTests: XCTestCase {
         return [a, b, c, d, e]
     }
 
-    func model(_ agents: [AgentView], link: DeckModel.Link = .connected) -> DeckModel {
+    func model(_ agents: [AgentView], link: DeckModel.Link = .connected, textSize: TextSize = .normal) -> DeckModel {
         let m = DeckModel(
             socketPath: "x", connector: { _, _ in throw DeckError.Failed(message: "no") },
             launcher: FakeLauncher(), initialLink: link
         )
+        m.textSizeStore = TextSizeStore(defaults: UserDefaults(suiteName: "deck.test.\(UUID().uuidString)") ?? .standard)
+        m.textSize = textSize
         m.apply(.state(host: "work", settings: SettingsView(mode: .auto, waitSecs: 120, retentionDays: 7), agents: agents))
         return m
     }
@@ -60,18 +62,45 @@ final class PanelRenderTests: XCTestCase {
         }
     }
 
-    /// Header, switch and footer take about 190 points, a card about 66.
+    /// Header, switch and footer take about 190 points, a card about 66, at the
+    /// normal text size. The cards grow with the text, the paddings do not.
     func testTheListShowsAtLeastThreeAgentsBeforeItScrolls() async {
         let many = (1...6).map { i in
             var a = makeAgent("p\(i)", project: "projekt-\(i)", status: .working)
             a.branch = "main"; a.activity = .subagent
             return a
         }
-        let three = await RenderSupport.hosted(PanelView(model: model(Array(many.prefix(3)))))
-        let six = await RenderSupport.hosted(PanelView(model: model(many)))
-        RenderSupport.save(six.image, named: "panel-six")
-        XCTAssertGreaterThan(three.size.height, 190 + 3 * 60, "three cards are fully visible")
-        XCTAssertGreaterThan(six.size.height, three.size.height + 100, "more agents make it taller")
+        for size in TextSize.allCases {
+            let s = size.scale
+            let small = model(Array(many.prefix(3)), textSize: size)
+            let large = model(many, textSize: size)
+            let three = await RenderSupport.hosted(PanelView(model: small).deckTextSize(small))
+            let six = await RenderSupport.hosted(PanelView(model: large).deckTextSize(large))
+            RenderSupport.save(six.image, named: "panel-six-\(size.rawValue)")
+            XCTAssertGreaterThan(three.size.height, 190 + 3 * 60 * s, "\(size): three cards are fully visible")
+            XCTAssertGreaterThan(six.size.height, three.size.height + 100, "\(size): more agents make it taller")
+            XCTAssertEqual(six.size.width, PanelView.width * s, accuracy: 1, "\(size): the panel grows with the text")
+            XCTAssertGreaterThan(PanelView.maxListHeight, 3 * PanelView.cardHeight(scale: s) + 24, "\(size): room for three before it scrolls")
+        }
+    }
+
+    /// The largest step: panel and cards are drawn, wider than normal, for a
+    /// look at the pictures (`DECK_RENDER_DIR`).
+    func testThePanelAndTheCardsDrawAtTheLargestSize() throws {
+        let m = model(Self.fixtureAgents(), textSize: .extraLarge)
+        let panel = try XCTUnwrap(RenderSupport.image(PanelView(model: m, staticNowMs: Self.now).deckTextSize(m)))
+        RenderSupport.save(panel, named: "panel-extra-large")
+        XCTAssertEqual(panel.size.width, 380 * 1.3, accuracy: 1)
+        let normal = model(Self.fixtureAgents())
+        let before = try XCTUnwrap(RenderSupport.image(PanelView(model: normal, staticNowMs: Self.now).deckTextSize(normal)))
+        XCTAssertGreaterThan(panel.size.height, before.size.height, "larger text makes the cards taller")
+        for (i, agent) in Self.fixtureAgents().enumerated() {
+            let card = try XCTUnwrap(RenderSupport.image(
+                AgentCardView(agent: agent, nowMs: Self.now, model: m).frame(width: 356 * 1.3).deckTextSize(m)
+            ))
+            RenderSupport.save(card, named: "card-extra-large-\(i)")
+            XCTAssertGreaterThan(card.size.height, 40)
+        }
     }
 
     /// The menu bar window may ask for the smallest size the panel accepts. A

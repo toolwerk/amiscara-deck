@@ -6,6 +6,7 @@ struct MainWindowView: View {
     let model: DeckModel
     @State private var filter: AgentFilter = .all
     @State private var selection: String?
+    @Environment(\.deckScale) private var scale
     /// A fixed "now" for pictures in tests (a timeline does not draw there).
     var staticNowMs: UInt64?
 
@@ -29,12 +30,12 @@ struct MainWindowView: View {
                 Divider().overlay(Theme.line)
                 if shown.isEmpty {
                     Text(all.isEmpty ? L10n.t("No agent yet. Start Claude Code in a terminal.") : L10n.t("No agent in this selection."))
-                        .font(.system(size: 13))
+                        .deckFont(13)
                         .foregroundStyle(Theme.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 12, alignment: .top)], spacing: 12) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300 * scale), spacing: 12, alignment: .top)], spacing: 12) {
                             ForEach(shown, id: \.id) { agent in
                                 AgentCardView(agent: agent, nowMs: now, model: model, showHost: model.showsHostNames)
                                     .overlay(
@@ -52,11 +53,12 @@ struct MainWindowView: View {
             if let selected {
                 Divider().overlay(Theme.line)
                 AgentDetailView(agent: selected, nowMs: now, model: model)
-                    .frame(width: 340)
+                    .frame(width: 340 * scale)
             }
         }
-        .frame(minWidth: 760, minHeight: 480)
+        .frame(minWidth: 760 * scale, minHeight: 480)
         .background(Theme.background)
+        .background(TextSizeKeys(model: model))
     }
 
     private func filterBar(_ all: [AgentView]) -> some View {
@@ -66,7 +68,7 @@ struct MainWindowView: View {
                     filter = f
                 } label: {
                     Text("\(f.title) \(f.count(in: all))")
-                        .font(.system(size: 12, weight: filter == f ? .semibold : .regular))
+                        .deckFont(12, weight: filter == f ? .semibold : .regular)
                         .foregroundStyle(filter == f ? Theme.onTeal : Theme.text)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
@@ -78,7 +80,7 @@ struct MainWindowView: View {
             Spacer()
             if let cost = model.costToday, cost > 0 {
                 Text(CostText.today(cost))
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.secondary)
                     .help(CostText.hint)
             }
@@ -93,6 +95,7 @@ struct AgentDetailView: View {
     let agent: AgentView
     let nowMs: UInt64
     let model: DeckModel
+    @Environment(\.deckScale) private var scale
 
     var body: some View {
         ScrollView {
@@ -100,15 +103,15 @@ struct AgentDetailView: View {
                 HStack(spacing: 8) {
                     StatusDot(status: agent.status, inTerminal: agent.request?.state == .passedThrough)
                     Text(agent.displayName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .deckFont(16, weight: .semibold)
                         .foregroundStyle(Theme.text)
                     Spacer()
                     Text(agent.statusLabel)
-                        .font(.system(size: 12))
+                        .deckFont(12)
                         .foregroundStyle(Theme.color(agent.status))
                 }
                 if let branch = agent.branch {
-                    Text(branch).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    Text(branch).deckFont(12).foregroundStyle(Theme.secondary)
                 }
                 if let request = agent.request {
                     RequestCardView(request: request, model: model)
@@ -116,7 +119,7 @@ struct AgentDetailView: View {
                 if let prompt = agent.lastPrompt, !prompt.isEmpty {
                     section(L10n.t("Last task")) {
                         Text(prompt)
-                            .font(.system(size: 13))
+                            .deckFont(13)
                             .foregroundStyle(Theme.text)
                             .lineLimit(8)
                             .textSelection(.enabled)
@@ -136,17 +139,17 @@ struct AgentDetailView: View {
                 section(L10n.t("History")) {
                     if agent.history.isEmpty {
                         Text(L10n.t("Nothing recorded yet."))
-                            .font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                            .deckFont(12).foregroundStyle(Theme.secondary)
                     } else {
                         VStack(alignment: .leading, spacing: 4) {
                             ForEach(Array(agent.history.reversed().enumerated()), id: \.offset) { _, entry in
                                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                                     Text(RelativeTime.short(sinceMs: entry.atMs, nowMs: nowMs))
-                                        .font(.system(size: 11).monospacedDigit())
+                                        .deckFont(11).monospacedDigit()
                                         .foregroundStyle(Theme.secondary)
-                                        .frame(width: 48, alignment: .trailing)
+                                        .frame(width: 48 * scale, alignment: .trailing)
                                     Text(ActivityText.text(entry.event))
-                                        .font(.system(size: 12))
+                                        .deckFont(12)
                                         .foregroundStyle(Theme.tertiary)
                                         .lineLimit(2)
                                 }
@@ -162,16 +165,39 @@ struct AgentDetailView: View {
 
     private func section<C: View>(_ title: String, @ViewBuilder _ body: () -> C) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title).font(.system(size: 11, weight: .semibold)).foregroundStyle(Theme.secondary)
+            Text(title).deckFont(11, weight: .semibold).foregroundStyle(Theme.secondary)
             body()
         }
     }
 
     private func figure(_ name: String, _ value: String) -> some View {
         HStack {
-            Text(name).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+            Text(name).deckFont(12).foregroundStyle(Theme.secondary)
             Spacer()
-            Text(value).font(.system(size: 12, weight: .medium)).foregroundStyle(Theme.text)
+            Text(value).deckFont(12, weight: .medium).foregroundStyle(Theme.text)
         }
+    }
+}
+
+/// ⌘+ and ⌘- change the text size, ⌘0 goes back to normal. The buttons are
+/// not seen; they only carry the shortcuts of the window.
+struct TextSizeKeys: View {
+    let model: DeckModel
+
+    var body: some View {
+        ZStack {
+            key("+") { model.textSize = model.textSize.larger }
+            key("=") { model.textSize = model.textSize.larger }
+            key("-") { model.textSize = model.textSize.smaller }
+            key("0") { model.textSize = .normal }
+        }
+        .opacity(0)
+        .accessibilityHidden(true)
+    }
+
+    private func key(_ character: Character, action: @escaping () -> Void) -> some View {
+        Button("", action: action)
+            .keyboardShortcut(KeyEquivalent(character), modifiers: .command)
+            .frame(width: 0, height: 0)
     }
 }

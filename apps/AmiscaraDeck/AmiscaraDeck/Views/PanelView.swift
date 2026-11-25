@@ -9,11 +9,16 @@ struct PanelView: View {
     /// A fixed "now" and no scrolling, for drawing the panel into a picture in
     /// tests (a scroll view and a timeline do not draw there).
     var staticNowMs: UInt64?
-    /// The list grows with its agents up to here, then it scrolls.
+    /// The width at the normal text size; it grows with the text.
+    static let width: CGFloat = 380
+    /// The list grows with its agents up to here, then it scrolls. It does not
+    /// grow with the text: the panel must still fit on a small screen, and three
+    /// cards fit at every size.
     static let maxListHeight: CGFloat = 560
     /// About the height of one card with its space, for the moment before the
     /// list was measured.
-    static let cardHeight: CGFloat = 76
+    static func cardHeight(scale: CGFloat) -> CGFloat { 76 * scale }
+    @Environment(\.deckScale) private var scale
     @State private var measuredListHeight: CGFloat = 0
 
     /// A scroll view has no height of its own: the menu bar window would shrink
@@ -21,7 +26,7 @@ struct PanelView: View {
     var listHeight: CGFloat {
         let content = measuredListHeight > 0
             ? measuredListHeight
-            : CGFloat(min(model.allAgents.count, 3)) * Self.cardHeight + 24
+            : CGFloat(min(model.allAgents.count, 3)) * Self.cardHeight(scale: scale) + 24
         return min(content, Self.maxListHeight)
     }
 
@@ -38,7 +43,7 @@ struct PanelView: View {
             if let cost = model.costToday, cost > 0 {
                 Divider().overlay(Theme.line)
                 Text(CostText.today(cost))
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.secondary)
                     .help(CostText.hint)
                     .accessibilityHint(CostText.hint)
@@ -50,26 +55,26 @@ struct PanelView: View {
             Divider().overlay(Theme.line)
             footer
         }
-        .frame(width: 380)
+        .frame(width: Self.width * scale)
         .background(Theme.background)
     }
 
     private var header: some View {
         HStack {
             Text("Amiscara Deck")
-                .font(.system(size: 15, weight: .semibold))
+                .deckFont(15, weight: .semibold)
                 .foregroundStyle(Theme.text)
             Spacer()
             if model.waitingCount > 0 {
                 Text(L10n.t("{n} waiting", ["n": String(model.waitingCount)]))
-                    .font(.system(size: 12, weight: .semibold))
+                    .deckFont(12, weight: .semibold)
                     .foregroundStyle(Theme.onAmber)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 3)
                     .background(Theme.amber, in: Capsule())
             }
             Text(L10n.plural("{n} agent", "{n} agents", model.agents.count))
-                .font(.system(size: 12))
+                .deckFont(12)
                 .foregroundStyle(Theme.secondary)
         }
         .padding(.horizontal, 16)
@@ -82,7 +87,7 @@ struct PanelView: View {
         case .connected:
             if model.agents.isEmpty {
                 Text(L10n.t("No agent yet. Start Claude Code in a terminal."))
-                    .font(.system(size: 13))
+                    .deckFont(13)
                     .foregroundStyle(Theme.secondary)
                     .multilineTextAlignment(.center)
                     .padding(28)
@@ -124,7 +129,7 @@ struct PanelView: View {
 
     private func note(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13))
+            .deckFont(13)
             .foregroundStyle(Theme.secondary)
             .multilineTextAlignment(.center)
             .padding(28)
@@ -142,8 +147,8 @@ struct PanelView: View {
                 .foregroundStyle(Theme.secondary)
         }
         .buttonStyle(.plain)
-        .font(.system(size: 13))
+        .deckFont(13)
         .padding(.horizontal, 16)
-        .frame(height: 44)
+        .frame(height: 44 * scale)
     }
 }

@@ -12,7 +12,7 @@ struct UpdateBanner: View {
                 if inset { Divider().overlay(Theme.line) }
                 HStack(spacing: 10) {
                     Text(notice.text)
-                        .font(.system(size: 13, weight: .medium))
+                        .deckFont(13, weight: .medium)
                         .foregroundStyle(Theme.text)
                         .lineLimit(2)
                     Spacer(minLength: 8)
