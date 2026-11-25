@@ -266,7 +266,7 @@ The app ships the program `amiscara-deck`:
 | `daemon status\|install\|uninstall` | start the daemon at login, without the app |
 | `sim demo` | play made up agents, to try things out without spending tokens |
 
-`amiscara-deck help` shows the options. Its output is English or German, following `LANG` (or `DECK_LANGUAGE`).
+`amiscara-deck help` shows the options. Its output is English or German, following the environment: the first value set of `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` counts.
 
 ## Updates
 
