@@ -137,6 +137,9 @@ pub fn run(
     let addr = std::os::unix::net::SocketAddr::from_pathname(&opts.socket).ok()?;
     let mut stream = connect(&addr, opts.connect_timeout)?;
     stream.set_write_timeout(Some(opts.write_timeout)).ok()?;
+    // Set before anything is sent: macOS refuses it once the daemon has
+    // answered and hung up, and the answer would be lost.
+    stream.set_read_timeout(Some(opts.reply_timeout)).ok()?;
     stream.write_all(line.as_bytes()).ok()?;
     stream.flush().ok()?;
 
@@ -145,7 +148,6 @@ pub fn run(
     if event != "PermissionRequest" {
         return None;
     }
-    stream.set_read_timeout(Some(opts.reply_timeout)).ok()?;
     let mut reply = String::new();
     std::io::BufRead::read_line(&mut std::io::BufReader::new(&stream), &mut reply).ok()?;
     let reply: HookReply = decode_line(&reply).ok()?;
