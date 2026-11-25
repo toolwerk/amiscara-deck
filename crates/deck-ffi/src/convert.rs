@@ -2,7 +2,8 @@
 //! in the core and these are only the face of it for Swift.
 
 use deck_proto::agent::{
-    Agent, AlwaysAllow, HistoryEntry, Location, Question, Request, RequestState, Status, Tool,
+    Activity, Agent, AlwaysAllow, HistoryEntry, HistoryEvent, Location, Question, Request,
+    RequestState, Status, Tool,
 };
 use deck_proto::message::{AnswerVia, ApprovalMode, NotifyKind, Presence, Settings};
 
@@ -72,6 +73,12 @@ pub struct RequestView {
     /// Shortened: "allow" only after the full text was shown.
     pub truncated: bool,
     pub full: String,
+    /// The lines of `full` (from 0) that are section headings.
+    #[uniffi(default = [])]
+    pub headings: Vec<u32>,
+    /// Fields the card does not show by name, as `key=value` lines.
+    #[uniffi(default = [])]
+    pub extra: Vec<String>,
     pub always_allow: Vec<AlwaysAllowView>,
     pub state: RequestStateKind,
     /// Unix time in milliseconds when the wait ends.
@@ -136,18 +143,80 @@ impl From<AnswerViaKind> for AnswerVia {
     }
 }
 
+/// What an agent does right now. The app words it in its own language.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum ActivityView {
+    Run { command: Option<String> },
+    Edit { path: Option<String> },
+    Read { path: Option<String> },
+    Search { pattern: Option<String> },
+    Subagent,
+    Web,
+    Compacting,
+    Tool { name: String },
+}
+
+impl From<Activity> for ActivityView {
+    fn from(a: Activity) -> Self {
+        match a {
+            Activity::Run { command } => ActivityView::Run { command },
+            Activity::Edit { path } => ActivityView::Edit { path },
+            Activity::Read { path } => ActivityView::Read { path },
+            Activity::Search { pattern } => ActivityView::Search { pattern },
+            Activity::Subagent => ActivityView::Subagent,
+            Activity::Web => ActivityView::Web,
+            Activity::Compacting => ActivityView::Compacting,
+            Activity::Tool { name } => ActivityView::Tool { name },
+        }
+    }
+}
+
+/// What happened in a session.
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum HistoryEventView {
+    SessionStarted,
+    PromptReceived,
+    Activity { activity: ActivityView },
+    PermissionRequested,
+    Compacting,
+    TurnEnded,
+    TurnFailed,
+    SessionEnded,
+    Allowed,
+    Denied,
+    Answered,
+}
+
+impl From<HistoryEvent> for HistoryEventView {
+    fn from(e: HistoryEvent) -> Self {
+        match e {
+            HistoryEvent::SessionStarted => HistoryEventView::SessionStarted,
+            HistoryEvent::PromptReceived => HistoryEventView::PromptReceived,
+            HistoryEvent::Activity(a) => HistoryEventView::Activity { activity: a.into() },
+            HistoryEvent::PermissionRequested => HistoryEventView::PermissionRequested,
+            HistoryEvent::Compacting => HistoryEventView::Compacting,
+            HistoryEvent::TurnEnded => HistoryEventView::TurnEnded,
+            HistoryEvent::TurnFailed => HistoryEventView::TurnFailed,
+            HistoryEvent::SessionEnded => HistoryEventView::SessionEnded,
+            HistoryEvent::Allowed => HistoryEventView::Allowed,
+            HistoryEvent::Denied => HistoryEventView::Denied,
+            HistoryEvent::Answered => HistoryEventView::Answered,
+        }
+    }
+}
+
 /// One line of the history of an agent.
 #[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
 pub struct HistoryEntryView {
     pub at_ms: u64,
-    pub text: String,
+    pub event: HistoryEventView,
 }
 
 impl From<HistoryEntry> for HistoryEntryView {
     fn from(e: HistoryEntry) -> Self {
         HistoryEntryView {
             at_ms: e.at_ms,
-            text: e.text,
+            event: e.event.into(),
         }
     }
 }
@@ -164,7 +233,7 @@ pub struct AgentView {
     pub status: AgentStatus,
     pub paused: bool,
     pub status_since_ms: u64,
-    pub activity: Option<String>,
+    pub activity: Option<ActivityView>,
     pub last_prompt: Option<String>,
     pub context_used: Option<u64>,
     pub context_window: Option<u64>,
@@ -289,6 +358,8 @@ impl From<Request> for RequestView {
             summary: r.summary,
             truncated: r.truncated,
             full: r.full,
+            headings: r.headings,
+            extra: r.extra,
             always_allow: r.always_allow.into_iter().map(Into::into).collect(),
             state: r.state.into(),
             deadline_ms: r.deadline_ms,
@@ -310,7 +381,7 @@ impl From<Agent> for AgentView {
             status: a.status.into(),
             paused: a.paused,
             status_since_ms: a.status_since_ms,
-            activity: a.activity,
+            activity: a.activity.map(Into::into),
             last_prompt: a.last_prompt,
             context_used: a.context.as_ref().map(|c| c.used_tokens),
             context_window: a.context.as_ref().map(|c| c.window_tokens),

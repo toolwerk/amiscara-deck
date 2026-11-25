@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/deck-proto",
+    "crates/deck-i18n",
     "crates/deck-session",
     "crates/deck-daemon",
     "crates/deck-client",

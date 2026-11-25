@@ -583,6 +583,7 @@ dependencies = [
  "deck-client",
  "deck-daemon",
  "deck-hooks",
+ "deck-i18n",
  "deck-proto",
  "deck-sim",
  "serde_json",
@@ -653,6 +654,10 @@ dependencies = [
  "tempfile",
  "thiserror",
 ]
+
+[[package]]
+name = "deck-i18n"
+version = "0.1.0"
 
 [[package]]
 name = "deck-presence"

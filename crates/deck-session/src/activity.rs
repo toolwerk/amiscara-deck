@@ -1,5 +1,6 @@
-//! Short German texts for what an agent does right now.
+//! What an agent does right now, as data for the UIs.
 
+use deck_proto::agent::Activity;
 use serde_json::Value;
 
 const MAX: usize = 80;
@@ -27,30 +28,28 @@ fn relative(path: &str, cwd: Option<&str>) -> String {
     }
 }
 
-/// "bearbeitet src/import.rs", "führt aus: cargo test", ...
-pub fn describe_tool(tool: &str, input: &Value, cwd: Option<&str>) -> String {
+/// What a tool call does, as data: the UI words it in its own language.
+pub fn describe_tool(tool: &str, input: &Value, cwd: Option<&str>) -> Activity {
     let text = |k: &str| input.get(k).and_then(Value::as_str);
     match tool {
-        "Bash" => match text("command") {
-            Some(c) => format!("führt aus: {}", shorten(c)),
-            None => "führt einen Befehl aus".into(),
+        "Bash" => Activity::Run {
+            command: text("command").map(shorten),
         },
-        "Edit" | "Write" | "MultiEdit" | "NotebookEdit" => {
-            match text("file_path").or(text("notebook_path")) {
-                Some(p) => format!("bearbeitet {}", relative(p, cwd)),
-                None => "bearbeitet eine Datei".into(),
-            }
-        }
-        "Read" => match text("file_path") {
-            Some(p) => format!("liest {}", relative(p, cwd)),
-            None => "liest eine Datei".into(),
+        "Edit" | "Write" | "MultiEdit" | "NotebookEdit" => Activity::Edit {
+            path: text("file_path")
+                .or(text("notebook_path"))
+                .map(|p| relative(p, cwd)),
         },
-        "Grep" | "Glob" => match text("pattern") {
-            Some(p) => format!("sucht {}", shorten(p)),
-            None => "sucht".into(),
+        "Read" => Activity::Read {
+            path: text("file_path").map(|p| relative(p, cwd)),
         },
-        "Agent" | "Task" => "startet einen Subagenten".into(),
-        "WebFetch" | "WebSearch" => "ruft das Netz ab".into(),
-        other => other.to_owned(),
+        "Grep" | "Glob" => Activity::Search {
+            pattern: text("pattern").map(shorten),
+        },
+        "Agent" | "Task" => Activity::Subagent,
+        "WebFetch" | "WebSearch" => Activity::Web,
+        other => Activity::Tool {
+            name: other.to_owned(),
+        },
     }
 }

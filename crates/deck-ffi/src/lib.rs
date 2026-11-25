@@ -19,9 +19,9 @@ use tokio::runtime::Runtime;
 use tokio::sync::mpsc;
 
 pub use convert::{
-    AgentStatus, AgentView, AlwaysAllowView, AnswerViaKind, ApprovalModeKind, HistoryEntryView,
-    LocationView, NotifyKindView, PresenceReport, QuestionOptionView, QuestionView,
-    RequestStateKind, RequestView, SettingsView, ToolKind,
+    ActivityView, AgentStatus, AgentView, AlwaysAllowView, AnswerViaKind, ApprovalModeKind,
+    HistoryEntryView, HistoryEventView, LocationView, NotifyKindView, PresenceReport,
+    QuestionOptionView, QuestionView, RequestStateKind, RequestView, SettingsView, ToolKind,
 };
 
 uniffi::setup_scaffolding!();

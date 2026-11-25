@@ -10,10 +10,12 @@ struct UpdateNotice: Equatable, Sendable {
     let readyToInstall: Bool
 
     var text: String {
-        readyToInstall ? "Version \(version) ist bereit." : "Version \(version) ist verfügbar."
+        readyToInstall
+            ? L10n.t("Version {version} is ready.", ["version": version])
+            : L10n.t("Version {version} is available.", ["version": version])
     }
 
-    var button: String { readyToInstall ? "Jetzt neu starten" : "Ansehen" }
+    var button: String { readyToInstall ? L10n.t("Restart now") : L10n.t("View") }
 }
 
 /// Owns Sparkle. The app comes with Developer ID from GitHub; Sparkle checks at

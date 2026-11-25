@@ -1,0 +1,1154 @@
+# Amiscara Deck: the texts for people, in English.
+# Written by `python3 scripts/i18n.py extract`. Do not edit by hand.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/AmiscaraDeck/AmiscaraDeck/AmiscaraDeckApp.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "Settings"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "running: {command}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "running a command"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "editing {path}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "editing a file"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "reading {path}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "reading a file"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "searching {pattern}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "searching"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "starting a subagent"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "fetching from the web"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "compacting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Session started"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Task received"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Approval requested"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Compacting context"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Turn ended"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Turn ended with an error"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift
+msgid "Session ended"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Approval allowed"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Approval denied"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+msgid "Question answered"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "further details"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "content"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "old"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "new"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+msgid "options"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "All"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "Waiting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "Working"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "Done"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "Other"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "{used} of {window}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "{n}K"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "{n}M"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+msgid "{whole}.{tenth}M"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "paused"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "working"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "waiting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "done"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "no task"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "error"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+msgid "ended"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "only in this session"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "only on this machine (.claude/settings.local.json)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "in the repo for everyone who uses it (.claude/settings.json)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "for all projects (~/.claude/settings.json)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "Target: {target}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AlwaysAllowText.swift
+msgid "Target unknown"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "In Deck"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "Automatic"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "In Terminal"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "Notifies you about every approval."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "Notifies you when you are not at the terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "Deck holds nothing. Answers only in the terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+msgid "{n} s"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+msgid "{n} min"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift
+msgid "{minutes} min {seconds} s"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Attention.swift
+msgid "macOS shows no notifications of Amiscara Deck. Allow them in System Settings."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Attention.swift
+msgid "Notifications do not appear as alerts. In System Settings, choose “Banners” or “Alerts”."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+msgid "$0.00"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+msgid "< $0.01"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+msgid "${dollars}.{cents}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+msgid "Today ≈ {amount}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+msgid "Estimate of Claude Code, not a billed amount."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/FocusFilter.swift
+msgid "Deck stays quiet in this Focus: no notification, no window, no sound."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/FocusFilter.swift
+msgid "Stay quiet"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/FocusFilter.swift
+msgid "Deck stays quiet"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/FocusFilter.swift
+msgid "Deck speaks up"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "The hook program is missing from the app."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "The hook program is not executable."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Installed ({installed} of {total} events)."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Outdated: {count} entries point to another place. Reinstalling fixes it."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Not installed. Agents appear only after installing."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Partly installed ({installed} of {total} events)."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "{count} entries of other programs stay untouched."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Claude Code {version} is older than the tested version 2.1.331. Hooks may be missing or work differently."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Claude Code not found"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "After installing, confirm the hooks once in Codex with /hooks. Without approvals Deck only shows the sessions."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "Codex shows its dialog only once Deck lets the request go. So Deck holds it only when it would show a notification, and lets it go as soon as you are back at the terminal. Codex has no \"Always allow\"."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/HooksControl.swift
+msgid "{n} day"
+msgid_plural "{n} days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "{name} has a question"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "{name} is waiting for approval"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "{start}…\nLong: view it first, then allow."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "{name} is waiting in the terminal"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "Answer there. Deck does not hold this request."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "{name} is done"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "Branch {branch}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+msgid "The agent is waiting for a new task."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Allow"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Deny"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "View"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+msgid "{n} h"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+msgid "{n} d"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RemoteEndpoint.swift
+msgid "The connection was closed."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RemoteEndpoint.swift
+msgid "The key of {host} has changed (now {fingerprint})."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RemoteEndpoint.swift
+msgid "No daemon at {path}."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift
+msgid "Amiscara Deck, {n} agents waiting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift
+msgid "Amiscara Deck, one agent waiting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift
+msgid "Version {version} is ready."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift
+msgid "Version {version} is available."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift
+msgid "Restart now"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift
+msgid "Codex · read only"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift
+msgid "Context {percent} %"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift
+msgid "Context {percent} percent full"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AttentionPopup.swift
+msgid "Waiting for you"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AttentionPopup.swift
+msgid "Close"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AttentionPopup.swift
+msgid "Nobody is waiting."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Approvals"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Status unknown."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Reinstall"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Install"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Installed."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Uninstall"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Uninstalled."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Approvals for Codex"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Installed. Please confirm in Codex with /hooks."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Start"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Start at login"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "History"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Keep"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Delete history …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Delete history and decision log?"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Delete"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "This cannot be undone."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Nothing to change."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift crates/deck-cli/src/view.rs
+msgid "Error: {error}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Start at login: {error}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Check for updates automatically"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Check now …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "This app was built locally and does not update itself."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "No agent yet. Start Claude Code in a terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "No agent in this selection."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Last task"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Key figures"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Context"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "unknown"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Turns"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Subagents"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Cost (estimate)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+msgid "Nothing recorded yet."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/ModeSwitchView.swift
+msgid "Answer approvals"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/ModeSwitchView.swift
+msgid "Wait time for a request"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/ModeSwitchView.swift
+msgid "Wait time"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/ModeSwitchView.swift
+msgid "After that the request stays in the terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Open System Settings"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Quiet right now: a Focus with the filter of Deck is on."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "To keep Deck quiet in “Do Not Disturb” or another Focus: in System Settings, at the Focus choose “Add Filter”, pick “Amiscara Deck” and switch on “Stay quiet”. Without the filter Deck does not see a Focus; macOS then only holds back the notifications."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Getting your attention"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Open a window when asked"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Sound when asked"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Remind again after 1 minute"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Number at the menu bar symbol"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Symbol pulses while someone waits"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Open Focus settings"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/NotificationWarning.swift
+msgid "Window, sound and reminder come when Deck would also send a notification: in “Automatic” only when you are not at the terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "{n} waiting"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "{n} agent"
+msgid_plural "{n} agents"
+msgstr[0] ""
+msgstr[1] ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "Connecting to the daemon …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "The daemon is not running. Deck starts it."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "The daemon is from another version. Please restart."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift
+msgid "Open window"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+msgid "Quit"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "Question {index} of {count}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "Back"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "Answer"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "Next"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "To give an answer of your own, type it in the program the agent runs in."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/QuestionAnswerView.swift
+msgid "Several possible"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: connecting …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: machine not reachable"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: key must be confirmed (Settings)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: key has changed (Settings)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: daemon is from another version"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Connected."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Connecting …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Not reachable: {reason}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Unknown key, fingerprint {fingerprint}."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "The daemon there speaks protocol {version}. Please bring both to the same version."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Other machines"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "None. Deck can show the agents of another machine and give approvals there, over SSH."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Remove"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Trust this key"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Add machine"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Name (shown on the cards)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Host"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "User"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Port"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Key file (empty: SSH agent)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Socket there (empty: usual place)"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Add"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to run a command"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to write a file"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to change a file"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to change a notebook"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to read a file"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to fetch a web page"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to search the web"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Has a question for you"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Presents a plan for approval"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Wants to use {tool}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Answer in the program the agent runs in. Deck does not approve plans."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Deck does not hold this question. Answer in the program the agent runs in."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Deck does not hold this request. Answer in the terminal."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Answered"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Full text"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Shortened. Allow works only after you have seen everything."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Hidden characters appear as ⟦U+202E⟧. A typed ⟦ appears twice."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+msgid "Always allow: "
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift
+msgid "Check for updates …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift
+msgid "Settings …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift
+msgid "Quit Amiscara Deck"
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "Usage: amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--socket <file>]"
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "--always needs a number."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs crates/deck-cli/src/live.rs crates/deck-cli/src/sim_cmd.rs
+msgid "Unknown option: {option}"
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "--message only goes with deny."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "--always only goes with allow."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "Use allow or deny."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs crates/deck-cli/src/live.rs crates/deck-cli/src/sim_cmd.rs
+msgid "No home folder found: please give --socket."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs crates/deck-cli/src/live.rs crates/deck-cli/src/sim_cmd.rs
+msgid "Error: no runtime."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "No request with the id {id}."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "The request {id} is not held, it waits in the terminal."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "This is a question. Answer it in Deck or where the agent runs."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "The request is shortened. The whole text:\n\n{text}\n\nNothing allowed. After reading, allow with --seen."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "none"
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "This rule is not offered. Offered: {offered}"
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "Error: the answer could not be sent."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "Allowed."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "Denied."
+msgstr ""
+
+#: crates/deck-cli/src/answer.rs
+msgid "No confirmation: the request was already answered or ran out."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Paths not found: please give --program, --data-dir and --plist."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
+msgid "Unknown command: {command}"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "The daemon is missing or not executable: {path}\nNothing set up."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Already set up: {path}"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Written: {path}"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "User id not found, launchctl not called."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "The daemon now starts at login and is already running."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "launchctl bootstrap failed. The file is in place, the daemon starts at the next login."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Removed: {path}"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Nothing set up, nothing removed."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "set up"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "set up, but different (install brings it in line)"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "not set up"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Start at login: {state} ({path})"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
+msgid "(missing)"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Daemon: {path}{missing}"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "No home folder found: please give --settings."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Hook program not found: please give --program."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "The hook program is missing or not executable: {path}\nNothing installed. Install anyway with --force."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Hooks installed in {path}"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Backup: {path}"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Running sessions with project settings pick them up at once; with the user settings, restart a session when in doubt."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Already installed, nothing changed."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Hooks removed from {path}"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Nothing of Deck found, nothing changed."
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Settings: {path}{missing}"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "present"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "present, but not executable"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "missing"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Hook program: {path} ({state})"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "installed"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "outdated (install fixes it)"
+msgstr ""
+
+#: crates/deck-cli/src/hooks_cmd.rs
+msgid "Hooks of other programs (left alone): {count}"
+msgstr ""
+
+#: crates/deck-cli/src/lib.rs
+msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
+msgstr ""
+
+#: crates/deck-cli/src/live.rs
+msgid "The daemon speaks protocol {daemon}, this program {ours}. Restart the daemon."
+msgstr ""
+
+#: crates/deck-cli/src/live.rs
+msgid "The daemon closed the connection."
+msgstr ""
+
+#: crates/deck-cli/src/live.rs
+msgid "{name}: removed"
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "--speed needs a number above 0."
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "--wait needs a number of seconds."
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "Unknown scenario: {name}. Available: {list}"
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "{session}: request allowed"
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "{session}: request denied"
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "{session}: request goes on without an answer (terminal)"
+msgstr ""
+
+#: crates/deck-cli/src/sim_cmd.rs
+msgid "No daemon reachable. Start it with amiscara-deckd."
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "No daemon reachable at {socket}. Start it with amiscara-deckd."
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "No agents."
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "STATUS"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "TOOL"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "PROJECT"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "BRANCH"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "ACTIVITY"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "SINCE"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "asks: {summary} [{id}]"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "{name}: new, {status}"
+msgstr ""
+
+#: crates/deck-cli/src/view.rs
+msgid "asks: {summary}"
+msgstr ""

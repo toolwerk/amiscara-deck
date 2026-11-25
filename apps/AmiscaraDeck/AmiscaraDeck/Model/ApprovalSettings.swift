@@ -4,18 +4,18 @@ import Foundation
 enum ApprovalWording {
     static func title(_ mode: ApprovalModeKind) -> String {
         switch mode {
-        case .deck: "Im Deck"
-        case .auto: "Automatik"
-        case .terminal: "Im Terminal"
+        case .deck: L10n.t("In Deck")
+        case .auto: L10n.t("Automatic")
+        case .terminal: L10n.t("In Terminal")
         }
     }
 
     /// One sentence under the switch.
     static func caption(_ mode: ApprovalModeKind) -> String {
         switch mode {
-        case .deck: "Meldet sich bei jeder Freigabe."
-        case .auto: "Meldet sich, wenn Sie nicht am Terminal sind."
-        case .terminal: "Deck hält nichts. Antworten gibt es nur im Terminal."
+        case .deck: L10n.t("Notifies you about every approval.")
+        case .auto: L10n.t("Notifies you when you are not at the terminal.")
+        case .terminal: L10n.t("Deck holds nothing. Answers only in the terminal.")
         }
     }
 
@@ -36,9 +36,11 @@ enum WaitTime {
     /// "30 s", "2 min", "2 min 30 s", "9 min".
     static func label(_ seconds: UInt32) -> String {
         let s = clamp(seconds)
-        if s < 60 { return "\(s) s" }
+        if s < 60 { return L10n.t("{n} s", ["n": String(s)]) }
         let minutes = s / 60, rest = s % 60
-        return rest == 0 ? "\(minutes) min" : "\(minutes) min \(rest) s"
+        return rest == 0
+            ? L10n.t("{n} min", ["n": String(minutes)])
+            : L10n.t("{minutes} min {seconds} s", ["minutes": String(minutes), "seconds": String(rest)])
     }
 }
 

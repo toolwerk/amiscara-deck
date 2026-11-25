@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use deck_daemon::{Config, Daemon, Error};
 use deck_proto::PROTOCOL_VERSION;
-use deck_proto::agent::{Location, Status, Tool};
+use deck_proto::agent::{Activity, Location, Status, Tool};
 use deck_proto::message::{
     DaemonMessage, HookEnv, HookMessage, HookReply, UiMessage, decode_line, encode_line,
 };
@@ -201,11 +201,11 @@ async fn several_events_build_up_the_state() {
     };
     let sessions: std::collections::BTreeSet<_> = agents.iter().map(|a| a.id.clone()).collect();
     assert!(!sessions.is_empty());
-    assert!(agents.iter().any(|a| {
-        a.activity
-            .as_deref()
-            .is_some_and(|t| t.starts_with("führt aus"))
-    }));
+    assert!(
+        agents
+            .iter()
+            .any(|a| matches!(a.activity, Some(Activity::Run { command: Some(_) })))
+    );
     d.stop().await;
 }
 

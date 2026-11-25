@@ -1,19 +1,95 @@
 //! How agents look on the command line. Pure functions, tested without a daemon.
+//! The words are the same as in the app (`po/deck.pot`).
 
-use deck_proto::agent::{Agent, Status, Tool};
+use deck_i18n::{t, t_with};
+use deck_proto::agent::{Activity, Agent, Status, Tool};
 use deck_proto::text::show_deceptive;
 
-/// German label of a status. A finished agent with background tasks is "pausiert".
-pub fn status_label(a: &Agent) -> &'static str {
+/// Label of a status. A finished agent with background tasks is "paused".
+pub fn status_label(a: &Agent) -> String {
     match (a.status, a.paused) {
-        (Status::Done, true) => "pausiert",
-        (Status::Working, _) => "arbeitet",
-        (Status::Blocked, _) => "wartet",
-        (Status::Done, false) => "fertig",
-        (Status::Idle, _) => "ohne Auftrag",
-        (Status::Error, _) => "Fehler",
-        (Status::Exited, _) => "beendet",
+        (Status::Done, true) => t("paused"),
+        (Status::Working, _) => t("working"),
+        (Status::Blocked, _) => t("waiting"),
+        (Status::Done, false) => t("done"),
+        (Status::Idle, _) => t("no task"),
+        (Status::Error, _) => t("error"),
+        (Status::Exited, _) => t("ended"),
     }
+}
+
+/// What an agent does: "editing src/import.rs", "running: cargo test".
+pub fn activity_text(a: &Activity) -> String {
+    match a {
+        Activity::Run { command: Some(c) } => t_with("running: {command}", &[("command", c)]),
+        Activity::Run { command: None } => t("running a command"),
+        Activity::Edit { path: Some(p) } => t_with("editing {path}", &[("path", p)]),
+        Activity::Edit { path: None } => t("editing a file"),
+        Activity::Read { path: Some(p) } => t_with("reading {path}", &[("path", p)]),
+        Activity::Read { path: None } => t("reading a file"),
+        Activity::Search { pattern: Some(p) } => t_with("searching {pattern}", &[("pattern", p)]),
+        Activity::Search { pattern: None } => t("searching"),
+        Activity::Subagent => t("starting a subagent"),
+        Activity::Web => t("fetching from the web"),
+        Activity::Compacting => t("compacting"),
+        Activity::Tool { name } => name.clone(),
+    }
+}
+
+/// The name of a section of the full text (`--- 2 old ---`), translated.
+fn section(name: &str) -> Option<String> {
+    let (number, word) = match name.split_once(' ') {
+        Some((n, w)) if n.chars().all(|c| c.is_ascii_digit()) => (Some(n), w),
+        _ => (None, name),
+    };
+    let word = match word {
+        "content" => t("content"),
+        "old" => t("old"),
+        "new" => t("new"),
+        "options" => t("options"),
+        _ => return None,
+    };
+    Some(match number {
+        Some(n) => format!("{n} {word}"),
+        None => word,
+    })
+}
+
+/// The whole text of a request: section names in the language of the user,
+/// the fields the card does not name after it.
+/// Only the lines the daemon marked as headings are translated.
+pub fn request_text(full: &str, headings: &[u32], extra: &[String]) -> String {
+    let mut lines: Vec<String> = full
+        .split('\n')
+        .enumerate()
+        .map(|(i, line)| {
+            u32::try_from(i)
+                .ok()
+                .filter(|i| headings.contains(i))
+                .and_then(|_| line.strip_prefix("--- "))
+                .and_then(|l| l.strip_suffix(" ---"))
+                .and_then(section)
+                .map_or_else(|| line.to_owned(), |s| format!("--- {s} ---"))
+        })
+        .collect();
+    if !extra.is_empty() {
+        lines.push(format!("--- {} ---", t("further details")));
+        lines.extend(extra.iter().cloned());
+    }
+    lines.join("\n")
+}
+
+/// "Error: ..." for a failure.
+pub fn error(e: &dyn std::fmt::Display) -> String {
+    t_with("Error: {error}", &[("error", &e.to_string())])
+}
+
+/// No daemon answers at this socket.
+pub fn no_daemon(socket: &std::path::Path) -> String {
+    t_with(
+        "No daemon reachable at {socket}. Start it with amiscara-deckd.",
+        &[("socket", &socket.display().to_string())],
+    )
 }
 
 /// Waiting first, then working, error, done, idle, ended (Detailkonzept, section 8).
@@ -39,14 +115,15 @@ pub fn sorted(mut agents: Vec<Agent>) -> Vec<Agent> {
     agents
 }
 
-/// "12 s", "3 Min.", "2 Std.", "4 Tg."
+/// "12 s", "3 min", "2 h", "4 d", the same as in the app.
 pub fn since(now_ms: u64, then_ms: u64) -> String {
     let s = now_ms.saturating_sub(then_ms) / 1000;
+    let n = |v: u64| v.to_string();
     match s {
-        0..=59 => format!("{s} s"),
-        60..=3599 => format!("{} Min.", s / 60),
-        3600..=86399 => format!("{} Std.", s / 3600),
-        _ => format!("{} Tg.", s / 86400),
+        0..=59 => t_with("{n} s", &[("n", &n(s))]),
+        60..=3599 => t_with("{n} min", &[("n", &n(s / 60))]),
+        3600..=86399 => t_with("{n} h", &[("n", &n(s / 3600))]),
+        _ => t_with("{n} d", &[("n", &n(s / 86400))]),
     }
 }
 
@@ -75,33 +152,44 @@ fn tool(t: Tool) -> &'static str {
 /// The table `list` prints. Empty input gives the "no agents" line.
 pub fn table(agents: &[Agent], now_ms: u64) -> String {
     if agents.is_empty() {
-        return "Keine Agenten.\n".to_owned();
+        return format!("{}\n", t("No agents."));
     }
     let head = [
-        "STATUS",
-        "WERKZEUG",
-        "PROJEKT",
-        "BRANCH",
-        "TÄTIGKEIT",
-        "SEIT",
+        t("STATUS"),
+        t("TOOL"),
+        t("PROJECT"),
+        t("BRANCH"),
+        t("ACTIVITY"),
+        t("SINCE"),
     ];
     let rows: Vec<[String; 6]> = sorted(agents.to_vec())
         .iter()
         .map(|a| {
             [
-                status_label(a).to_owned(),
+                status_label(a),
                 tool(a.tool).to_owned(),
                 cell(a.project.as_deref().unwrap_or("-"), 24),
                 cell(a.branch.as_deref().unwrap_or("-"), 24),
                 match &a.request {
-                    Some(r) => cell(&format!("fragt: {} [{}]", r.summary, r.id), 60),
-                    None => cell(a.activity.as_deref().unwrap_or("-"), 60),
+                    Some(r) => cell(
+                        &t_with(
+                            "asks: {summary} [{id}]",
+                            &[("summary", &r.summary), ("id", &r.id)],
+                        ),
+                        60,
+                    ),
+                    None => cell(
+                        &a.activity
+                            .as_ref()
+                            .map_or_else(|| "-".to_owned(), activity_text),
+                        60,
+                    ),
                 },
                 since(now_ms, a.status_since_ms),
             ]
         })
         .collect();
-    let mut width = head.map(|h| h.chars().count());
+    let mut width = head.each_ref().map(|h| h.chars().count());
     for r in &rows {
         for (w, c) in width.iter_mut().zip(r) {
             *w = (*w).max(c.chars().count());
@@ -118,7 +206,7 @@ pub fn table(agents: &[Agent], now_ms: u64) -> String {
         s.push('\n');
         s
     };
-    let mut out = line(head);
+    let mut out = line([&head[0], &head[1], &head[2], &head[3], &head[4], &head[5]]);
     for r in &rows {
         out.push_str(&line([&r[0], &r[1], &r[2], &r[3], &r[4], &r[5]]));
     }
@@ -130,13 +218,19 @@ pub fn change_line(before: Option<&Agent>, now: &Agent) -> String {
     let name = cell(now.project.as_deref().unwrap_or(&now.id), 24);
     let label = status_label(now);
     let head = match before {
-        None => format!("{name}: neu, {label}"),
+        None => t_with(
+            "{name}: new, {status}",
+            &[("name", &name), ("status", &label)],
+        ),
         Some(b) if status_label(b) != label => format!("{name}: {} → {label}", status_label(b)),
         Some(_) => format!("{name}: {label}"),
     };
     match (&now.request, &now.activity) {
-        (Some(r), _) => format!("{head}  fragt: {}", cell(&r.summary, 60)),
-        (None, Some(act)) => format!("{head}  {}", cell(act, 60)),
+        (Some(r), _) => format!(
+            "{head}  {}",
+            t_with("asks: {summary}", &[("summary", &cell(&r.summary, 60))])
+        ),
+        (None, Some(act)) => format!("{head}  {}", cell(&activity_text(act), 60)),
         (None, None) => head,
     }
 }
@@ -144,7 +238,16 @@ pub fn change_line(before: Option<&Agent>, now: &Agent) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use deck_i18n::{Language, with_language};
     use deck_proto::agent::Location;
+
+    fn de<R>(f: impl FnOnce() -> R) -> R {
+        with_language(Language::De, f)
+    }
+
+    fn en<R>(f: impl FnOnce() -> R) -> R {
+        with_language(Language::En, f)
+    }
 
     fn agent(id: &str, project: &str, status: Status) -> Agent {
         Agent {
@@ -196,16 +299,22 @@ mod tests {
     }
 
     #[test]
-    fn time_since_is_short_and_german() {
-        assert_eq!(since(10_000, 4_000), "6 s");
-        assert_eq!(since(200_000, 20_000), "3 Min.");
-        assert_eq!(since(8_000_000, 0), "2 Std.");
-        assert_eq!(since(200_000_000, 0), "2 Tg.");
-        assert_eq!(
-            since(0, 5_000),
-            "0 s",
-            "a clock that went back does not underflow"
-        );
+    fn time_since_is_short_in_both_languages() {
+        de(|| {
+            assert_eq!(since(10_000, 4_000), "6 s");
+            assert_eq!(since(200_000, 20_000), "3 min");
+            assert_eq!(since(8_000_000, 0), "2 Std.");
+            assert_eq!(since(200_000_000, 0), "2 Tg.");
+            assert_eq!(
+                since(0, 5_000),
+                "0 s",
+                "a clock that went back does not underflow"
+            );
+        });
+        en(|| {
+            assert_eq!(since(8_000_000, 0), "2 h");
+            assert_eq!(since(200_000_000, 0), "2 d");
+        });
     }
 
     #[test]
@@ -230,22 +339,70 @@ mod tests {
     #[test]
     fn a_paused_agent_is_called_paused() {
         let mut a = agent("1", "a", Status::Done);
-        assert_eq!(status_label(&a), "fertig");
+        de(|| assert_eq!(status_label(&a), "fertig"));
         a.paused = true;
-        assert_eq!(status_label(&a), "pausiert");
+        de(|| assert_eq!(status_label(&a), "pausiert"));
+        en(|| assert_eq!(status_label(&a), "paused"));
+    }
+
+    #[test]
+    fn activities_read_in_the_language_of_the_user() {
+        let run = Activity::Run {
+            command: Some("cargo test".into()),
+        };
+        de(|| {
+            assert_eq!(activity_text(&run), "führt aus: cargo test");
+            assert_eq!(
+                activity_text(&Activity::Edit { path: None }),
+                "bearbeitet eine Datei"
+            );
+        });
+        en(|| {
+            assert_eq!(activity_text(&run), "running: cargo test");
+            assert_eq!(activity_text(&Activity::Subagent), "starting a subagent");
+        });
+        assert_eq!(
+            de(|| activity_text(&Activity::Tool {
+                name: "mcp__x".into()
+            })),
+            "mcp__x",
+            "a tool name stays as it is"
+        );
+    }
+
+    #[test]
+    fn the_full_text_names_its_sections_in_the_language_of_the_user() {
+        let full = "a.rs\n--- 1 old ---\nx\n--- 1 new ---\n--- new ---\n--- not ours ---";
+        let extra = vec!["dangerouslyDisableSandbox=true".to_owned()];
+        assert_eq!(
+            de(|| request_text(full, &[1, 3], &extra)),
+            "a.rs\n--- 1 alt ---\nx\n--- 1 neu ---\n--- new ---\n--- not ours ---\n--- Weitere Angaben ---\ndangerouslyDisableSandbox=true",
+            "a line of the content that looks like a heading stays as written"
+        );
+        assert_eq!(
+            en(|| request_text(full, &[1, 3], &[])),
+            full,
+            "English is the text itself"
+        );
     }
 
     #[test]
     fn the_table_has_a_head_and_aligned_columns() {
         let mut a = agent("1", "app", Status::Working);
-        a.activity = Some("bearbeitet src/import.rs".into());
+        a.activity = Some(Activity::Edit {
+            path: Some("src/import.rs".into()),
+        });
         a.status_since_ms = 0;
-        let t = table(&[a, agent("2", "längerer-name", Status::Blocked)], 90_000);
+        let list = [a, agent("2", "längerer-name", Status::Blocked)];
+        let english = en(|| table(&list, 90_000));
+        assert!(english.starts_with("STATUS") && english.contains("ACTIVITY"));
+        assert!(english.contains("editing src/import.rs"), "{english}");
+        let t = de(|| table(&list, 90_000));
         let lines: Vec<_> = t.lines().collect();
         assert!(lines[0].starts_with("STATUS") && lines[0].contains("TÄTIGKEIT"));
         assert!(lines[1].starts_with("wartet"), "waiting first: {t}");
         assert!(lines[2].starts_with("arbeitet"), "{t}");
-        assert!(lines[2].contains("bearbeitet src/import.rs") && lines[2].contains("1 Min."));
+        assert!(lines[2].contains("bearbeitet src/import.rs") && lines[2].contains("1 min"));
         let col = |l: &str| l.find("claude").or(l.find("WERKZEUG"));
         assert_eq!(col(lines[0]), col(lines[1]));
         assert_eq!(col(lines[1]), col(lines[2]));
@@ -253,19 +410,25 @@ mod tests {
 
     #[test]
     fn no_agents_say_so() {
-        assert_eq!(table(&[], 0), "Keine Agenten.\n");
+        assert_eq!(de(|| table(&[], 0)), "Keine Agenten.\n");
+        assert_eq!(en(|| table(&[], 0)), "No agents.\n");
     }
 
     #[test]
     fn change_lines_tell_what_happened() {
         let before = agent("1", "app", Status::Working);
         let mut now = agent("1", "app", Status::Blocked);
-        assert_eq!(change_line(Some(&before), &now), "app: arbeitet → wartet");
-        assert_eq!(change_line(None, &now), "app: neu, wartet");
+        de(|| {
+            assert_eq!(change_line(Some(&before), &now), "app: arbeitet → wartet");
+            assert_eq!(change_line(None, &now), "app: neu, wartet");
+        });
+        en(|| assert_eq!(change_line(None, &now), "app: new, waiting"));
         now.status = Status::Working;
-        now.activity = Some("liest a.rs".into());
+        now.activity = Some(Activity::Read {
+            path: Some("a.rs".into()),
+        });
         assert_eq!(
-            change_line(Some(&before), &now),
+            de(|| change_line(Some(&before), &now)),
             "app: arbeitet  liest a.rs"
         );
     }

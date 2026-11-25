@@ -28,7 +28,7 @@ struct MainWindowView: View {
                 filterBar(all)
                 Divider().overlay(Theme.line)
                 if shown.isEmpty {
-                    Text(all.isEmpty ? "Noch kein Agent da. Starten Sie Claude Code in einem Terminal." : "Kein Agent in dieser Auswahl.")
+                    Text(all.isEmpty ? L10n.t("No agent yet. Start Claude Code in a terminal.") : L10n.t("No agent in this selection."))
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -114,7 +114,7 @@ struct AgentDetailView: View {
                     RequestCardView(request: request, model: model)
                 }
                 if let prompt = agent.lastPrompt, !prompt.isEmpty {
-                    section("Letzter Auftrag") {
+                    section(L10n.t("Last task")) {
                         Text(prompt)
                             .font(.system(size: 13))
                             .foregroundStyle(Theme.text)
@@ -122,20 +122,20 @@ struct AgentDetailView: View {
                             .textSelection(.enabled)
                     }
                 }
-                section("Kennzahlen") {
+                section(L10n.t("Key figures")) {
                     VStack(spacing: 6) {
-                        figure("Kontext", agent.contextText ?? "unbekannt")
-                        figure("Züge", agent.turns.map(String.init) ?? "unbekannt")
-                        figure("Subagenten", String(agent.subagents))
-                        figure("Kosten (Schätzung)", agent.costMicroUsd.map(CostText.amount) ?? "unbekannt")
+                        figure(L10n.t("Context"), agent.contextText ?? L10n.t("unknown"))
+                        figure(L10n.t("Turns"), agent.turns.map(String.init) ?? L10n.t("unknown"))
+                        figure(L10n.t("Subagents"), String(agent.subagents))
+                        figure(L10n.t("Cost (estimate)"), agent.costMicroUsd.map(CostText.amount) ?? L10n.t("unknown"))
                     }
                     if let fill = agent.contextFill {
                         ContextBar(fill: fill, color: Theme.working)
                     }
                 }
-                section("Verlauf") {
+                section(L10n.t("History")) {
                     if agent.history.isEmpty {
-                        Text("Noch nichts aufgezeichnet.")
+                        Text(L10n.t("Nothing recorded yet."))
                             .font(.system(size: 12)).foregroundStyle(Theme.secondary)
                     } else {
                         VStack(alignment: .leading, spacing: 4) {
@@ -145,7 +145,7 @@ struct AgentDetailView: View {
                                         .font(.system(size: 11).monospacedDigit())
                                         .foregroundStyle(Theme.secondary)
                                         .frame(width: 48, alignment: .trailing)
-                                    Text(entry.text)
+                                    Text(ActivityText.text(entry.event))
                                         .font(.system(size: 12))
                                         .foregroundStyle(Theme.tertiary)
                                         .lineLimit(2)

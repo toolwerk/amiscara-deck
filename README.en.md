@@ -14,12 +14,12 @@ A menu bar tool for the Mac. It shows all AI coding agents on your machine and t
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="docs/images/panel-hell.png">
-    <img src="docs/images/panel.png" width="420" alt="The panel below the menu bar symbol: one agent waits for approval, two are working, one is done">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/en/panel-hell.png">
+    <img src="docs/images/en/panel.png" width="420" alt="The panel below the menu bar symbol: one agent waits for approval, two are working, one is done">
   </picture>
 </p>
 
-The interface of the app is currently German only. This page names the buttons as they appear, with their meaning. All pictures show made up example data.
+The app speaks English or German, following the language of macOS. You can set a language for Deck alone in System Settings under General, Language & Region, Applications. All pictures show made up example data.
 
 ## Contents
 
@@ -66,24 +66,24 @@ Download the zip of the [latest version](https://github.com/toolwerk/amiscara-de
 
 1. Move the app to `/Applications` before you install anything. The entries in Claude Code name the path of a program inside the app.
 2. Start the app. It has no Dock icon, only a symbol in the menu bar.
-3. In the panel choose "Einstellungen" (settings) and click "Einbauen" (install) under "Claude Code".
+3. In the panel choose "Settings" and click "Install" under "Claude Code".
 4. Allow notifications when macOS asks.
-5. If you like, switch on "Beim Anmelden starten" (start at login).
+5. If you like, switch on "Start at login".
 
 Running sessions appear with their next event, new ones at once.
 
 <p align="center">
-  <img src="docs/images/einstellungen-werkzeuge.png" width="520" alt="Settings: the hooks for Claude Code and Codex are installed">
+  <img src="docs/images/en/einstellungen-werkzeuge.png" width="520" alt="Settings: the hooks for Claude Code and Codex are installed">
 </p>
 
-Installing only adds Deck's own entries to `~/.claude/settings.json`. Entries of other programs stay as they are. Before every change a backup is written next to the file (`settings.json.deck-….bak`), the last five are kept. "Ausbauen" (remove) takes the entries out again.
+Installing only adds Deck's own entries to `~/.claude/settings.json`. Entries of other programs stay as they are. Before every change a backup is written next to the file (`settings.json.deck-….bak`), the last five are kept. "Uninstall" takes the entries out again.
 
 ## The symbol and the panel
 
 The symbol in the menu bar shows whether somebody is waiting for you. You can switch off the number next to it.
 
 <p align="center">
-  <img src="docs/images/symbol.png" width="345" alt="The menu bar symbol in three states: calm, somebody waits, three wait">
+  <img src="docs/images/en/symbol.png" width="345" alt="The menu bar symbol in three states: calm, somebody waits, three wait">
 </p>
 
 - **Left click** opens the panel.
@@ -105,42 +105,42 @@ The panel lists the agents waiting for you at the top. Besides its color every s
 
 | Position | Behavior |
 |---|---|
-| **Im Deck** (in Deck) | Deck notifies you about every approval. |
-| **Automatik** (automatic) | Deck notifies only when you are not at the terminal. Default. |
-| **Im Terminal** (in the terminal) | Deck holds nothing and notifies nothing. You answer in the terminal only. |
+| **In Deck** | Deck notifies you about every approval. |
+| **Automatic** | Deck notifies only when you are not at the terminal. Default. |
+| **In Terminal** | Deck holds nothing and notifies nothing. You answer in the terminal only. |
 
 In automatic mode Deck notifies when the screen is locked, you have been idle for more than 2 minutes, another program than the agent's terminal is in front, or tmux does not show its pane.
 
 The **wait time** (30 seconds to 9 minutes, 2 minutes by default) sets how long Deck holds a request. After that it stays in the terminal.
 
 <p align="center">
-  <img src="docs/images/einstellungen-freigaben.png" width="520" alt="Settings: the switch, the wait time and the extra signals">
+  <img src="docs/images/en/einstellungen-freigaben.png" width="520" alt="Settings: the switch, the wait time and the extra signals">
 </p>
 
 ## Answering approvals
 
 <p align="center">
-  <img src="docs/images/karte-freigabe.png" width="420" alt="Card with an approval: command, allow, deny and always allow">
+  <img src="docs/images/en/karte-freigabe.png" width="420" alt="Card with an approval: command, allow, deny and always allow">
 </p>
 
-- **Erlauben** (allow) and **Ablehnen** (deny) take effect at once. The dialog in the terminal disappears by itself.
-- **Immer erlauben** (always allow) sits small below. You read there which rule will be created and where it applies, before you click. A broad rule (for everybody in the repository, or for all projects) is highlighted.
+- **Allow** and **Deny** take effect at once. The dialog in the terminal disappears by itself.
+- **Always allow** sits small below. You read there which rule will be created and where it applies, before you click. A broad rule (for everybody in the repository, or for all projects) is highlighted.
 
 ### Shortened requests
 
-If a request is too long for the card, you first get only **Ansehen** (view) and **Ablehnen**. You can allow it only after the full text has been shown.
+If a request is too long for the card, you first get only **View** and **Deny**. You can allow it only after the full text has been shown.
 
 <p align="center">
-  <img src="docs/images/karte-gekuerzt.png" width="420" alt="Shortened card with view and deny">
-  <img src="docs/images/karte-aufgeklappt.png" width="420" alt="Expanded card with the whole command and further fields">
+  <img src="docs/images/en/karte-gekuerzt.png" width="420" alt="Shortened card with view and deny">
+  <img src="docs/images/en/karte-aufgeklappt.png" width="420" alt="Expanded card with the whole command and further fields">
 </p>
 
-"Weitere Angaben" (further fields) lists everything else the call asks for, for example running a command without its sandbox. Invisible characters are made visible.
+"further details" lists everything else the call asks for, for example running a command without its sandbox. Invisible characters are made visible.
 
 ### When the time is up
 
 <p align="center">
-  <img src="docs/images/karte-terminal.png" width="420" alt="Card of a request waiting in the terminal">
+  <img src="docs/images/en/karte-terminal.png" width="420" alt="Card of a request waiting in the terminal">
 </p>
 
 Deck then only shows that the agent is waiting. You answer in the terminal.
@@ -150,18 +150,18 @@ Deck then only shows that the agent is waiting. You answer in the terminal.
 When an agent asks a question with choices, you answer it right on the card.
 
 <p align="center">
-  <img src="docs/images/karte-frage.png" width="420" alt="Card with a question of the agent and three answers">
+  <img src="docs/images/en/karte-frage.png" width="420" alt="Card with a question of the agent and three answers">
 </p>
 
-- Several questions come one after the other, with "Weiter" (next) and "Zurück" (back).
-- "Antworten" (answer) sends everything to the agent.
+- Several questions come one after the other, with "Next" and "Back".
+- "Answer" sends everything to the agent.
 - A free text answer of your own is typed in the program the agent runs in.
 
 Deck does not answer plans waiting for approval. Those stay in the agent's program.
 
 ## Getting your attention
 
-The base is the macOS **notification**. An approval offers "Erlauben" and "Ablehnen" there. A shortened one offers "Ansehen" and "Ablehnen", a question only "Ansehen". If notifications are switched off, Deck says so and leads you to the right system setting.
+The base is the macOS **notification**. An approval offers "Allow" and "Deny" there. A shortened one offers "View" and "Deny", a question only "View". If notifications are switched off, Deck says so and leads you to the right system setting.
 
 If that is not enough, switch on more in the settings:
 
@@ -172,7 +172,7 @@ If that is not enough, switch on more in the settings:
 - a blinking symbol
 
 <p align="center">
-  <img src="docs/images/fenster-rueckfrage.png" width="420" alt="The floating window with a waiting approval">
+  <img src="docs/images/en/fenster-rueckfrage.png" width="420" alt="The floating window with a waiting approval">
 </p>
 
 Window, sound and reminder appear only when Deck would also send a notification.
@@ -183,15 +183,15 @@ On its own Deck cannot detect a Focus. To keep Deck silent during "Do Not Distur
 
 1. Open the Focus in System Settings.
 2. Choose "Add Filter", then "Amiscara Deck".
-3. Switch on "Still bleiben" (stay quiet).
+3. Switch on "Stay quiet".
 
 The cards in the panel stay visible.
 
 ## The window
 
-"Fenster öffnen" (open window) shows all agents side by side, with a filter by state. The column on the right shows the selected agent: open request, last task, key figures and history.
+"Open window" shows all agents side by side, with a filter by state. The column on the right shows the selected agent: open request, last task, key figures and history.
 
-![The window with six agents on two machines and the detail column](docs/images/fenster.png)
+![The window with six agents on two machines and the detail column](docs/images/en/fenster.png)
 
 ### Context and cost
 
@@ -208,10 +208,10 @@ If Deck does not know a model yet, it assumes 200,000 tokens. Put the right size
 
 Deck shows Codex sessions. This is less tested than Claude Code.
 
-1. In the settings click "Einbauen" under "Codex". The section appears when Codex is installed.
+1. In the settings click "Install" under "Codex". The section appears when Codex is installed.
 2. In Codex run `/hooks` once and confirm the entries.
 
-**Approvals for Codex** ("Freigaben für Codex") are off and can be switched on. There is one difference: Codex shows its dialog only after Deck gives the request back. So Deck holds it only when it would also send a notification, and gives it back as soon as you are at the terminal again. Codex has no "always allow".
+**Approvals for Codex** are off and can be switched on. There is one difference: Codex shows its dialog only after Deck gives the request back. So Deck holds it only when it would also send a notification, and gives it back as soon as you are at the terminal again. Codex has no "always allow".
 
 ## Other machines
 
@@ -238,14 +238,14 @@ Start the daemon:
 target/release/amiscara-deckd
 ```
 
-Then add the machine on your Mac in the settings under "Andere Rechner" (other machines):
+Then add the machine on your Mac in the settings under "Other machines":
 
 | Field | Meaning |
 |---|---|
 | Name | shown on the cards |
-| Host, user (Benutzer), port | as with `ssh` |
-| Key file (Schlüsseldatei) | empty: Deck uses the SSH agent |
-| Socket there (Socket dort) | empty: the usual place |
+| Host, user, port | as with `ssh` |
+| Key file | empty: Deck uses the SSH agent |
+| Socket there | empty: the usual place |
 
 If your Mac does not know the key of the machine yet, Deck shows its fingerprint and waits for your yes. If the key changes later, Deck does not connect.
 
@@ -266,14 +266,14 @@ The app ships the program `amiscara-deck`:
 | `daemon status\|install\|uninstall` | start the daemon at login, without the app |
 | `sim demo` | play made up agents, to try things out without spending tokens |
 
-`amiscara-deck help` shows the options. Its output is German.
+`amiscara-deck help` shows the options. Its output is English or German, following the environment: the first value set of `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` counts.
 
 ## Updates
 
-A released version checks for a new one at start and once a day. It downloads it in the background and installs it when it quits. A menu bar app is rarely quit, so the panel announces a waiting version with "Jetzt neu starten" (restart now).
+A released version checks for a new one at start and once a day. It downloads it in the background and installs it when it quits. A menu bar app is rarely quit, so the panel announces a waiting version with "Restart now".
 
 <p align="center">
-  <img src="docs/images/update.png" width="420" alt="The panel saying that a new version is ready">
+  <img src="docs/images/en/update.png" width="420" alt="The panel saying that a new version is ready">
 </p>
 
 Updates are signed. In the settings you can switch off the automatic check or check by hand. Debug builds of your own do not update.
@@ -294,8 +294,8 @@ All data is kept in `~/Library/Application Support/Amiscara Deck`.
 | Problem | What helps |
 |---|---|
 | An agent does not appear | Are the hooks installed? A running session appears only with its next event. |
-| No notification | Allow notifications in System Settings. Check the switch: in "Automatik" Deck stays quiet while you are at the terminal. Check the Focus filter. |
-| Nothing happens after moving the app | Click "Neu einbauen" (install again) in the settings, so the new path is written. |
+| No notification | Allow notifications in System Settings. Check the switch: in "Automatic" Deck stays quiet while you are at the terminal. Check the Focus filter. |
+| Nothing happens after moving the app | Click "Reinstall" in the settings, so the new path is written. |
 | The background daemon hangs | End it with `pkill -x amiscara-deckd`. The app starts it again. |
 | The context fill is wrong | Enter the size of the model in `context-windows.json`. |
 
@@ -303,8 +303,8 @@ All data is kept in `~/Library/Application Support/Amiscara Deck`.
 
 Remove the entries first and delete the app afterwards. That way Claude Code keeps no entry without a program.
 
-1. In the settings click "Ausbauen" for Claude Code and for Codex.
-2. Switch off "Beim Anmelden starten".
+1. In the settings click "Uninstall" for Claude Code and for Codex.
+2. Switch off "Start at login".
 3. Quit the app.
 4. End the daemon: `pkill -x amiscara-deckd`
 5. Delete the app and the folder `~/Library/Application Support/Amiscara Deck`.
@@ -344,11 +344,22 @@ The logic is written in Rust under `crates/`. Findings from checks against the r
 
 ### Redraw the pictures
 
-The app draws the pictures of this page itself, with made up data:
+The app draws the pictures of this page itself, with made up data. The English ones land in `docs/images/en`:
 
 ```sh
 TEST_RUNNER_DECK_SCREENSHOT_DIR="$PWD/docs/images" xcodebuild -project apps/AmiscaraDeck/AmiscaraDeck.xcodeproj -scheme AmiscaraDeck -derivedDataPath target/xcode CODE_SIGNING_ALLOWED=NO test -only-testing:AmiscaraDeckTests/ScreenshotTests
 ```
+
+### Translating texts
+
+Texts in the code are English and marked: `L10n.t("…")` in Swift, `t("…")` in Rust, placeholders as `{name}`. The template `po/deck.pot` comes from the code, German is in `po/de.po`. After changing a text:
+
+```sh
+python3 scripts/i18n.py extract
+python3 scripts/i18n.py check
+```
+
+`check` fails when the template is out of date or a text in `de.po` is missing, empty, fuzzy or has other placeholders. The build turns the files into `Localizable.strings` for the Mac app.
 
 ### Contributing
 

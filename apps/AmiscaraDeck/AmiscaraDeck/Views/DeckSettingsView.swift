@@ -1,7 +1,7 @@
 import ServiceManagement
 import SwiftUI
 
-/// The settings window (Mockup "Einstellungen").
+/// The settings window (Mockup "Einstellungen", settings).
 struct DeckSettingsView: View {
     let model: DeckModel
     let hooks: HooksControl
@@ -16,7 +16,7 @@ struct DeckSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Freigaben") {
+            Section(L10n.t("Approvals")) {
                 ModeSwitchView(model: model)
                 WaitTimeSlider(model: model)
             }
@@ -35,22 +35,24 @@ struct DeckSettingsView: View {
                     }
                     Text(s.settingsPath).font(.system(size: 11)).foregroundStyle(Theme.secondary).textSelection(.enabled)
                 } else {
-                    Text("Status unbekannt.").foregroundStyle(Theme.secondary)
+                    Text(L10n.t("Status unknown.")).foregroundStyle(Theme.secondary)
                 }
                 HStack {
-                    Button(hooksStatus.map(HooksText.isInstalled) == true ? "Neu einbauen" : "Einbauen") { run(hooks.install, done: "Eingebaut.") }
-                    Button("Ausbauen") { run(hooks.uninstall, done: "Ausgebaut.") }
+                    Button(hooksStatus.map(HooksText.isInstalled) == true ? L10n.t("Reinstall") : L10n.t("Install")) {
+                        run(hooks.install, done: L10n.t("Installed."))
+                    }
+                    Button(L10n.t("Uninstall")) { run(hooks.uninstall, done: L10n.t("Uninstalled.")) }
                         .disabled((hooksStatus?.installed ?? 0) == 0)
                 }
                 if let m = hooksMessage {
                     Text(m).font(.system(size: 12)).foregroundStyle(Theme.secondary)
                 }
-                Text("Vor jeder Änderung legt Deck eine Sicherung der Datei an. Laufende Sitzungen übernehmen neue Hooks beim nächsten Ereignis.")
+                Text(L10n.t("Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."))
                     .font(.system(size: 11)).foregroundStyle(Theme.secondary)
             }
             if codexThere {
                 Section("Codex") {
-                    Toggle("Freigaben für Codex", isOn: Binding(
+                    Toggle(L10n.t("Approvals for Codex"), isOn: Binding(
                         get: { model.settings.codexApprovals },
                         set: { model.setCodexApprovals($0) }
                     ))
@@ -64,10 +66,10 @@ struct DeckSettingsView: View {
                         }
                     }
                     HStack {
-                        Button(codexStatus.map(HooksText.isInstalled) == true ? "Neu einbauen" : "Einbauen") {
-                            runCodex(hooks.codexInstall, done: "Eingebaut. Bitte in Codex über /hooks bestätigen.")
+                        Button(codexStatus.map(HooksText.isInstalled) == true ? L10n.t("Reinstall") : L10n.t("Install")) {
+                            runCodex(hooks.codexInstall, done: L10n.t("Installed. Please confirm in Codex with /hooks."))
                         }
-                        Button("Ausbauen") { runCodex(hooks.codexUninstall, done: "Ausgebaut.") }
+                        Button(L10n.t("Uninstall")) { runCodex(hooks.codexUninstall, done: L10n.t("Uninstalled.")) }
                             .disabled((codexStatus?.installed ?? 0) == 0)
                     }
                     if let m = codexMessage {
@@ -78,21 +80,21 @@ struct DeckSettingsView: View {
             }
             RemotesSection(model: model)
             UpdateSection(updater: .shared)
-            Section("Start") {
-                Toggle("Beim Anmelden starten", isOn: Binding(get: { autostart }, set: setAutostart))
+            Section(L10n.t("Start")) {
+                Toggle(L10n.t("Start at login"), isOn: Binding(get: { autostart }, set: setAutostart))
             }
-            Section("Verlauf") {
-                Picker("Aufbewahren", selection: Binding(
+            Section(L10n.t("History")) {
+                Picker(L10n.t("Keep"), selection: Binding(
                     get: { model.settings.retentionDays },
                     set: { model.setRetention(days: $0) }
                 )) {
                     ForEach(Retention.options, id: \.self) { Text(Retention.label($0)).tag($0) }
                 }
-                Button("Verlauf löschen …", role: .destructive) { confirmClear = true }
-                    .confirmationDialog("Verlauf und Entscheidungslog löschen?", isPresented: $confirmClear) {
-                        Button("Löschen", role: .destructive) { model.clearHistory() }
+                Button(L10n.t("Delete history …"), role: .destructive) { confirmClear = true }
+                    .confirmationDialog(L10n.t("Delete history and decision log?"), isPresented: $confirmClear) {
+                        Button(L10n.t("Delete"), role: .destructive) { model.clearHistory() }
                     } message: {
-                        Text("Das lässt sich nicht rückgängig machen.")
+                        Text(L10n.t("This cannot be undone."))
                     }
             }
         }
@@ -116,9 +118,9 @@ struct DeckSettingsView: View {
     private func run(_ action: () throws -> HooksChange, done: String) {
         do {
             let change = try action()
-            hooksMessage = change.changed ? done : "Nichts zu ändern."
+            hooksMessage = change.changed ? done : L10n.t("Nothing to change.")
         } catch {
-            hooksMessage = "Fehler: \(error)"
+            hooksMessage = L10n.t("Error: {error}", ["error": String(describing: error)])
         }
         refresh()
     }
@@ -126,9 +128,9 @@ struct DeckSettingsView: View {
     private func runCodex(_ action: () throws -> HooksChange, done: String) {
         do {
             let change = try action()
-            codexMessage = change.changed ? done : "Nichts zu ändern."
+            codexMessage = change.changed ? done : L10n.t("Nothing to change.")
         } catch {
-            codexMessage = "Fehler: \(error)"
+            codexMessage = L10n.t("Error: {error}", ["error": String(describing: error)])
         }
         refresh()
     }
@@ -137,7 +139,7 @@ struct DeckSettingsView: View {
         do {
             if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
         } catch {
-            hooksMessage = "Autostart: \(error.localizedDescription)"
+            hooksMessage = L10n.t("Start at login: {error}", ["error": error.localizedDescription])
         }
         autostart = SMAppService.mainApp.status == .enabled
     }
@@ -151,10 +153,10 @@ struct UpdateSection: View {
         Section("Updates") {
             UpdateBanner(updater: updater, inset: false)
             if updater.isAvailable {
-                Toggle("Automatisch nach Updates suchen", isOn: $updater.automaticallyChecks)
-                Button("Jetzt suchen …") { updater.checkForUpdates() }
+                Toggle(L10n.t("Check for updates automatically"), isOn: $updater.automaticallyChecks)
+                Button(L10n.t("Check now …")) { updater.checkForUpdates() }
             } else {
-                Text("Diese App wurde selbst gebaut und aktualisiert sich nicht.")
+                Text(L10n.t("This app was built locally and does not update itself."))
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondary)
             }

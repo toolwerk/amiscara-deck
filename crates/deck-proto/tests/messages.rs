@@ -14,7 +14,9 @@ fn agent() -> Agent {
         status: Status::Blocked,
         paused: false,
         status_since_ms: 1_700_000_000_000,
-        activity: Some("bearbeitet src/import.rs".into()),
+        activity: Some(Activity::Edit {
+            path: Some("src/import.rs".into()),
+        }),
         last_prompt: Some("Fix the import".into()),
         context: Some(ContextUsage {
             used_tokens: 39_600,
@@ -31,6 +33,8 @@ fn agent() -> Agent {
             summary: "curl --version".into(),
             truncated: false,
             full: "curl --version".into(),
+            headings: Vec::new(),
+            extra: vec!["dangerouslyDisableSandbox=true".into()],
             always_allow: vec![AlwaysAllow {
                 index: 0,
                 rules: vec!["Bash(curl --version)".into()],
@@ -41,10 +45,16 @@ fn agent() -> Agent {
             questions: Vec::new(),
         }),
         cost_micro_usd: Some(1_250_000),
-        history: vec![HistoryEntry {
-            at_ms: 1_700_000_000_500,
-            text: "Auftrag erhalten".into(),
-        }],
+        history: vec![
+            HistoryEntry {
+                at_ms: 1_700_000_000_500,
+                event: HistoryEvent::PromptReceived,
+            },
+            HistoryEntry {
+                at_ms: 1_700_000_000_600,
+                event: HistoryEvent::Activity(Activity::Subagent),
+            },
+        ],
     }
 }
 
@@ -58,6 +68,57 @@ fn roundtrip<T: serde::Serialize + serde::de::DeserializeOwned + PartialEq + std
     );
     let back: T = decode_line(&line).expect("decode");
     assert_eq!(back, v);
+}
+
+/// Activity and history are data the UIs word themselves (no sentences of
+/// one language in the protocol). Every form survives the way over the socket.
+#[test]
+fn every_activity_and_history_event_survives_a_round_trip() {
+    let activities = vec![
+        Activity::Run {
+            command: Some("cargo test".into()),
+        },
+        Activity::Run { command: None },
+        Activity::Edit {
+            path: Some("a.rs".into()),
+        },
+        Activity::Read { path: None },
+        Activity::Search {
+            pattern: Some("fn main".into()),
+        },
+        Activity::Subagent,
+        Activity::Web,
+        Activity::Compacting,
+        Activity::Tool {
+            name: "mcp__x".into(),
+        },
+    ];
+    for a in &activities {
+        roundtrip(a.clone());
+        roundtrip(HistoryEvent::Activity(a.clone()));
+    }
+    for e in [
+        HistoryEvent::SessionStarted,
+        HistoryEvent::PromptReceived,
+        HistoryEvent::PermissionRequested,
+        HistoryEvent::Compacting,
+        HistoryEvent::TurnEnded,
+        HistoryEvent::TurnFailed,
+        HistoryEvent::SessionEnded,
+        HistoryEvent::Allowed,
+        HistoryEvent::Denied,
+        HistoryEvent::Answered,
+    ] {
+        roundtrip(e);
+    }
+    let json = serde_json::to_value(HistoryEvent::Activity(Activity::Run {
+        command: Some("ls".into()),
+    }))
+    .expect("json");
+    assert_eq!(
+        json,
+        serde_json::json!({"event": "activity", "kind": "run", "command": "ls"})
+    );
 }
 
 #[test]

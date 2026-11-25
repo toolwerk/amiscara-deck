@@ -35,7 +35,7 @@ struct AmiscaraDeckApp: App {
             MainWindowView(model: model)
         }
 
-        Window("Einstellungen", id: "settings") {
+        Window(L10n.t("Settings"), id: "settings") {
             DeckSettingsView(model: model, hooks: .live())
         }
         .windowResizability(.contentSize)

@@ -44,7 +44,7 @@ enum TrayIcon {
         // colors, so the amber tile stays amber.
         image.isTemplate = !waiting
         image.accessibilityDescription = waiting
-            ? (count > 1 ? "Amiscara Deck, \(count) Agenten warten" : "Amiscara Deck, ein Agent wartet")
+            ? (count > 1 ? L10n.t("Amiscara Deck, {n} agents waiting", ["n": String(count)]) : L10n.t("Amiscara Deck, one agent waiting"))
             : "Amiscara Deck"
         return image
     }

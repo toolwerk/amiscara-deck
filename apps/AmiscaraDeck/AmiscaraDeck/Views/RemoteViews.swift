@@ -7,23 +7,24 @@ enum RemoteWording {
         let name = endpoint.setting.name
         switch endpoint.link {
         case .connected: return nil
-        case .connecting: return "\(name): verbinde …"
-        case .unreachable: return "\(name): Rechner nicht erreichbar"
-        case .needsTrust: return "\(name): Schlüssel muss bestätigt werden (Einstellungen)"
-        case .hostKeyChanged: return "\(name): Schlüssel hat sich geändert (Einstellungen)"
-        case .versionMismatch: return "\(name): Dienst ist von einer anderen Version"
+        case .connecting: return L10n.t("{name}: connecting …", ["name": name])
+        case .unreachable: return L10n.t("{name}: machine not reachable", ["name": name])
+        case .needsTrust: return L10n.t("{name}: key must be confirmed (Settings)", ["name": name])
+        case .hostKeyChanged: return L10n.t("{name}: key has changed (Settings)", ["name": name])
+        case .versionMismatch: return L10n.t("{name}: daemon is from another version", ["name": name])
         }
     }
 
     /// The longer text for the settings.
     static func detail(_ endpoint: RemoteEndpoint) -> String {
         switch endpoint.link {
-        case .connected: "Verbunden."
-        case .connecting: "Verbinde …"
-        case .unreachable(let why): "Nicht erreichbar: \(why)"
-        case .needsTrust(let p): "Unbekannter Schlüssel, Fingerabdruck \(p.fingerprint)."
+        case .connected: L10n.t("Connected.")
+        case .connecting: L10n.t("Connecting …")
+        case .unreachable(let why): L10n.t("Not reachable: {reason}", ["reason": why])
+        case .needsTrust(let p): L10n.t("Unknown key, fingerprint {fingerprint}.", ["fingerprint": p.fingerprint])
         case .hostKeyChanged(let why): why
-        case .versionMismatch(let daemon): "Der Dienst dort spricht Protokoll \(daemon). Bitte beide auf denselben Stand bringen."
+        case .versionMismatch(let daemon):
+            L10n.t("The daemon there speaks protocol {version}. Please bring both to the same version.", ["version": String(daemon)])
         }
     }
 }
@@ -58,9 +59,9 @@ struct RemotesSection: View {
     @State private var socket = ""
 
     var body: some View {
-        Section("Andere Rechner") {
+        Section(L10n.t("Other machines")) {
             if model.remotes.isEmpty {
-                Text("Keine. Deck kann die Agenten eines anderen Rechners zeigen und dort Freigaben geben, über SSH.")
+                Text(L10n.t("None. Deck can show the agents of another machine and give approvals there, over SSH."))
                     .font(.system(size: 12)).foregroundStyle(Theme.secondary)
             }
             ForEach(model.remotes, id: \.id) { endpoint in
@@ -70,22 +71,22 @@ struct RemotesSection: View {
                         Text("\(endpoint.setting.user)@\(endpoint.setting.host)")
                             .font(.system(size: 12)).foregroundStyle(Theme.secondary)
                         Spacer()
-                        Button("Entfernen") { model.removeRemote(id: endpoint.id) }
+                        Button(L10n.t("Remove")) { model.removeRemote(id: endpoint.id) }
                     }
                     Text(RemoteWording.detail(endpoint)).font(.system(size: 12)).foregroundStyle(Theme.secondary)
                     if case .needsTrust = endpoint.link {
-                        Button("Diesem Schlüssel vertrauen") { endpoint.trust() }
+                        Button(L10n.t("Trust this key")) { endpoint.trust() }
                     }
                 }
             }
-            DisclosureGroup("Rechner hinzufügen") {
-                TextField("Name (steht auf den Karten)", text: $name)
-                TextField("Host", text: $host)
-                TextField("Benutzer", text: $user)
-                TextField("Port", text: $port)
-                TextField("Schlüsseldatei (leer: SSH-Agent)", text: $keyFile)
-                TextField("Socket dort (leer: üblicher Ort)", text: $socket)
-                Button("Hinzufügen") { add() }
+            DisclosureGroup(L10n.t("Add machine")) {
+                TextField(L10n.t("Name (shown on the cards)"), text: $name)
+                TextField(L10n.t("Host"), text: $host)
+                TextField(L10n.t("User"), text: $user)
+                TextField(L10n.t("Port"), text: $port)
+                TextField(L10n.t("Key file (empty: SSH agent)"), text: $keyFile)
+                TextField(L10n.t("Socket there (empty: usual place)"), text: $socket)
+                Button(L10n.t("Add")) { add() }
                     .disabled(host.trimmingCharacters(in: .whitespaces).isEmpty || user.isEmpty)
             }
         }

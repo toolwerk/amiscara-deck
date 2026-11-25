@@ -2,6 +2,7 @@ use std::io::Write;
 use std::path::PathBuf;
 
 use deck_hooks::{EventState, Status};
+use deck_i18n::{t, t_with};
 
 struct Opts {
     settings: PathBuf,
@@ -20,19 +21,28 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
             "--program" => program = it.next().map(PathBuf::from),
             "--force" => force = true,
             other => {
-                let _ = writeln!(err, "Unbekannte Option: {other}");
+                let _ = writeln!(
+                    err,
+                    "{}",
+                    t_with("Unknown option: {option}", &[("option", other)])
+                );
                 return None;
             }
         }
     }
     let Some(settings) = settings.or_else(deck_hooks::default_claude_settings) else {
-        let _ = writeln!(err, "Kein Home-Ordner gefunden: bitte --settings angeben.");
+        let _ = writeln!(
+            err,
+            "{}",
+            t("No home folder found: please give --settings.")
+        );
         return None;
     };
     let Some(program) = program.or_else(sibling_program) else {
         let _ = writeln!(
             err,
-            "Hook-Programm nicht gefunden: bitte --program angeben."
+            "{}",
+            t("Hook program not found: please give --program.")
         );
         return None;
     };
@@ -59,7 +69,14 @@ pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -
         "uninstall" => uninstall(&o, out, err),
         "status" => status(&o, out, err),
         other => {
-            let _ = writeln!(err, "Unbekannter Befehl: hooks {other}");
+            let _ = writeln!(
+                err,
+                "{}",
+                t_with(
+                    "Unknown command: {command}",
+                    &[("command", &format!("hooks {other}"))]
+                )
+            );
             2
         }
     }
@@ -72,27 +89,42 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     if !ready && !o.force {
         let _ = writeln!(
             err,
-            "Das Hook-Programm fehlt oder ist nicht ausführbar: {}\n\
-             Nichts eingebaut. Mit --force trotzdem einbauen.",
-            o.program.display()
+            "{}",
+            t_with(
+                "The hook program is missing or not executable: {path}\nNothing installed. Install anyway with --force.",
+                &[("path", &o.program.display().to_string())]
+            )
         );
         return 1;
     }
     match deck_hooks::install(&o.settings, &o.program) {
         Ok(r) if r.changed => {
-            let _ = writeln!(out, "Hooks eingebaut in {}", o.settings.display());
+            let _ = writeln!(
+                out,
+                "{}",
+                t_with(
+                    "Hooks installed in {path}",
+                    &[("path", &o.settings.display().to_string())]
+                )
+            );
             if let Some(b) = r.backup {
-                let _ = writeln!(out, "Sicherung: {}", b.display());
+                let _ = writeln!(
+                    out,
+                    "{}",
+                    t_with("Backup: {path}", &[("path", &b.display().to_string())])
+                );
             }
             let _ = writeln!(
                 out,
-                "Laufende Sitzungen mit Projekt-Einstellungen greifen sie sofort, \
-                 bei den Benutzer-Einstellungen im Zweifel eine Sitzung neu starten."
+                "{}",
+                t(
+                    "Running sessions with project settings pick them up at once; with the user settings, restart a session when in doubt."
+                )
             );
             0
         }
         Ok(_) => {
-            let _ = writeln!(out, "Schon eingebaut, nichts geändert.");
+            let _ = writeln!(out, "{}", t("Already installed, nothing changed."));
             0
         }
         Err(e) => fail(err, &e),
@@ -102,14 +134,25 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
 fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     match deck_hooks::uninstall(&o.settings, &o.program) {
         Ok(r) if r.changed => {
-            let _ = writeln!(out, "Hooks ausgebaut aus {}", o.settings.display());
+            let _ = writeln!(
+                out,
+                "{}",
+                t_with(
+                    "Hooks removed from {path}",
+                    &[("path", &o.settings.display().to_string())]
+                )
+            );
             if let Some(b) = r.backup {
-                let _ = writeln!(out, "Sicherung: {}", b.display());
+                let _ = writeln!(
+                    out,
+                    "{}",
+                    t_with("Backup: {path}", &[("path", &b.display().to_string())])
+                );
             }
             0
         }
         Ok(_) => {
-            let _ = writeln!(out, "Nichts von Deck gefunden, nichts geändert.");
+            let _ = writeln!(out, "{}", t("Nothing of Deck found, nothing changed."));
             0
         }
         Err(e) => fail(err, &e),
@@ -126,34 +169,57 @@ fn status(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
 }
 
 fn write_status(s: &Status, o: &Opts, out: &mut dyn Write) -> std::io::Result<()> {
+    let missing = if s.file_exists {
+        String::new()
+    } else {
+        format!(" {}", t("(missing)"))
+    };
     writeln!(
         out,
-        "Einstellungen: {}{}",
-        o.settings.display(),
-        if s.file_exists { "" } else { " (fehlt)" }
+        "{}",
+        t_with(
+            "Settings: {path}{missing}",
+            &[
+                ("path", &o.settings.display().to_string()),
+                ("missing", &missing)
+            ]
+        )
     )?;
     let program = match (s.program_exists, s.program_executable) {
-        (true, true) => "vorhanden",
-        (true, false) => "vorhanden, aber nicht ausführbar",
-        _ => "fehlt",
+        (true, true) => t("present"),
+        (true, false) => t("present, but not executable"),
+        _ => t("missing"),
     };
-    writeln!(out, "Hook-Programm: {} ({program})", o.program.display())?;
+    writeln!(
+        out,
+        "{}",
+        t_with(
+            "Hook program: {path} ({state})",
+            &[
+                ("path", &o.program.display().to_string()),
+                ("state", &program)
+            ]
+        )
+    )?;
     for (event, state) in &s.events {
         let text = match state {
-            EventState::Installed => "eingebaut",
-            EventState::Missing => "fehlt",
-            EventState::Outdated => "veraltet (install behebt es)",
+            EventState::Installed => t("installed"),
+            EventState::Missing => t("missing"),
+            EventState::Outdated => t("outdated (install fixes it)"),
         };
         writeln!(out, "  {event:<20} {text}")?;
     }
     writeln!(
         out,
-        "Hooks anderer Programme (unberührt): {}",
-        s.foreign_entries
+        "{}",
+        t_with(
+            "Hooks of other programs (left alone): {count}",
+            &[("count", &s.foreign_entries.to_string())]
+        )
     )
 }
 
 fn fail(err: &mut dyn Write, e: &deck_hooks::Error) -> u8 {
-    let _ = writeln!(err, "Fehler: {e}");
+    let _ = writeln!(err, "{}", crate::view::error(e));
     1
 }

@@ -77,6 +77,16 @@ pub struct Request {
     pub truncated: bool,
     /// The full text, for the main window.
     pub full: String,
+    /// The lines of `full` (counted from 0) that are section headings such as
+    /// `--- old ---`. The UI translates only these: a line of the same look
+    /// inside a file or command stays as it is.
+    #[serde(default)]
+    pub headings: Vec<u32>,
+    /// Fields of the input the card does not show by name, as `key=value`
+    /// lines. The UI shows them after the full text under a heading of its own
+    /// language. Not empty: the card is shortened.
+    #[serde(default)]
+    pub extra: Vec<String>,
     pub always_allow: Vec<AlwaysAllow>,
     pub state: RequestState,
     /// Unix time in milliseconds when the wait ends.
@@ -103,13 +113,63 @@ pub struct QuestionOption {
     pub description: Option<String>,
 }
 
+/// What an agent does right now. The daemon only says what and with what;
+/// every UI words it in its own language, so an agent of another machine reads
+/// like one of this machine.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum Activity {
+    /// Runs a command (shortened to one line).
+    Run {
+        command: Option<String>,
+    },
+    /// Writes or edits a file (relative to the working folder when inside).
+    Edit {
+        path: Option<String>,
+    },
+    Read {
+        path: Option<String>,
+    },
+    /// Searches for a pattern (shortened to one line).
+    Search {
+        pattern: Option<String>,
+    },
+    Subagent,
+    /// Fetches or searches the web.
+    Web,
+    /// Compacts its context.
+    Compacting,
+    /// Any other tool, by its name.
+    Tool {
+        name: String,
+    },
+}
+
+/// What happened in a session, for its history.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "event", rename_all = "snake_case")]
+pub enum HistoryEvent {
+    SessionStarted,
+    PromptReceived,
+    Activity(Activity),
+    PermissionRequested,
+    Compacting,
+    TurnEnded,
+    TurnFailed,
+    SessionEnded,
+    /// A request was allowed in Deck.
+    Allowed,
+    Denied,
+    /// A question was answered in Deck.
+    Answered,
+}
+
 /// One line of what an agent did, for the history of a session.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HistoryEntry {
     /// Unix time in milliseconds.
     pub at_ms: u64,
-    /// For example "bearbeitet src/import.rs" or "Freigabe erlaubt".
-    pub text: String,
+    pub event: HistoryEvent,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -128,8 +188,7 @@ pub struct Agent {
     pub paused: bool,
     /// Unix time in milliseconds of the last status change.
     pub status_since_ms: u64,
-    /// For example "bearbeitet src/import.rs".
-    pub activity: Option<String>,
+    pub activity: Option<Activity>,
     pub last_prompt: Option<String>,
     pub context: Option<ContextUsage>,
     pub turns: Option<u32>,

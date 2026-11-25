@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// "Im Deck | Automatik | Im Terminal", with a sentence about the chosen one.
+/// "In Deck | Automatic | In Terminal", with a sentence about the chosen one.
 struct ModeSwitchView: View {
     let model: DeckModel
 
@@ -22,7 +22,7 @@ struct ModeSwitchView: View {
             .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line))
             .accessibilityElement(children: .contain)
-            .accessibilityLabel("Freigaben beantworten")
+            .accessibilityLabel(L10n.t("Answer approvals"))
 
             Text(ApprovalWording.caption(model.settings.mode))
                 .font(.system(size: 11))
@@ -41,7 +41,7 @@ struct WaitTimeSlider: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("Wartezeit für eine Anfrage")
+                Text(L10n.t("Wait time for a request"))
                 Spacer()
                 Text(WaitTime.label(model.settings.waitSecs)).monospacedDigit()
             }
@@ -56,7 +56,7 @@ struct WaitTimeSlider: View {
                 step: Double(WaitTime.step)
             )
             .tint(Theme.teal)
-            .accessibilityLabel("Wartezeit")
+            .accessibilityLabel(L10n.t("Wait time"))
             .accessibilityValue(WaitTime.label(model.settings.waitSecs))
             HStack {
                 Text(WaitTime.label(WaitTime.range.lowerBound))
@@ -65,7 +65,7 @@ struct WaitTimeSlider: View {
             }
             .font(.system(size: 11))
             .foregroundStyle(Theme.secondary)
-            Text("Danach bleibt die Anfrage im Terminal.")
+            Text(L10n.t("After that the request stays in the terminal."))
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondary)
         }

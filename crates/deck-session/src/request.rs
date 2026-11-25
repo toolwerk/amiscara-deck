@@ -162,34 +162,44 @@ fn question_text(input: &Value) -> Option<String> {
 /// tools that write, the path and what is written. Whatever is written must be
 /// visible before "allow", so it goes into the full text on further lines and
 /// the card counts as shortened.
-fn raw_full_text(req: &PermissionRequest) -> String {
+/// A section heading of the full text, and which line it is on: only these
+/// lines are headings, a line of the same look inside the content is not.
+fn push_section(out: &mut String, headings: &mut Vec<u32>, label: &str, body: &str) {
+    let line = out.matches('\n').count() + 1;
+    headings.push(u32::try_from(line).unwrap_or(u32::MAX));
+    out.push_str(&format!("\n--- {label} ---\n{body}"));
+}
+
+/// The full text, the lines of its section headings and the extra fields.
+fn raw_full_text(req: &PermissionRequest) -> (String, Vec<u32>, Vec<String>) {
     let input = &req.tool_input;
     let text = |k: &str| input.get(k).and_then(Value::as_str);
     let with_body = |path: &str, parts: Vec<(&str, String)>| {
         let mut out = path.to_owned();
+        let mut headings = Vec::new();
         for (label, body) in parts.into_iter().filter(|(_, b)| !b.is_empty()) {
-            out.push_str(&format!("\n--- {label} ---\n{body}"));
+            push_section(&mut out, &mut headings, label, &body);
         }
-        out
+        (out, headings)
     };
     let known = match req.tool_name.as_str() {
-        "Bash" => text("command").map(str::to_owned),
-        QUESTION_TOOL => question_text(input),
-        "ExitPlanMode" => text("plan").map(str::to_owned),
-        "Read" => text("file_path").map(str::to_owned),
+        "Bash" => text("command").map(|c| (c.to_owned(), Vec::new())),
+        QUESTION_TOOL => question_text(input).map(|q| (q, Vec::new())),
+        "ExitPlanMode" => text("plan").map(|p| (p.to_owned(), Vec::new())),
+        "Read" => text("file_path").map(|p| (p.to_owned(), Vec::new())),
         "Write" => text("file_path").map(|p| {
             with_body(
                 p,
-                vec![("Inhalt", text("content").unwrap_or("").to_owned())],
+                vec![("content", text("content").unwrap_or("").to_owned())],
             )
         }),
         "Edit" => text("file_path").map(|p| {
             with_body(
                 p,
                 vec![
-                    ("alt", text("old_string").unwrap_or("").to_owned()),
-                    ("neu", text("new_string").unwrap_or("").to_owned()),
-                    ("Optionen", options(input, &["replace_all"])),
+                    ("old", text("old_string").unwrap_or("").to_owned()),
+                    ("new", text("new_string").unwrap_or("").to_owned()),
+                    ("options", options(input, &["replace_all"])),
                 ],
             )
         }),
@@ -205,10 +215,10 @@ fn raw_full_text(req: &PermissionRequest) -> String {
                                 edit.get(k).and_then(Value::as_str).unwrap_or("").to_owned()
                             };
                             [
-                                (format!("{} alt", i + 1), get("old_string")),
-                                (format!("{} neu", i + 1), get("new_string")),
+                                (format!("{} old", i + 1), get("old_string")),
+                                (format!("{} new", i + 1), get("new_string")),
                                 (
-                                    format!("{} Optionen", i + 1),
+                                    format!("{} options", i + 1),
                                     options(edit, &["replace_all"]),
                                 ),
                             ]
@@ -217,22 +227,23 @@ fn raw_full_text(req: &PermissionRequest) -> String {
                 })
                 .unwrap_or_default();
             let mut out = p.to_owned();
+            let mut headings = Vec::new();
             for (label, body) in edits.into_iter().filter(|(_, b)| !b.is_empty()) {
-                out.push_str(&format!("\n--- {label} ---\n{body}"));
+                push_section(&mut out, &mut headings, &label, &body);
             }
             let opts = options(input, &["replace_all"]);
             if !opts.is_empty() {
-                out.push_str(&format!("\n--- Optionen ---\n{opts}"));
+                push_section(&mut out, &mut headings, "options", &opts);
             }
-            out
+            (out, headings)
         }),
         "NotebookEdit" => text("notebook_path").map(|p| {
             with_body(
                 p,
                 vec![
-                    ("neu", text("new_source").unwrap_or("").to_owned()),
+                    ("new", text("new_source").unwrap_or("").to_owned()),
                     (
-                        "Optionen",
+                        "options",
                         options(input, &["edit_mode", "cell_id", "cell_type"]),
                     ),
                 ],
@@ -245,16 +256,13 @@ fn raw_full_text(req: &PermissionRequest) -> String {
         // may be allowed that was not seen (a Bash call can ask to run
         // without its sandbox, for example). The extra lines also make the
         // card a shortened one, so "allow" needs it expanded.
-        Some(mut out) => {
-            let extra = unshown(&req.tool_name, input);
-            if !extra.is_empty() {
-                out.push_str("\n--- Weitere Angaben ---\n");
-                out.push_str(&extra.join("\n"));
-            }
-            out
-        }
-        None if input.is_null() => req.tool_name.clone(),
-        None => format!("{}: {input}", req.tool_name),
+        Some((out, headings)) => (out, headings, unshown(&req.tool_name, input)),
+        None if input.is_null() => (req.tool_name.clone(), Vec::new(), Vec::new()),
+        None => (
+            format!("{}: {input}", req.tool_name),
+            Vec::new(),
+            Vec::new(),
+        ),
     }
 }
 
@@ -345,8 +353,13 @@ pub fn must_expand(tool_name: &str) -> bool {
 pub struct Rendered {
     /// First line, cut, deceptive characters escaped.
     pub summary: String,
-    /// All of it, deceptive characters escaped, line breaks kept.
+    /// All of it, deceptive characters escaped, line breaks kept. Sections
+    /// such as `--- old ---` carry English names the UI translates.
     pub full: String,
+    /// The lines of `full` (from 0) that are section headings.
+    pub headings: Vec<u32>,
+    /// The fields the card does not show by name, escaped, one per line.
+    pub extra: Vec<String>,
     /// "Allow" only comes after expanding. True when the text is long, has
     /// more than one line, holds a character that can hide something, or the
     /// tool writes (decision E4 and its security review).
@@ -356,13 +369,15 @@ pub struct Rendered {
 /// Render the request. Detection runs on the raw text, escaping comes after:
 /// no renderer ever gets a raw control or bidi character.
 pub fn render(req: &PermissionRequest) -> Rendered {
-    let raw = raw_full_text(req);
+    let (raw, headings, extra) = raw_full_text(req);
     let first = raw.lines().next().unwrap_or("");
     let multi = raw.lines().nth(1).is_some();
-    let deceptive = raw.chars().any(is_deceptive);
+    let deceptive =
+        raw.chars().any(is_deceptive) || extra.iter().flat_map(|e| e.chars()).any(is_deceptive);
     let shown = show_deceptive(first);
     let too_long = shown.chars().count() > MAX_SUMMARY;
-    let truncated = too_long || multi || deceptive || must_expand(&req.tool_name);
+    let truncated =
+        too_long || multi || deceptive || !extra.is_empty() || must_expand(&req.tool_name);
     let summary = if too_long || multi {
         let cut: String = shown.chars().take(MAX_SUMMARY - 1).collect();
         format!("{cut}…")
@@ -372,6 +387,8 @@ pub fn render(req: &PermissionRequest) -> Rendered {
     Rendered {
         summary,
         full: show_deceptive(&raw),
+        headings,
+        extra: extra.iter().map(|e| show_deceptive(e)).collect(),
         truncated,
     }
 }

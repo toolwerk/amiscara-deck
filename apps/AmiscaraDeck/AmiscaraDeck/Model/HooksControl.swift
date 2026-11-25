@@ -35,14 +35,17 @@ struct HooksControl: Sendable {
 /// What the settings view says about the hooks. Pure, so it is tested.
 enum HooksText {
     static func summary(_ s: HooksStatus) -> String {
-        if !s.programExists { return "Das Hook-Programm fehlt in der App." }
-        if !s.programExecutable { return "Das Hook-Programm ist nicht ausführbar." }
+        let counts = ["installed": String(s.installed), "total": String(s.total)]
+        if !s.programExists { return L10n.t("The hook program is missing from the app.") }
+        if !s.programExecutable { return L10n.t("The hook program is not executable.") }
         if s.installed == s.total && s.total > 0 && s.outdated == 0 {
-            return "Eingebaut (\(s.installed) von \(s.total) Ereignissen)."
+            return L10n.t("Installed ({installed} of {total} events).", counts)
         }
-        if s.outdated > 0 { return "Veraltet: \(s.outdated) Einträge zeigen auf einen anderen Ort. Neu einbauen behebt das." }
-        if s.installed == 0 { return "Nicht eingebaut. Agenten erscheinen erst nach dem Einbau." }
-        return "Teilweise eingebaut (\(s.installed) von \(s.total) Ereignissen)."
+        if s.outdated > 0 {
+            return L10n.t("Outdated: {count} entries point to another place. Reinstalling fixes it.", ["count": String(s.outdated)])
+        }
+        if s.installed == 0 { return L10n.t("Not installed. Agents appear only after installing.") }
+        return L10n.t("Partly installed ({installed} of {total} events).", counts)
     }
 
     static func isInstalled(_ s: HooksStatus) -> Bool {
@@ -50,7 +53,7 @@ enum HooksText {
     }
 
     static func foreign(_ s: HooksStatus) -> String? {
-        s.foreignEntries == 0 ? nil : "\(s.foreignEntries) Einträge anderer Programme bleiben unberührt."
+        s.foreignEntries == 0 ? nil : L10n.t("{count} entries of other programs stay untouched.", ["count": String(s.foreignEntries)])
     }
 }
 
@@ -59,7 +62,7 @@ extension HooksText {
     static func versionWarning(_ v: ClaudeVersionCheck) -> String? {
         switch v {
         case .tooOld(let version):
-            "Claude Code \(version) ist älter als die geprüfte Version 2.1.331. Hooks können fehlen oder anders arbeiten."
+            L10n.t("Claude Code {version} is older than the tested version 2.1.331. Hooks may be missing or work differently.", ["version": version])
         case .ok, .unknown:
             nil
         }
@@ -68,15 +71,19 @@ extension HooksText {
     static func versionLine(_ v: ClaudeVersionCheck) -> String {
         switch v {
         case .ok(let version), .tooOld(let version): "Claude Code \(version)"
-        case .unknown: "Claude Code nicht gefunden"
+        case .unknown: L10n.t("Claude Code not found")
         }
     }
 }
 
 extension HooksText {
-    static let codexNote = "Nach dem Einbau müssen Sie die Hooks in Codex einmal über /hooks bestätigen. Ohne Freigaben zeigt Deck die Sitzungen nur an."
+    static var codexNote: String {
+        L10n.t("After installing, confirm the hooks once in Codex with /hooks. Without approvals Deck only shows the sessions.")
+    }
     /// Codex waits for Deck before it shows its own dialog, so say that.
-    static let codexApprovalNote = "Codex zeigt seinen Dialog erst, wenn Deck die Anfrage freigibt. Deck hält sie deshalb nur, wenn es eine Mitteilung zeigen würde, und gibt sie frei, sobald Sie wieder am Terminal sind. \"Immer erlauben\" gibt es bei Codex nicht."
+    static var codexApprovalNote: String {
+        L10n.t("Codex shows its dialog only once Deck lets the request go. So Deck holds it only when it would show a notification, and lets it go as soon as you are back at the terminal. Codex has no \"Always allow\".")
+    }
 }
 
 /// How long the history is kept, as the menu offers it.
@@ -84,6 +91,6 @@ enum Retention {
     static let options: [UInt32] = [1, 7, 30]
 
     static func label(_ days: UInt32) -> String {
-        days == 1 ? "1 Tag" : "\(days) Tage"
+        L10n.plural("{n} day", "{n} days", Int(days))
     }
 }

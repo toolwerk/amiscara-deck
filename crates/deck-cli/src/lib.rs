@@ -2,6 +2,9 @@
 //!
 //! Exit codes: 0 done, 1 failed, 2 wrong usage, 3 (`hooks status` only) the
 //! hooks are not all installed.
+//!
+//! Texts are English in the code and German from `po/de.po`, by the language
+//! of the environment (`deck-i18n`).
 
 mod answer;
 mod daemon_cmd;
@@ -12,29 +15,34 @@ mod view;
 
 use std::io::Write;
 
-pub const USAGE: &str = "\
+use deck_i18n::t;
+
+/// The help text, in the language of the user.
+pub fn usage() -> String {
+    t("\
 Amiscara Deck
 
-Aufruf:
-  amiscara-deck answer <Anfrage> allow|deny [--always <Nr>] [--message <Text>] [--seen] [--socket <Datei>]
-  amiscara-deck sim [Szenario] [--speed <Faktor>] [--wait <Sekunden>] [--list] [--socket <Datei>]
-  amiscara-deck list  [--socket <Datei>] [--json]
-  amiscara-deck watch [--socket <Datei>] [--json]
-  amiscara-deck hooks install   [--settings <Datei>] [--program <Pfad>] [--force]
-  amiscara-deck hooks uninstall [--settings <Datei>] [--program <Pfad>]
-  amiscara-deck hooks status    [--settings <Datei>] [--program <Pfad>]
+Usage:
+  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]
+  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]
+  amiscara-deck list  [--socket <file>] [--json]
+  amiscara-deck watch [--socket <file>] [--json]
+  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]
+  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]
+  amiscara-deck hooks status    [--settings <file>] [--program <path>]
 
-  --socket    Socket des Dienstes (Vorgabe: im Datenordner von Amiscara Deck)
-  --speed     sim: Abspielgeschwindigkeit (1 = Echtzeit)
-  --wait      sim: wie lange eine Anfrage auf Antwort wartet (Vorgabe 60)
-  --json      Ausgabe als JSON (watch: eine Zeile je Nachricht)
-  --settings  Einstellungsdatei von Claude Code (Vorgabe: ~/.claude/settings.json)
-  --program   Pfad des Hook-Programms (Vorgabe: deck-hook neben diesem Programm)
-  --force     Auch einbauen, wenn das Hook-Programm fehlt oder nicht ausführbar ist
+  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)
+  --speed     sim: playback speed (1 = real time)
+  --wait      sim: how long a request waits for an answer (default 60)
+  --json      Output as JSON (watch: one line per message)
+  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)
+  --program   Path of the hook program (default: deck-hook next to this program)
+  --force     Install even if the hook program is missing or not executable
 
-Beendigungscodes: 0 erledigt, 1 Fehler, 2 falscher Aufruf,
-3 (status) nicht alle Hooks eingebaut.
-";
+Exit codes: 0 done, 1 failed, 2 wrong usage,
+3 (status) not all hooks installed.
+")
+}
 
 /// Run the command line. `args` without the program name. Returns the exit code.
 pub fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
@@ -47,11 +55,11 @@ pub fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
         ["list", opts @ ..] => live::list(opts, out, err),
         ["watch", opts @ ..] => live::watch(opts, out, err),
         ["--help"] | ["-h"] | ["help"] => {
-            let _ = out.write_all(USAGE.as_bytes());
+            let _ = out.write_all(usage().as_bytes());
             0
         }
         _ => {
-            let _ = err.write_all(USAGE.as_bytes());
+            let _ = err.write_all(usage().as_bytes());
             2
         }
     }

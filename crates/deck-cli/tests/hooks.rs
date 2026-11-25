@@ -24,6 +24,8 @@ fn run(args: &[&str]) -> (Option<i32>, String, String) {
     let out = Command::new(env!("CARGO_BIN_EXE_amiscara-deck"))
         .args(args)
         .env_clear()
+        // The texts of these tests are German.
+        .env("DECK_LANGUAGE", "de")
         .output()
         .expect("run");
     (
@@ -265,4 +267,71 @@ fn a_changed_launch_agent_is_reported_and_install_repairs_it() {
     assert!(out.contains("anders"), "{out}");
     assert_eq!(run(&daemon_args(&e, "install", plist_s, &[])).0, Some(0));
     assert_eq!(run(&daemon_args(&e, "status", plist_s, &[])).0, Some(0));
+}
+
+/// The help in the language of the environment, as `amiscara-deck` prints it.
+fn help_with(vars: &[(&str, &str)]) -> String {
+    let out = Command::new(env!("CARGO_BIN_EXE_amiscara-deck"))
+        .arg("help")
+        .env_clear()
+        .envs(vars.iter().copied())
+        .output()
+        .expect("run");
+    String::from_utf8_lossy(&out.stdout).into_owned()
+}
+
+#[test]
+fn the_language_follows_the_environment() {
+    let english = help_with(&[("LANG", "en_US.UTF-8")]);
+    assert!(
+        english.contains("Usage:") && english.contains("Exit codes"),
+        "{english}"
+    );
+    let german = help_with(&[("LANG", "de_DE.UTF-8")]);
+    assert!(
+        german.contains("Aufruf:") && german.contains("Beendigungscodes"),
+        "{german}"
+    );
+    assert!(
+        help_with(&[("LC_ALL", "C"), ("LANG", "de_DE.UTF-8")]).contains("Aufruf:"),
+        "C says nothing about the language"
+    );
+    assert!(
+        help_with(&[("DECK_LANGUAGE", "en"), ("LANG", "de_DE.UTF-8")]).contains("Usage:"),
+        "DECK_LANGUAGE comes first"
+    );
+    assert!(
+        help_with(&[("LANG", "fr_FR.UTF-8")]).contains("Usage:"),
+        "neither German nor English: English"
+    );
+    assert!(help_with(&[]).contains("Usage:"));
+}
+
+#[test]
+fn hook_status_in_english() {
+    let e = env();
+    let out = Command::new(env!("CARGO_BIN_EXE_amiscara-deck"))
+        .args([
+            "hooks",
+            "status",
+            "--settings",
+            e.settings.to_str().expect("utf8"),
+            "--program",
+            e.program.to_str().expect("utf8"),
+        ])
+        .env_clear()
+        .env("LANG", "en_GB.UTF-8")
+        .output()
+        .expect("run");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        text.contains("Settings: ")
+            && text.contains("(missing)")
+            && text.contains("Hook program: "),
+        "{text}"
+    );
+    assert!(
+        !text.contains("fehlt") && !text.contains("Einstellungen"),
+        "{text}"
+    );
 }
