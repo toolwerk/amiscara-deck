@@ -127,7 +127,7 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
         }
         // Shortened card: show everything first, allow only when it was read.
         if request.truncated && matches!(decision, Decision::Allow { expanded: false, .. }) {
-            let full = view::request_text(&request.full, &request.extra);
+            let full = view::request_text(&request.full, &request.headings, &request.extra);
             let _ = writeln!(
                 err,
                 "{}",

@@ -1346,6 +1346,33 @@ fn a_field_the_card_does_not_name_is_shown_and_needs_expanding() {
     assert!(full.contains("cwd=a⟦U+202E⟧b"), "{full}");
 }
 
+/// Only the lines the daemon wrote are headings: a file whose content has a
+/// line like `--- new ---` must reach the user word for word.
+#[test]
+fn only_the_section_lines_of_the_daemon_are_headings() {
+    let mut st = Store::new("work");
+    ask(
+        &mut st,
+        json!({"tool_name": "Edit", "tool_input": {"file_path": "/a.md", "old_string": "x\n--- new ---", "new_string": "y"}}),
+        1000,
+        true,
+    );
+    let r = st.get(S).and_then(|a| a.request.clone()).expect("request");
+    let lines: Vec<&str> = r.full.split('\n').collect();
+    assert_eq!(
+        lines,
+        [
+            "/a.md",
+            "--- old ---",
+            "x",
+            "--- new ---",
+            "--- new ---",
+            "y"
+        ]
+    );
+    assert_eq!(r.headings, [1, 4]);
+}
+
 #[test]
 fn fields_that_change_nothing_leave_the_card_short() {
     for input in [

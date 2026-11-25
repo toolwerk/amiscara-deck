@@ -77,6 +77,11 @@ pub struct Request {
     pub truncated: bool,
     /// The full text, for the main window.
     pub full: String,
+    /// The lines of `full` (counted from 0) that are section headings such as
+    /// `--- old ---`. The UI translates only these: a line of the same look
+    /// inside a file or command stays as it is.
+    #[serde(default)]
+    pub headings: Vec<u32>,
     /// Fields of the input the card does not show by name, as `key=value`
     /// lines. The UI shows them after the full text under a heading of its own
     /// language. Not empty: the card is shortened.

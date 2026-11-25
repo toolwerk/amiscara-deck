@@ -43,10 +43,12 @@ enum ActivityText {
 /// The whole text of a request, as the card shows it after "View".
 enum RequestText {
     /// Section names of the daemon (`--- 2 old ---`) in the language of the
-    /// app, and the fields the card does not name after them.
+    /// app, and the fields the card does not name after them. Only the lines
+    /// the daemon marked are headings; the content stays word for word.
     static func full(_ request: RequestView) -> String {
-        var lines = request.full.split(separator: "\n", omittingEmptySubsequences: false).map { line -> String in
-            guard line.hasPrefix("--- "), line.hasSuffix(" ---"), line.count > 8 else { return String(line) }
+        let headings = Set(request.headings)
+        var lines = request.full.split(separator: "\n", omittingEmptySubsequences: false).enumerated().map { i, line -> String in
+            guard headings.contains(UInt32(i)), line.hasPrefix("--- "), line.hasSuffix(" ---"), line.count > 8 else { return String(line) }
             let name = String(line.dropFirst(4).dropLast(4))
             return section(name).map { "--- \($0) ---" } ?? String(line)
         }

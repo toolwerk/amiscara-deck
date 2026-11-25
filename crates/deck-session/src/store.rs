@@ -452,6 +452,7 @@ impl Store {
                     summary: shown.summary,
                     truncated: shown.truncated,
                     full: shown.full,
+                    headings: shown.headings,
                     extra: shown.extra,
                     always_allow: always_allow(&req.permission_suggestions),
                     state: if held {

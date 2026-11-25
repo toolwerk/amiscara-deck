@@ -15,6 +15,7 @@ final class LanguageTests: XCTestCase {
             summary: "rm -rf build…", truncated: true, full: "a.rs\n--- 1 old ---\nx\n--- 1 new ---\ny"
         ))
         a.request?.extra = ["dangerouslyDisableSandbox=true"]
+        a.request?.headings = [1, 3]
         a.statusSinceMs = 0
         a.contextUsed = 128_000
         a.contextWindow = 1_000_000
@@ -112,6 +113,13 @@ final class LanguageTests: XCTestCase {
         XCTAssertEqual(AgentCardView(agent: a, nowMs: 0).detailLine, "main · editing src/a.rs")
         L10n.language = "de"
         XCTAssertEqual(AgentCardView(agent: a, nowMs: 0).detailLine, "main · bearbeitet src/a.rs")
+    }
+
+    func testContentThatLooksLikeAHeadingStaysAsWritten() {
+        L10n.language = "de"
+        var r = makeFullRequest(full: "a.md\n--- old ---\n--- new ---\nx")
+        r.headings = [1]
+        XCTAssertEqual(RequestText.full(r), "a.md\n--- alt ---\n--- new ---\nx")
     }
 
     func testPlaceholdersAreFilledOnce() {

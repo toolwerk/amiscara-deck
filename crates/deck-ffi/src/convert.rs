@@ -73,6 +73,9 @@ pub struct RequestView {
     /// Shortened: "allow" only after the full text was shown.
     pub truncated: bool,
     pub full: String,
+    /// The lines of `full` (from 0) that are section headings.
+    #[uniffi(default = [])]
+    pub headings: Vec<u32>,
     /// Fields the card does not show by name, as `key=value` lines.
     #[uniffi(default = [])]
     pub extra: Vec<String>,
@@ -355,6 +358,7 @@ impl From<Request> for RequestView {
             summary: r.summary,
             truncated: r.truncated,
             full: r.full,
+            headings: r.headings,
             extra: r.extra,
             always_allow: r.always_allow.into_iter().map(Into::into).collect(),
             state: r.state.into(),

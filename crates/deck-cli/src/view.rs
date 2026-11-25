@@ -57,11 +57,16 @@ fn section(name: &str) -> Option<String> {
 
 /// The whole text of a request: section names in the language of the user,
 /// the fields the card does not name after it.
-pub fn request_text(full: &str, extra: &[String]) -> String {
+/// Only the lines the daemon marked as headings are translated.
+pub fn request_text(full: &str, headings: &[u32], extra: &[String]) -> String {
     let mut lines: Vec<String> = full
         .split('\n')
-        .map(|line| {
-            line.strip_prefix("--- ")
+        .enumerate()
+        .map(|(i, line)| {
+            u32::try_from(i)
+                .ok()
+                .filter(|i| headings.contains(i))
+                .and_then(|_| line.strip_prefix("--- "))
                 .and_then(|l| l.strip_suffix(" ---"))
                 .and_then(section)
                 .map_or_else(|| line.to_owned(), |s| format!("--- {s} ---"))
@@ -367,14 +372,15 @@ mod tests {
 
     #[test]
     fn the_full_text_names_its_sections_in_the_language_of_the_user() {
-        let full = "a.rs\n--- 1 old ---\nx\n--- 1 new ---\ny\n--- not ours ---";
+        let full = "a.rs\n--- 1 old ---\nx\n--- 1 new ---\n--- new ---\n--- not ours ---";
         let extra = vec!["dangerouslyDisableSandbox=true".to_owned()];
         assert_eq!(
-            de(|| request_text(full, &extra)),
-            "a.rs\n--- 1 alt ---\nx\n--- 1 neu ---\ny\n--- not ours ---\n--- Weitere Angaben ---\ndangerouslyDisableSandbox=true"
+            de(|| request_text(full, &[1, 3], &extra)),
+            "a.rs\n--- 1 alt ---\nx\n--- 1 neu ---\n--- new ---\n--- not ours ---\n--- Weitere Angaben ---\ndangerouslyDisableSandbox=true",
+            "a line of the content that looks like a heading stays as written"
         );
         assert_eq!(
-            en(|| request_text(full, &[])),
+            en(|| request_text(full, &[1, 3], &[])),
             full,
             "English is the text itself"
         );

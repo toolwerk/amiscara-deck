@@ -33,6 +33,7 @@ fn agent() -> Agent {
             summary: "curl --version".into(),
             truncated: false,
             full: "curl --version".into(),
+            headings: Vec::new(),
             extra: vec!["dangerouslyDisableSandbox=true".into()],
             always_allow: vec![AlwaysAllow {
                 index: 0,
