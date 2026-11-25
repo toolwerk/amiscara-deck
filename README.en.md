@@ -363,10 +363,11 @@ python3 scripts/i18n.py check
 
 ### Contributing
 
-One issue per task, branch `feature/<n>-slug` or `fix/<n>-slug`, squash merge, an entry in `CHANGELOG.md`. Before you push:
+One issue per task, branch `feature/<n>-slug` or `fix/<n>-slug`, squash merge, an entry in `CHANGELOG.md` (German) and in `CHANGELOG.en.md` (English). Before you push:
 
 ```sh
 cargo fmt --all --check && cargo clippy --workspace --all-targets --locked -- -D warnings && cargo test --workspace --locked
+python3 scripts/release-notes.py check
 ```
 
 Related to [Amiscara Agents](https://github.com/staude/amiscara-agents), but independent of it.
