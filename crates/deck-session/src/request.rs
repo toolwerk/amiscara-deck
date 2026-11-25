@@ -172,7 +172,7 @@ fn raw_full_text(req: &PermissionRequest) -> String {
         }
         out
     };
-    match req.tool_name.as_str() {
+    let known = match req.tool_name.as_str() {
         "Bash" => text("command").map(str::to_owned),
         QUESTION_TOOL => question_text(input),
         "ExitPlanMode" => text("plan").map(str::to_owned),
@@ -239,14 +239,86 @@ fn raw_full_text(req: &PermissionRequest) -> String {
             )
         }),
         _ => None,
-    }
-    .unwrap_or_else(|| {
-        if req.tool_input.is_null() {
-            req.tool_name.clone()
-        } else {
-            format!("{}: {}", req.tool_name, req.tool_input)
+    };
+    match known {
+        // Whatever the card does not show by name is shown after it: nothing
+        // may be allowed that was not seen (a Bash call can ask to run
+        // without its sandbox, for example). The extra lines also make the
+        // card a shortened one, so "allow" needs it expanded.
+        Some(mut out) => {
+            let extra = unshown(&req.tool_name, input);
+            if !extra.is_empty() {
+                out.push_str("\n--- Weitere Angaben ---\n");
+                out.push_str(&extra.join("\n"));
+            }
+            out
         }
-    })
+        None if input.is_null() => req.tool_name.clone(),
+        None => format!("{}: {input}", req.tool_name),
+    }
+}
+
+/// The fields of a known tool that its card already shows, or that change
+/// nothing about what is done (a description, a time limit, which part of a
+/// file is read).
+fn shown_fields(tool_name: &str) -> &'static [&'static str] {
+    match tool_name {
+        "Bash" => &["command", "description", "timeout"],
+        "Read" => &["file_path", "offset", "limit", "pages"],
+        "Write" => &["file_path", "content"],
+        "Edit" => &["file_path", "old_string", "new_string", "replace_all"],
+        "MultiEdit" => &["file_path", "edits", "replace_all"],
+        "NotebookEdit" => &[
+            "notebook_path",
+            "new_source",
+            "edit_mode",
+            "cell_id",
+            "cell_type",
+        ],
+        QUESTION_TOOL => &["questions"],
+        "ExitPlanMode" => &["plan"],
+        _ => &[],
+    }
+}
+
+/// Switches whose "off" is what happens without them.
+const HARMLESS_WHEN_FALSE: &[&str] = &["dangerouslyDisableSandbox", "run_in_background"];
+
+/// `key=value` for every field the card does not show, edits of a MultiEdit
+/// included.
+fn unshown(tool_name: &str, input: &Value) -> Vec<String> {
+    let line = |prefix: &str, key: &str, value: &Value| match value.as_str() {
+        Some(t) => format!("{prefix}{key}={t}"),
+        None => format!("{prefix}{key}={value}"),
+    };
+    let matters = |key: &str, value: &Value| {
+        !value.is_null() && !(value == &Value::Bool(false) && HARMLESS_WHEN_FALSE.contains(&key))
+    };
+    let shown = shown_fields(tool_name);
+    let mut out: Vec<String> = input
+        .as_object()
+        .into_iter()
+        .flatten()
+        .filter(|(k, v)| !shown.contains(&k.as_str()) && matters(k, v))
+        .map(|(k, v)| line("", k, v))
+        .collect();
+    if tool_name == "MultiEdit" {
+        let edits = input.get("edits").and_then(Value::as_array);
+        for (i, edit) in edits.into_iter().flatten().enumerate() {
+            let prefix = format!("{} ", i + 1);
+            out.extend(
+                edit.as_object()
+                    .into_iter()
+                    .flatten()
+                    .filter(|(k, v)| {
+                        !["old_string", "new_string", "replace_all"].contains(&k.as_str())
+                            && matters(k, v)
+                    })
+                    .map(|(k, v)| line(&prefix, k, v)),
+            );
+        }
+    }
+    out
 }
 
 /// `key=value` for the given keys that are set, on one line.
