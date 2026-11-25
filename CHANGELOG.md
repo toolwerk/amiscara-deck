@@ -10,6 +10,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Fixed
 
+- An answer of the daemon could get lost on macOS when the daemon hung up right after sending it: the hook program set its read limit only after sending the request, which macOS then refuses. The normal dialog appeared instead (found by a failing test run)
 - The cards of the main window sit at the top of their row instead of floating in its middle
 - The hook program reads its whole input also when it has nothing to do, so the caller never writes into a closed pipe
 - A request card showed only the command or path of a known tool: any other field of the call, such as a Bash call asking to run without its sandbox, stayed unseen and could still be allowed. Every such field is now shown under "Weitere Angaben" and makes the card one that has to be expanded first (security review)
