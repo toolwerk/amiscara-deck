@@ -3,6 +3,7 @@
 [![macOS 27+](https://img.shields.io/badge/macOS-27%2B-000000?logo=apple&logoColor=white)](#requirements)
 [![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)](apps/AmiscaraDeck)
 [![Rust](https://img.shields.io/badge/Rust-2024-000000?logo=rust&logoColor=white)](crates)
+[![Release](https://img.shields.io/github/v/release/toolwerk/amiscara-deck?color=blue)](https://github.com/toolwerk/amiscara-deck/releases/latest)
 [![License: MIT or Apache 2.0](https://img.shields.io/badge/License-MIT%20or%20Apache%202.0-blue)](#license)
 
 [Deutsch](README.md) · **English**
@@ -59,7 +60,7 @@ Deck does not start agents and does not replace a terminal. With Claude Code the
 
 ### Install
 
-Ready made versions are published under [Releases](https://github.com/toolwerk/amiscara-deck/releases) as soon as the first one is out. Until then, [build it yourself](#development).
+Download the zip of the [latest version](https://github.com/toolwerk/amiscara-deck/releases/latest) and unpack it. The app is signed and notarized by Apple. If you would rather [build it yourself](#development), see below.
 
 ### Set up
 
