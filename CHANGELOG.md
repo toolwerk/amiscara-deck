@@ -4,6 +4,10 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
+
+- Das README führt zum Download der fertigen Version
+
 ## [0.1.0] - 2026-11-25
 
 Erste öffentliche Version. Die Oberfläche ist deutsch. Sie braucht macOS 27 auf Apple Silicon und Claude Code ab 2.1.331.
