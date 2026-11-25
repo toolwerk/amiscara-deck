@@ -24,7 +24,7 @@ const DAY_MS: u64 = 24 * 60 * 60 * 1000;
 pub const EXITED_VISIBLE_MS: u64 = 10 * 60 * 1000;
 
 /// Shown to the model when a request is denied in Deck.
-pub const DENY_MESSAGE: &str = "Im Amiscara Deck abgelehnt";
+pub const DENY_MESSAGE: &str = "Denied in Amiscara Deck";
 
 /// One hook event plus what only the daemon can know.
 #[derive(Debug, Clone)]

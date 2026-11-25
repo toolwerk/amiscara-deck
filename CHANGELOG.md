@@ -15,6 +15,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 - Tätigkeit und Verlauf schickt der Dienst als Daten, jede Oberfläche formuliert sie in ihrer Sprache, auch für Agenten anderer Rechner. Protokoll 2: Dienst und App anderer Rechner gleichzeitig aktualisieren
 - Nach dem Update bleiben die Einstellungen erhalten, laufende Agenten erscheinen mit ihrem nächsten Ereignis wieder, ihr bisheriger Verlauf fällt weg
 - Die Befehlszeile schreibt Minuten als "min" wie die App
+- Nach einer Ablehnung in Deck liest der Agent "Denied in Amiscara Deck" statt eines deutschen Satzes
 
 ## [0.1.0] - 2026-11-25
 
