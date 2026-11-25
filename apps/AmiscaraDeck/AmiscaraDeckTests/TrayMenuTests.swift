@@ -72,3 +72,41 @@ final class TrayMenuTests: XCTestCase {
         XCTAssertFalse(TrayMenu.shared.present(windowNumber: -1))
     }
 }
+
+@MainActor
+final class UpdateNoticeTests: XCTestCase {
+    func testALoadedUpdateIsAnnouncedAndInstalledByTheButton() {
+        let updater = UpdaterController()
+        XCTAssertNil(updater.notice)
+        updater.act()
+        var installs = 0
+        updater.downloaded(version: "0.2.0") { installs += 1 }
+        XCTAssertEqual(updater.notice?.text, "Version 0.2.0 ist bereit.")
+        XCTAssertEqual(updater.notice?.button, "Jetzt neu starten")
+        updater.act()
+        XCTAssertEqual(installs, 1)
+        // Neither the end of a session nor a later find takes it away.
+        updater.seen()
+        updater.found(version: "0.3.0")
+        XCTAssertEqual(updater.notice?.version, "0.2.0")
+    }
+
+    func testAFoundUpdateIsAnnouncedUntilSeen() {
+        let updater = UpdaterController()
+        updater.found(version: "0.2.0")
+        XCTAssertEqual(updater.notice?.text, "Version 0.2.0 ist verfügbar.")
+        XCTAssertEqual(updater.notice?.button, "Ansehen")
+        updater.seen()
+        XCTAssertNil(updater.notice)
+    }
+
+    func testThePanelShowsTheNotice() async {
+        let updater = UpdaterController()
+        let model = DeckModel(socketPath: "x", connector: { _, _ in throw DeckError.Failed(message: "no") }, launcher: FakeLauncher(), initialLink: .connected)
+        let plain = await RenderSupport.hosted(PanelView(model: model, updater: updater))
+        updater.downloaded(version: "0.2.0") {}
+        let announced = await RenderSupport.hosted(PanelView(model: model, updater: updater))
+        RenderSupport.save(announced.image, named: "panel-update")
+        XCTAssertGreaterThan(announced.size.height, plain.size.height + 30)
+    }
+}

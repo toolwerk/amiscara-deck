@@ -24,6 +24,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- A waiting update shows in the panel and the settings ("Version x ist bereit", "Jetzt neu starten"): a menu bar app is hardly ever quit, so an update installed on quit would otherwise wait unnoticed
 - Updates: the app checks the signed feed of the releases once a day (Sparkle), installs a new version when it quits, and offers the check in the settings and the menu of the symbol; `scripts/sparkle-feed.sh` writes the feed, `scripts/publish.sh` publishes after asking (#68)
 - After an update the app ends the older background service and starts its own (a fingerprint of the running program in the welcome, a clean shutdown on request)
 - Release scripts: `scripts/release.sh` builds, signs with Developer ID (helpers included, checked), notarizes, staples and zips the app; `bump-build.sh` and release notes from the changelog (`docs/release.md`); README rewritten for the public, third-party schema removed (#66, #67, #69)

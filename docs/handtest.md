@@ -53,6 +53,7 @@ Je Terminal einmal: Terminal (macOS), iTerm2, Ghostty, Terminal im Editor (VS Co
 |---|---|---|---|
 | D10 | Mitteilungen in den Systemeinstellungen ausschalten, Panel öffnen | Hinweis mit Knopf "Systemeinstellungen öffnen"; nach dem Einschalten verschwindet er | |
 | D11 | Einstellungen "Aufmerksam machen": Fenster, Ton, Erinnern, Zahl, Pulsieren einschalten und eine Rückfrage auslösen | Fenster oben rechts ohne Tastatur wegzunehmen, Ton, Zahl am Symbol, Erinnerung nach 1 Minute | von Hand: Fenster, Ton, Mitteilung und Symbol bemerkt. Erinnerung nach 1 Minute offen |
+| D12 | Mit einer älteren Version eine neue veröffentlichen und warten (oder "Jetzt suchen") | Panel zeigt "Version x ist bereit", "Jetzt neu starten" setzt sie ein; danach läuft der neue Dienst | |
 | D9 | Rechtsklick auf das Menüleisten-Symbol | Menü mit Fenster, Einstellungen, Beenden; Linksklick öffnet weiter das Panel | von Hand bestanden (25.11.) |
 | D8 | Panel mit mehr als drei Agenten öffnen | mindestens drei sind ganz zu sehen, bei vielen wird gescrollt | Test bestanden; von Hand noch nicht ausdrücklich bestätigt |
 | D1 | Dienst hart beenden (`kill -9`), während eine Anfrage gehalten wird | Dialog steht im Terminal, Antwort dort läuft, der Agent arbeitet weiter | bestanden (Skript) |
