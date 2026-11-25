@@ -193,6 +193,10 @@ The cards in the panel stay visible.
 
 ![The window with six agents on two machines and the detail column](docs/images/en/fenster.png)
 
+### Text size
+
+In the settings under "Appearance" you choose the text size: Small, Normal, Large or Extra large. It applies to the panel, the window, the floating window and the settings. The panel and the window get wider with it. In the window ⌘+, ⌘- and ⌘0 work as well. Notifications, the icon menu and the icon itself stay as they are.
+
 ### Context and cost
 
 - Deck reads the **context fill** from the transcript of the session.
