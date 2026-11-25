@@ -64,10 +64,10 @@ struct AgentCardView: View {
     /// A Codex agent says whether Deck only watches it.
     var codexTag: String {
         let answers = (model?.settings.codexApprovals ?? false) || agent.request?.state == .held
-        return answers ? "Codex" : "Codex · nur lesend"
+        return answers ? "Codex" : L10n.t("Codex · read only")
     }
 
-    /// "wartet · 2 min", "arbeitet", "fertig · 14 min".
+    /// "waiting · 2 min", "working", "done · 14 min".
     var stateText: String {
         let label = agent.statusLabel
         switch agent.status {
@@ -76,15 +76,16 @@ struct AgentCardView: View {
         }
     }
 
-    /// "main · bearbeitet src/session.rs": branch, then what it does or did last.
+    /// "main · editing src/session.rs": branch, then what it does or did last.
     var detailLine: String {
         let what: String?
+        let activity = agent.activity.map(ActivityText.text)
         switch agent.status {
-        case .working: what = agent.activity ?? agent.lastPrompt
+        case .working: what = activity ?? agent.lastPrompt
         case .done, .idle: what = agent.lastPrompt
         case .blocked: what = agent.lastPrompt
-        case .error: what = agent.activity ?? agent.lastPrompt
-        case .exited: what = "Sitzung beendet"
+        case .error: what = activity ?? agent.lastPrompt
+        case .exited: what = L10n.t("Session ended")
         }
         return [agent.branch, what].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
     }
@@ -104,11 +105,15 @@ struct ContextBar: View {
                 }
             }
             .frame(height: 4)
-            Text("Kontext \(Int((fill * 100).rounded())) %")
+            Text(L10n.t("Context {percent} %", ["percent": percent]))
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.secondary)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Kontext zu \(Int((fill * 100).rounded())) Prozent gefüllt")
+        .accessibilityLabel(L10n.t("Context {percent} percent full", ["percent": percent]))
+    }
+
+    private var percent: String {
+        String(Int((fill * 100).rounded()))
     }
 }

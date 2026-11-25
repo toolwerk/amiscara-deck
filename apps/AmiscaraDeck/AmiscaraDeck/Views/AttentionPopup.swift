@@ -18,7 +18,7 @@ struct AttentionView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Wartet auf Sie")
+                Text(L10n.t("Waiting for you"))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.text)
                 Spacer()
@@ -30,7 +30,7 @@ struct AttentionView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Schließen")
+                .accessibilityLabel(L10n.t("Close"))
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
@@ -59,7 +59,7 @@ struct AttentionView: View {
     private func cards(now: UInt64) -> some View {
         VStack(spacing: 8) {
             if waiting.isEmpty {
-                Text("Niemand wartet.")
+                Text(L10n.t("Nobody is waiting."))
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.secondary)
                     .padding(16)

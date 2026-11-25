@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// "Frage 1 von 3".
+/// "Question 1 of 3".
 enum QuestionWording {
     static func position(_ index: Int, of count: Int) -> String {
-        "Frage \(index + 1) von \(count)"
+        L10n.t("Question {index} of {count}", ["index": String(index + 1), "count": String(count)])
     }
 }
 
@@ -35,22 +35,22 @@ struct QuestionAnswerView: View {
             }
             HStack(spacing: 8) {
                 if q > 0 {
-                    Button("Zurück") { model.previousQuestion(request) }
+                    Button(L10n.t("Back")) { model.previousQuestion(request) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
                 if last {
-                    Button("Antworten") { model.answer(request) }
+                    Button(L10n.t("Answer")) { model.answer(request) }
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(!model.canAnswer(request))
                         .opacity(model.canAnswer(request) ? 1 : 0.45)
                 } else {
-                    Button("Weiter") { model.nextQuestion(request) }
+                    Button(L10n.t("Next")) { model.nextQuestion(request) }
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(!model.isStepPicked(request))
                         .opacity(model.isStepPicked(request) ? 1 : 0.45)
                 }
             }
-            Text("Eine eigene Antwort tippen Sie im Programm, in dem der Agent läuft.")
+            Text(L10n.t("To give an answer of your own, type it in the program the agent runs in."))
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -64,7 +64,7 @@ struct QuestionAnswerView: View {
                 .foregroundStyle(Theme.text)
                 .fixedSize(horizontal: false, vertical: true)
             if question.multiSelect {
-                Text("Mehrere möglich")
+                Text(L10n.t("Several possible"))
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.secondary)
             }

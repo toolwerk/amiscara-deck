@@ -3,11 +3,11 @@ import UserNotifications
 
 /// The kinds of system notification Deck shows.
 enum NotificationKind: String, Sendable {
-    /// A request Deck holds: "Erlauben" and "Ablehnen" in the notification.
+    /// A request Deck holds: "Allow" and "Deny" in the notification.
     case held
-    /// Held, but shortened: "Ansehen" and "Ablehnen". Allowing needs the full text.
+    /// Held, but shortened: "View" and "Deny". Allowing needs the full text.
     case heldShortened
-    /// An agent asks a question: only "Ansehen", the answer is picked in Deck.
+    /// An agent asks a question: only "View", the answer is picked in Deck.
     case question
     /// Waits in the terminal: no buttons.
     case inTerminal
@@ -47,7 +47,7 @@ enum NotificationBuilder {
     /// A banner shows only a few lines and cuts the rest, so what it shows may
     /// be less than the request says. "Allow" in a notification is only for a
     /// request short enough to be read there in full; everything longer offers
-    /// "Ansehen" and "Ablehnen" (decision E4 reaches into the notification).
+    /// "View" and "Deny" (decision E4 reaches into the notification).
     static let maxAllowableLength = 60
 
     static func isShortEnoughToAllow(_ request: RequestView) -> Bool {
@@ -66,7 +66,7 @@ enum NotificationBuilder {
             if let first = request.questions.first {
                 return UserNotification(
                     identifier: request.id,
-                    title: "\(name) hat eine Frage",
+                    title: L10n.t("{name} has a question", ["name": name]),
                     body: first.question,
                     kind: .question, agentId: agent.id, requestId: request.id, sound: true
                 )
@@ -74,8 +74,10 @@ enum NotificationBuilder {
             let allowable = isShortEnoughToAllow(request)
             return UserNotification(
                 identifier: request.id,
-                title: "\(name) wartet auf Freigabe",
-                body: allowable ? request.summary : "\(String(request.summary.prefix(maxAllowableLength)))…\nLang: erst ansehen, dann erlauben.",
+                title: L10n.t("{name} is waiting for approval", ["name": name]),
+                body: allowable
+                    ? request.summary
+                    : L10n.t("{start}…\nLong: view it first, then allow.", ["start": String(request.summary.prefix(maxAllowableLength))]),
                 kind: allowable ? .held : .heldShortened,
                 agentId: agent.id, requestId: request.id, sound: true
             )
@@ -83,15 +85,15 @@ enum NotificationBuilder {
             guard let request = agent.request, request.id == requestId else { return nil }
             return UserNotification(
                 identifier: request.id,
-                title: "\(name) wartet im Terminal",
-                body: "Antworten Sie dort. Deck hält diese Anfrage nicht.",
+                title: L10n.t("{name} is waiting in the terminal", ["name": name]),
+                body: L10n.t("Answer there. Deck does not hold this request."),
                 kind: .inTerminal, agentId: agent.id, requestId: request.id, sound: false
             )
         case .done:
             return UserNotification(
                 identifier: "done-\(agent.id)",
-                title: "\(name) ist fertig",
-                body: agent.branch.map { "Branch \($0)" } ?? "Der Agent wartet auf einen neuen Auftrag.",
+                title: L10n.t("{name} is done", ["name": name]),
+                body: agent.branch.map { L10n.t("Branch {branch}", ["branch": $0]) } ?? L10n.t("The agent is waiting for a new task."),
                 kind: .done, agentId: agent.id, requestId: nil, sound: false
             )
         }
@@ -137,9 +139,9 @@ final class SystemNotifier: NSObject, Notifying, UNUserNotificationCenterDelegat
             if foreground { options.insert(.foreground) }
             return UNNotificationAction(identifier: a.rawValue, title: title, options: options)
         }
-        let allow = action(.allow, "Erlauben")
-        let deny = action(.deny, "Ablehnen", destructive: true)
-        let view = action(.view, "Ansehen", foreground: true)
+        let allow = action(.allow, L10n.t("Allow"))
+        let deny = action(.deny, L10n.t("Deny"), destructive: true)
+        let view = action(.view, L10n.t("View"), foreground: true)
         return [
             UNNotificationCategory(identifier: NotificationKind.held.category, actions: [allow, deny], intentIdentifiers: []),
             UNNotificationCategory(identifier: NotificationKind.heldShortened.category, actions: [view, deny], intentIdentifiers: []),

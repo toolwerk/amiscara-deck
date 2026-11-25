@@ -4,12 +4,12 @@ import Foundation
 enum AlwaysAllowText {
     static func target(_ destination: String?) -> String {
         switch destination {
-        case "session": "nur in dieser Sitzung"
-        case "localSettings": "nur auf diesem Rechner (.claude/settings.local.json)"
-        case "projectSettings": "im Repo für alle, die es nutzen (.claude/settings.json)"
-        case "userSettings": "für alle Projekte (~/.claude/settings.json)"
-        case .some(let other): "Ziel: \(other)"
-        case .none: "Ziel unbekannt"
+        case "session": L10n.t("only in this session")
+        case "localSettings": L10n.t("only on this machine (.claude/settings.local.json)")
+        case "projectSettings": L10n.t("in the repo for everyone who uses it (.claude/settings.json)")
+        case "userSettings": L10n.t("for all projects (~/.claude/settings.json)")
+        case .some(let other): L10n.t("Target: {target}", ["target": other])
+        case .none: L10n.t("Target unknown")
         }
     }
 

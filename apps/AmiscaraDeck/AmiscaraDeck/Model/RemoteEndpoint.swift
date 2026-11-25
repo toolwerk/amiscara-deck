@@ -133,7 +133,7 @@ final class RemoteEndpoint: Identifiable {
                 pause = retryDelay
                 for await event in bridge.events { apply(event) }
                 connection = nil
-                link = .unreachable("Die Verbindung wurde beendet.")
+                link = .unreachable(L10n.t("The connection was closed."))
                 agents = [:]
                 costToday = nil
             case .failure(let error):
@@ -144,13 +144,13 @@ final class RemoteEndpoint: Identifiable {
                         task = nil
                         return
                     case .HostKeyChanged(let host, let fingerprint):
-                        link = .hostKeyChanged("Der Schlüssel von \(host) hat sich geändert (jetzt \(fingerprint)).")
+                        link = .hostKeyChanged(L10n.t("The key of {host} has changed (now {fingerprint}).", ["host": host, "fingerprint": fingerprint]))
                         task = nil
                         return
                     case .VersionMismatch(let daemon, _):
                         link = .versionMismatch(daemon: daemon)
                     case .NoDaemon(let path):
-                        link = .unreachable("Kein Dienst unter \(path).")
+                        link = .unreachable(L10n.t("No daemon at {path}.", ["path": path]))
                     case .Failed(let message):
                         link = .unreachable(message)
                     }

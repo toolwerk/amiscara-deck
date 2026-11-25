@@ -64,8 +64,8 @@ enum NotificationState: Equatable, Sendable {
     var warning: String? {
         switch self {
         case .unknown, .ok: nil
-        case .denied: "macOS zeigt keine Mitteilungen von Amiscara Deck. Erlauben Sie sie in den Systemeinstellungen."
-        case .silent: "Mitteilungen erscheinen nicht als Hinweis. Stellen Sie in den Systemeinstellungen „Banner“ oder „Hinweise“ ein."
+        case .denied: L10n.t("macOS shows no notifications of Amiscara Deck. Allow them in System Settings.")
+        case .silent: L10n.t("Notifications do not appear as alerts. In System Settings, choose “Banners” or “Alerts”.")
         }
     }
 

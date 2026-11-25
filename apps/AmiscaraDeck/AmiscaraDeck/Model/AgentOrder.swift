@@ -33,16 +33,16 @@ extension AgentView {
         return id
     }
 
-    /// "wartet", "arbeitet", ... A finished agent with background tasks is "pausiert".
+    /// "waiting", "working", ... A finished agent with background tasks is "paused".
     var statusLabel: String {
         switch (status, paused) {
-        case (.done, true): "pausiert"
-        case (.working, _): "arbeitet"
-        case (.blocked, _): "wartet"
-        case (.done, false): "fertig"
-        case (.idle, _): "ohne Auftrag"
-        case (.error, _): "Fehler"
-        case (.exited, _): "beendet"
+        case (.done, true): L10n.t("paused")
+        case (.working, _): L10n.t("working")
+        case (.blocked, _): L10n.t("waiting")
+        case (.done, false): L10n.t("done")
+        case (.idle, _): L10n.t("no task")
+        case (.error, _): L10n.t("error")
+        case (.exited, _): L10n.t("ended")
         }
     }
 

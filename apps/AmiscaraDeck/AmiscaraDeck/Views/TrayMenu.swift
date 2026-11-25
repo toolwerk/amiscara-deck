@@ -7,10 +7,10 @@ enum TrayMenuEntry: CaseIterable {
 
     var title: String {
         switch self {
-        case .window: "Fenster öffnen"
-        case .updates: "Nach Updates suchen …"
-        case .settings: "Einstellungen …"
-        case .quit: "Amiscara Deck beenden"
+        case .window: L10n.t("Open window")
+        case .updates: L10n.t("Check for updates …")
+        case .settings: L10n.t("Settings …")
+        case .quit: L10n.t("Quit Amiscara Deck")
         }
     }
 }

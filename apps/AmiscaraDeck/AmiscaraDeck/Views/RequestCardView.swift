@@ -4,16 +4,16 @@ import SwiftUI
 enum RequestWording {
     static func intro(tool: String) -> String {
         switch tool {
-        case "Bash": "Möchte einen Befehl ausführen"
-        case "Write": "Möchte eine Datei schreiben"
-        case "Edit", "MultiEdit": "Möchte eine Datei ändern"
-        case "NotebookEdit": "Möchte ein Notebook ändern"
-        case "Read": "Möchte eine Datei lesen"
-        case "WebFetch": "Möchte eine Webseite abrufen"
-        case "WebSearch": "Möchte im Netz suchen"
-        case "AskUserQuestion": "Hat eine Frage an Sie"
-        case "ExitPlanMode": "Legt einen Plan zur Freigabe vor"
-        default: "Möchte \(tool) verwenden"
+        case "Bash": L10n.t("Wants to run a command")
+        case "Write": L10n.t("Wants to write a file")
+        case "Edit", "MultiEdit": L10n.t("Wants to change a file")
+        case "NotebookEdit": L10n.t("Wants to change a notebook")
+        case "Read": L10n.t("Wants to read a file")
+        case "WebFetch": L10n.t("Wants to fetch a web page")
+        case "WebSearch": L10n.t("Wants to search the web")
+        case "AskUserQuestion": L10n.t("Has a question for you")
+        case "ExitPlanMode": L10n.t("Presents a plan for approval")
+        default: L10n.t("Wants to use {tool}", ["tool": tool])
         }
     }
 
@@ -26,23 +26,29 @@ enum RequestWording {
     static func terminalHint(tool: String) -> String {
         switch tool {
         case "ExitPlanMode":
-            "Antworten Sie im Programm, in dem der Agent läuft. Pläne gibt Deck nicht frei."
+            L10n.t("Answer in the program the agent runs in. Deck does not approve plans.")
         case "AskUserQuestion":
-            "Diese Frage hält Deck nicht. Antworten Sie im Programm, in dem der Agent läuft."
+            L10n.t("Deck does not hold this question. Answer in the program the agent runs in.")
         default:
-            "Deck hält diese Anfrage nicht. Antworten Sie im Terminal."
+            L10n.t("Deck does not hold this request. Answer in the terminal.")
         }
     }
 }
 
 /// The request of a waiting agent, inside its card. Three looks:
-/// held (Erlauben, Ablehnen), held but shortened (Ansehen, Ablehnen; Erlauben
-/// only after the full text was shown), and waiting in the terminal.
+/// held (Allow, Deny), held but shortened (View, Deny; Allow only after the
+/// full text was shown), and waiting in the terminal.
 struct RequestCardView: View {
     let request: RequestView
     let model: DeckModel
 
     private var expanded: Bool { model.isExpanded(request.id) }
+    /// The whole text with section names in the language of the app.
+    private var fullText: String { RequestText.full(request) }
+    private var isLong: Bool {
+        let text = fullText
+        return text.count > 600 || text.split(separator: "\n", omittingEmptySubsequences: false).count > 8
+    }
 
     var body: some View {
         switch request.state {
@@ -54,7 +60,7 @@ struct RequestCardView: View {
             }
         case .passedThrough: inTerminal
         case .answered:
-            Text("Beantwortet")
+            Text(L10n.t("Answered"))
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondary)
         }
@@ -63,25 +69,25 @@ struct RequestCardView: View {
     private var held: some View {
         VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(expanded && request.truncated ? "Ganzer Text" : RequestWording.intro(tool: request.toolName))
+                Text(expanded && request.truncated ? L10n.t("Full text") : RequestWording.intro(tool: request.toolName))
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondary)
                 if expanded && request.truncated {
-                    if request.full.count > 600 || request.full.split(separator: "\n", omittingEmptySubsequences: false).count > 8 {
+                    if isLong {
                         // Long: scrolls inside its box.
-                        ScrollView { mono(request.full) }.frame(maxHeight: 180)
+                        ScrollView { mono(fullText) }.frame(maxHeight: 180)
                     } else {
-                        mono(request.full)
+                        mono(fullText)
                     }
                 } else {
                     mono(request.summary)
                 }
                 if request.truncated && !expanded {
-                    Text("Gekürzt. Erlauben geht erst, nachdem Sie alles gesehen haben.")
+                    Text(L10n.t("Shortened. Allow works only after you have seen everything."))
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.waiting)
                 } else if request.truncated {
-                    Text("Unsichtbare Zeichen erscheinen als ⟦U+202E⟧. Ein getipptes ⟦ steht doppelt.")
+                    Text(L10n.t("Hidden characters appear as ⟦U+202E⟧. A typed ⟦ appears twice."))
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.secondary)
                 }
@@ -92,13 +98,13 @@ struct RequestCardView: View {
 
             HStack(spacing: 8) {
                 if model.canAllow(request) {
-                    Button("Erlauben") { model.allow(request: request) }
+                    Button(L10n.t("Allow")) { model.allow(request: request) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else {
-                    Button("Ansehen") { model.expand(requestId: request.id) }
+                    Button(L10n.t("View")) { model.expand(requestId: request.id) }
                         .buttonStyle(SecondaryButtonStyle())
                 }
-                Button("Ablehnen") { model.deny(requestId: request.id) }
+                Button(L10n.t("Deny")) { model.deny(requestId: request.id) }
                     .buttonStyle(SecondaryButtonStyle())
             }
 
@@ -119,7 +125,7 @@ struct RequestCardView: View {
                 model.allow(request: request, always: option.index)
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    (Text("Immer erlauben: ") + Text(AlwaysAllowText.rules(option)).font(.system(size: 12, design: .monospaced)))
+                    (Text(L10n.t("Always allow: ")) + Text(AlwaysAllowText.rules(option)).font(.system(size: 12, design: .monospaced)))
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.tertiary)
                     Text(AlwaysAllowText.target(option.destination))
@@ -141,10 +147,10 @@ struct RequestCardView: View {
                     .foregroundStyle(Theme.waiting)
                 // The whole question or plan: there is nothing to decide here,
                 // only to read. Long ones scroll inside the card.
-                if request.full.count > 600 || request.full.split(separator: "\n", omittingEmptySubsequences: false).count > 8 {
-                    ScrollView { mono(request.full) }.frame(height: 180)
+                if isLong {
+                    ScrollView { mono(fullText) }.frame(height: 180)
                 } else {
-                    mono(request.full)
+                    mono(fullText)
                 }
             } else {
                 mono(request.summary)

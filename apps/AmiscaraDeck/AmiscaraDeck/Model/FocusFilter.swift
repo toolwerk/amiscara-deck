@@ -34,16 +34,18 @@ final class FocusState: Sendable {
 /// "Amiscara Deck" in the filters of a Focus (System Settings, Focus).
 struct DeckFocusFilter: SetFocusFilterIntent {
     static let title: LocalizedStringResource = "Amiscara Deck"
+    // The system reads these texts at build time: literals, translated through
+    // Localizable like every other text (`/*i18n*/` puts them in the template).
     static let description: IntentDescription? = IntentDescription(
-        "Deck meldet sich in diesem Fokus nicht: keine Mitteilung, kein Fenster, kein Ton."
+        /*i18n*/"Deck stays quiet in this Focus: no notification, no window, no sound."
     )
 
     /// Off by default: the system calls with the defaults when the Focus ends.
-    @Parameter(title: "Still bleiben", default: false)
+    @Parameter(title: /*i18n*/"Stay quiet", default: false)
     var quiet: Bool
 
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: quiet ? "Deck bleibt still" : "Deck meldet sich")
+        DisplayRepresentation(title: quiet ? /*i18n*/"Deck stays quiet" : /*i18n*/"Deck speaks up")
     }
 
     func perform() async throws -> some IntentResult {

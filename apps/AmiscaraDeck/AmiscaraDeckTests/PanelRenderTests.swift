@@ -10,11 +10,11 @@ final class PanelRenderTests: XCTestCase {
         var a = makeAgent("archiv", project: "archiv-app", status: .blocked, request: makeRequest(state: .passedThrough))
         a.branch = "main"; a.lastPrompt = "Datenimport umbauen"; a.statusSinceMs = now - 120_000
         var b = makeAgent("api", project: "api-server", status: .working)
-        b.branch = "feature/auth"; b.activity = "bearbeitet src/session.rs"; b.contextUsed = 620_000; b.contextWindow = 1_000_000
+        b.branch = "feature/auth"; b.activity = .edit(path: "src/session.rs"); b.contextUsed = 620_000; b.contextWindow = 1_000_000
         var c = makeAgent("portal", project: "kundenportal", status: .working)
-        c.branch = "main"; c.activity = "führt aus: cargo test"; c.contextUsed = 280_000; c.contextWindow = 1_000_000
+        c.branch = "main"; c.activity = .run(command: "cargo test"); c.contextUsed = 280_000; c.contextWindow = 1_000_000
         var d = makeAgent("preis", project: "preisrechner", status: .working)
-        d.tool = .codex; d.branch = "main"; d.activity = "passt die Staffelpreise an"
+        d.tool = .codex; d.branch = "main"; d.activity = .tool(name: "apply_patch")
         var e = makeAgent("blog", project: "blog", status: .done)
         e.branch = "main"; e.lastPrompt = "Theme aufräumen"; e.statusSinceMs = now - 14 * 60_000
         return [a, b, c, d, e]
@@ -64,7 +64,7 @@ final class PanelRenderTests: XCTestCase {
     func testTheListShowsAtLeastThreeAgentsBeforeItScrolls() async {
         let many = (1...6).map { i in
             var a = makeAgent("p\(i)", project: "projekt-\(i)", status: .working)
-            a.branch = "main"; a.activity = "arbeitet an etwas"
+            a.branch = "main"; a.activity = .subagent
             return a
         }
         let three = await RenderSupport.hosted(PanelView(model: model(Array(many.prefix(3)))))

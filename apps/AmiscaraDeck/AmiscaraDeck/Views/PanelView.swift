@@ -61,14 +61,14 @@ struct PanelView: View {
                 .foregroundStyle(Theme.text)
             Spacer()
             if model.waitingCount > 0 {
-                Text("\(model.waitingCount) wartet")
+                Text(L10n.t("{n} waiting", ["n": String(model.waitingCount)]))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.onAmber)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 3)
                     .background(Theme.amber, in: Capsule())
             }
-            Text(model.agents.count == 1 ? "1 Agent" : "\(model.agents.count) Agenten")
+            Text(L10n.plural("{n} agent", "{n} agents", model.agents.count))
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondary)
         }
@@ -81,7 +81,7 @@ struct PanelView: View {
         switch model.link {
         case .connected:
             if model.agents.isEmpty {
-                Text("Noch kein Agent da. Starten Sie Claude Code in einem Terminal.")
+                Text(L10n.t("No agent yet. Start Claude Code in a terminal."))
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.secondary)
                     .multilineTextAlignment(.center)
@@ -104,11 +104,11 @@ struct PanelView: View {
                 }
             }
         case .connecting:
-            note("Verbinde mit dem Dienst …")
+            note(L10n.t("Connecting to the daemon …"))
         case .noDaemon:
-            note("Der Dienst läuft nicht. Deck startet ihn.")
+            note(L10n.t("The daemon is not running. Deck starts it."))
         case .versionMismatch:
-            note("Der Dienst ist von einer anderen Version. Bitte neu starten.")
+            note(L10n.t("The daemon is from another version. Please restart."))
         case .failed(let message):
             note(message)
         }
@@ -133,12 +133,12 @@ struct PanelView: View {
 
     private var footer: some View {
         HStack {
-            Button("Einstellungen", action: openSettings)
+            Button(L10n.t("Settings"), action: openSettings)
                 .foregroundStyle(Theme.secondary)
             Spacer()
-            Button("Fenster öffnen", action: openWindow)
+            Button(L10n.t("Open window"), action: openWindow)
                 .foregroundStyle(Theme.text)
-            Button("Beenden") { NSApplication.shared.terminate(nil) }
+            Button(L10n.t("Quit")) { NSApplication.shared.terminate(nil) }
                 .foregroundStyle(Theme.secondary)
         }
         .buttonStyle(.plain)
