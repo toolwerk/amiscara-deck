@@ -10,6 +10,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Fixed
 
+- The cards of the main window sit at the top of their row instead of floating in its middle
 - The hook program reads its whole input also when it has nothing to do, so the caller never writes into a closed pipe
 - A request card showed only the command or path of a known tool: any other field of the call, such as a Bash call asking to run without its sandbox, stayed unseen and could still be allowed. Every such field is now shown under "Weitere Angaben" and makes the card one that has to be expanded first (security review)
 - Deck could not stay quiet in a Focus mode: macOS tells it nothing without a permission it does not have. Deck now brings a Focus filter ("Amiscara Deck", "Still bleiben") the user adds to a Focus; the settings explain it and show when it is active (found in the hand test)
@@ -24,6 +25,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- README in German and English (`README.en.md`, switch at the top) with screenshots and a guide: what Deck is for, setup, the switch, approvals, questions, signals, window, Codex, other machines, command line, updates, privacy, troubleshooting and removal; a skipped test draws the pictures from the real views with made up data
 - A waiting update shows in the panel and the settings ("Version x ist bereit", "Jetzt neu starten"): a menu bar app is hardly ever quit, so an update installed on quit would otherwise wait unnoticed
 - Updates: the app checks the signed feed of the releases once a day (Sparkle), installs a new version when it quits, and offers the check in the settings and the menu of the symbol; `scripts/sparkle-feed.sh` writes the feed, `scripts/publish.sh` publishes after asking (#68)
 - After an update the app ends the older background service and starts its own (a fingerprint of the running program in the welcome, a clean shutdown on request)

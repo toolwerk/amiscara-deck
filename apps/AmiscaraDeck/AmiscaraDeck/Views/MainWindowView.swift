@@ -34,7 +34,7 @@ struct MainWindowView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 12)], spacing: 12) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 12, alignment: .top)], spacing: 12) {
                             ForEach(shown, id: \.id) { agent in
                                 AgentCardView(agent: agent, nowMs: now, model: model, showHost: model.showsHostNames)
                                     .overlay(

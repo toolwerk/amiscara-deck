@@ -11,7 +11,7 @@ Persönliche, nicht eingecheckte Ergänzungen gehören in `CLAUDE.local.md` (ste
 - Ein Issue je Aufgabe, Branch `feature/<n>-slug` oder `fix/<n>-slug`, Squash-Merge, `Closes #<n>` im PR, `CHANGELOG.md` je Merge.
 - Commit-Messages auf Englisch, Conventional Commits.
 - Kein Code von anderen Projekten übernehmen, wenn keine Lizenz dabeisteht.
-- Texte für Menschen (README, UI): Deutsch, kein Em-Dash, kurze Sätze. Fremde Produkte werden nicht als Vorbild genannt.
+- Texte für Menschen (README, UI): Deutsch, kein Em-Dash, kurze Sätze. Das README gibt es zusätzlich auf Englisch (`README.en.md`), beide Fassungen werden zusammen geändert. Fremde Produkte werden nicht als Vorbild genannt.
 - Vor verändernden Aktionen ankündigen, was geprüft werden kann.
 
 ## Sicherheitsregel für das Hook-Programm
