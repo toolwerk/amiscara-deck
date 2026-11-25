@@ -1,16 +1,18 @@
 //! Replays the real hook inputs recorded in M0 (`testdata/hooks`) through the
-//! state machine, in order, repeated, shuffled and interleaved.
+//! state machine, in order, repeated, shuffled and interleaved. A whole Codex
+//! session (`testdata/hooks-codex`, M3-07) is replayed in recording order.
 
-use deck_proto::agent::{Activity, Location, Status, Tool};
+use deck_proto::agent::{Activity, Location, RequestState, Status, Tool};
 use deck_proto::hook::HookInput;
 use deck_proto::message::Decision;
 use deck_session::{Change, Incoming, Store};
 use serde_json::Value;
 use std::path::PathBuf;
 
-fn sample(name: &str, session: &str) -> HookInput {
+fn sample(dir: &str, name: &str, session: &str) -> HookInput {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../testdata/hooks")
+        .join("../../testdata")
+        .join(dir)
         .join(format!("{name}.json"));
     let raw: Value =
         serde_json::from_slice(&std::fs::read(&path).unwrap_or_else(|e| panic!("{name}: {e}")))
@@ -26,6 +28,8 @@ struct Run {
     store: Store,
     now: u64,
     hold: bool,
+    tool: Tool,
+    branch: Option<String>,
     all: Vec<Change>,
 }
 
@@ -35,18 +39,37 @@ impl Run {
             store: Store::new("work"),
             now: 1_000_000,
             hold,
+            tool: Tool::Claude,
+            branch: None,
             all: Vec::new(),
+        }
+    }
+
+    /// Codex samples, recorded in a Git repository on `probe-branch`.
+    fn codex() -> Self {
+        Run {
+            tool: Tool::Codex,
+            branch: Some("probe-branch".into()),
+            ..Run::new(false)
         }
     }
 
     fn feed(&mut self, name: &str, session: &str) -> Vec<Change> {
         self.now += 1000;
         let changes = self.store.apply(Incoming {
-            input: sample(name, session),
-            tool: Tool::Claude,
+            input: sample(
+                if self.tool == Tool::Codex {
+                    "hooks-codex"
+                } else {
+                    "hooks"
+                },
+                name,
+                session,
+            ),
+            tool: self.tool,
             now_ms: self.now,
             location: Location::Unknown,
-            branch: None,
+            branch: self.branch.clone(),
             hold: self.hold,
             wait_ms: 120_000,
         });
@@ -239,6 +262,74 @@ fn sessions_do_not_mix() {
         .expect("request")
         .id;
     assert_ne!(ia, ib);
+}
+
+/// The Codex samples in the order they were recorded: one turn that reads,
+/// edits and asks for a command outside the work folder (allowed in the
+/// terminal), the end of the session, then `codex resume --last`.
+#[test]
+fn a_whole_codex_session_as_recorded() {
+    let mut r = Run::codex();
+
+    r.feed("SessionStart-startup", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!(a.tool, Tool::Codex);
+    assert_eq!(a.status, Status::Idle);
+    assert_eq!(a.project.as_deref(), Some("project"));
+    assert_eq!(a.branch.as_deref(), Some("probe-branch"));
+
+    r.feed("UserPromptSubmit", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!(a.status, Status::Working);
+    assert!(
+        a.last_prompt
+            .as_deref()
+            .is_some_and(|p| p.starts_with("Show the content of notes.txt")),
+        "{:?}",
+        a.last_prompt
+    );
+
+    r.feed("PreToolUse-Bash", S);
+    assert_eq!(
+        r.store.get(S).expect("agent").activity,
+        Some(Activity::Run {
+            command: Some("cat notes.txt".into())
+        })
+    );
+    r.feed("PostToolUse-Bash", S);
+    assert_eq!(r.store.get(S).expect("agent").status, Status::Working);
+
+    r.feed("PreToolUse-apply_patch", S);
+    assert_eq!(
+        r.store.get(S).expect("agent").activity,
+        Some(Activity::Edit {
+            path: Some("notes.txt".into())
+        })
+    );
+    r.feed("PostToolUse-apply_patch", S);
+
+    r.feed("PermissionRequest-Bash", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!(a.status, Status::Blocked);
+    let req = a.request.as_ref().expect("request");
+    assert_eq!(req.state, RequestState::PassedThrough);
+    assert_eq!(req.summary, "touch ../outside.txt");
+
+    r.feed("PostToolUse-Bash", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!((a.status, a.request.is_none()), (Status::Working, true));
+
+    r.feed("Stop", S);
+    assert_eq!(r.store.get(S).expect("agent").status, Status::Done);
+    r.feed("SessionEnd", S);
+    assert_eq!(r.store.get(S).expect("agent").status, Status::Exited);
+
+    // `codex resume --last` keeps the session id: a new run of the same agent.
+    r.feed("SessionStart-resume", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!(a.status, Status::Idle);
+    assert_eq!(a.last_prompt, None);
+    assert_eq!(a.project.as_deref(), Some("project"));
 }
 
 const ALL: &[&str] = &[

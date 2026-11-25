@@ -1,12 +1,19 @@
-//! Parses every sample from `testdata/hooks` (real inputs recorded in M0).
+//! Parses every sample from `testdata/hooks` (real inputs recorded in M0) and
+//! `testdata/hooks-codex` (a whole Codex session, M3-07).
 
 use deck_proto::hook::{HookEvent, HookInput, PermissionAnswer, SuggestionKind};
 use std::path::PathBuf;
 
 fn samples() -> Vec<(String, Vec<u8>)> {
-    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../testdata/hooks");
+    samples_in("hooks")
+}
+
+fn samples_in(dir: &str) -> Vec<(String, Vec<u8>)> {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../testdata")
+        .join(dir);
     let mut out = Vec::new();
-    for entry in std::fs::read_dir(dir).expect("testdata/hooks exists") {
+    for entry in std::fs::read_dir(path).unwrap_or_else(|e| panic!("testdata/{dir}: {e}")) {
         let path = entry.expect("dir entry").path();
         let sample: serde_json::Value =
             serde_json::from_slice(&std::fs::read(&path).expect("read sample"))
@@ -39,6 +46,15 @@ fn event_name(e: &HookEvent) -> &'static str {
     }
 }
 
+fn each_parses_to_the_event_in_its_file_name(all: Vec<(String, Vec<u8>)>) {
+    for (name, bytes) in all {
+        let input = HookInput::parse(&bytes).unwrap_or_else(|e| panic!("{name}: {e}"));
+        let prefix = name.split('-').next().expect("prefix");
+        assert_eq!(event_name(&input.event), prefix, "{name}");
+        assert!(!input.common.session_id.is_empty(), "{name}");
+    }
+}
+
 #[test]
 fn every_sample_parses_to_the_event_in_its_file_name() {
     let all = samples();
@@ -47,12 +63,27 @@ fn every_sample_parses_to_the_event_in_its_file_name() {
         "expected the M0 samples, got {}",
         all.len()
     );
-    for (name, bytes) in all {
-        let input = HookInput::parse(&bytes).unwrap_or_else(|e| panic!("{name}: {e}"));
-        let prefix = name.split('-').next().expect("prefix");
-        assert_eq!(event_name(&input.event), prefix, "{name}");
-        assert!(!input.common.session_id.is_empty(), "{name}");
+    each_parses_to_the_event_in_its_file_name(all);
+}
+
+#[test]
+fn every_codex_sample_parses_and_all_events_are_there() {
+    let all = samples_in("hooks-codex");
+    let names: Vec<&str> = all
+        .iter()
+        .map(|(n, _)| n.split('-').next().expect("prefix"))
+        .collect();
+    for event in [
+        "SessionStart",
+        "UserPromptSubmit",
+        "PreToolUse",
+        "PostToolUse",
+        "PermissionRequest",
+        "Stop",
+    ] {
+        assert!(names.contains(&event), "no Codex sample for {event}");
     }
+    each_parses_to_the_event_in_its_file_name(all);
 }
 
 #[test]
