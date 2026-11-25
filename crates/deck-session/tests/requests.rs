@@ -1284,3 +1284,69 @@ fn a_request_from_before_a_restart_goes_when_the_agent_moves_on() {
     assert_eq!(state(&st), None);
     assert_eq!(st.get(S).expect("agent").status, Status::Working);
 }
+
+fn rendered(tool: &str, input: Value) -> (bool, String) {
+    let mut st = Store::new("work");
+    ask(
+        &mut st,
+        json!({"tool_name": tool, "tool_input": input}),
+        1000,
+        true,
+    );
+    let r = st.get(S).and_then(|a| a.request.clone()).expect("request");
+    (r.truncated, r.full)
+}
+
+#[test]
+fn a_field_the_card_does_not_name_is_shown_and_needs_expanding() {
+    let (truncated, full) = rendered(
+        "Bash",
+        json!({"command": "ls", "dangerouslyDisableSandbox": true}),
+    );
+    assert!(truncated);
+    assert_eq!(
+        full,
+        "ls\n--- Weitere Angaben ---\ndangerouslyDisableSandbox=true"
+    );
+
+    let (truncated, full) = rendered("Bash", json!({"command": "ls", "run_in_background": true}));
+    assert!(truncated);
+    assert!(full.ends_with("run_in_background=true"));
+
+    let (truncated, full) = rendered("Read", json!({"file_path": "/etc/hosts", "follow": "yes"}));
+    assert!(truncated);
+    assert!(full.ends_with("follow=yes"));
+
+    // A switch Deck does not know counts even when it is false.
+    let (truncated, _) = rendered("Bash", json!({"command": "ls", "sandbox": false}));
+    assert!(truncated);
+
+    let (_, full) = rendered(
+        "MultiEdit",
+        json!({"file_path": "/a", "edits": [{"old_string": "x", "new_string": "y", "regex": true}], "force": true}),
+    );
+    assert!(full.contains("force=true"));
+    assert!(full.contains("1 regex=true"));
+
+    // Hidden characters in such a field are escaped like everywhere.
+    let (_, full) = rendered("Bash", json!({"command": "ls", "cwd": "a\u{202E}b"}));
+    assert!(full.contains("cwd=a⟦U+202E⟧b"), "{full}");
+}
+
+#[test]
+fn fields_that_change_nothing_leave_the_card_short() {
+    for input in [
+        json!({"command": "ls"}),
+        json!({"command": "ls", "description": "List files", "timeout": 5000}),
+        json!({"command": "ls", "dangerouslyDisableSandbox": false, "run_in_background": false}),
+        json!({"command": "ls", "extra": null}),
+    ] {
+        let (truncated, full) = rendered("Bash", input.clone());
+        assert_eq!((truncated, full.as_str()), (false, "ls"), "{input}");
+    }
+    let (truncated, full) = rendered(
+        "Read",
+        json!({"file_path": "/etc/hosts", "offset": 1, "limit": 10}),
+    );
+    assert_eq!((truncated, full.as_str()), (false, "/etc/hosts"));
+}
