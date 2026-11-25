@@ -41,9 +41,7 @@ Alle Bilder zeigen erfundene Beispieldaten.
 
 ## Wofür es gedacht ist
 
-Wer mit mehreren Agenten gleichzeitig arbeitet, kennt das: Ein Agent wartet seit zehn Minuten auf ein Ja, und niemand hat es gesehen. Er läuft in einem anderen Fenster, in einem anderen Terminal oder auf einem anderen Rechner.
-
-Amiscara Deck löst genau das:
+Bei mehreren Agenten gleichzeitig passiert es schnell: Einer wartet seit zehn Minuten auf ein Ja, und niemand hat es gesehen. Er läuft in einem anderen Fenster, in einem anderen Terminal oder auf einem anderen Rechner. Dafür gibt es Amiscara Deck.
 
 - **Überblick.** Wer arbeitet, wer wartet, wer ist fertig. Mit Projekt, Zweig, aktueller Tätigkeit, Kontextfüllung und geschätzten Kosten.
 - **Antworten ohne Suchen.** Freigaben und Fragen beantworten Sie im Panel, im Fenster oder in der Mitteilung.
@@ -65,7 +63,7 @@ Fertige Versionen liegen unter [Releases](https://github.com/toolwerk/amiscara-d
 
 ### Einrichten
 
-1. Die App nach `/Applications` legen. Das ist wichtig: Die Einträge in Claude Code nennen den Pfad eines Programms innerhalb der App.
+1. Die App nach `/Applications` legen, bevor Sie etwas einbauen. Die Einträge in Claude Code nennen den Pfad eines Programms innerhalb der App.
 2. Die App starten. Sie hat kein Symbol im Dock, nur eines in der Menüleiste.
 3. Im Panel auf "Einstellungen" und unter "Claude Code" auf "Einbauen".
 4. Mitteilungen erlauben, wenn macOS fragt.
@@ -90,7 +88,7 @@ Das Symbol in der Menüleiste zeigt, ob jemand auf Sie wartet. Die Zahl daneben 
 - **Linksklick** öffnet das Panel.
 - **Rechtsklick** öffnet ein Menü: Fenster öffnen, Einstellungen, nach Updates suchen, beenden.
 
-Im Panel steht oben, wer auf Sie wartet. Jeder Zustand hat eine eigene Form, nicht nur eine Farbe:
+Im Panel steht oben, wer auf Sie wartet. Jeder Zustand hat neben der Farbe eine eigene Form:
 
 | Zeichen | Zustand |
 |---|---|
@@ -227,9 +225,13 @@ Auf dem anderen Rechner läuft der Dienst von Deck, und die Hooks sind dort eing
 cargo build --release -p deck-daemon -p deck-hook -p deck-cli
 ```
 
+Die Hooks einbauen:
+
 ```sh
 target/release/amiscara-deck hooks install
 ```
+
+Den Dienst starten:
 
 ```sh
 target/release/amiscara-deckd
@@ -298,7 +300,7 @@ Alle Daten liegen in `~/Library/Application Support/Amiscara Deck`.
 
 ## Entfernen
 
-Die Reihenfolge ist wichtig: zuerst die Einträge ausbauen, dann die App löschen.
+Bauen Sie zuerst die Einträge aus und löschen Sie danach die App. So bleibt in Claude Code kein Eintrag ohne Programm zurück.
 
 1. In den Einstellungen bei Claude Code und bei Codex "Ausbauen".
 2. "Beim Anmelden starten" ausschalten.
@@ -314,9 +316,13 @@ Die Sicherungen neben `settings.json` bleiben liegen, bis Sie sie löschen.
 
 Sie brauchen Xcode, Rust (stable) und [xcodegen](https://github.com/yonaskolb/XcodeGen).
 
+Einmal einrichten:
+
 ```sh
 ./setup.sh
 ```
+
+Dann die App bauen:
 
 ```sh
 xcodebuild -project apps/AmiscaraDeck/AmiscaraDeck.xcodeproj -scheme AmiscaraDeck -configuration Release -derivedDataPath target/xcode-release build

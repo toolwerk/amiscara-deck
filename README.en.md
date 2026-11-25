@@ -41,9 +41,7 @@ The interface of the app is currently German only. This page names the buttons a
 
 ## What it is for
 
-If you work with several agents at once, you know this: one agent has been waiting for a yes for ten minutes, and nobody saw it. It runs in another window, another terminal or on another machine.
-
-Amiscara Deck solves exactly that:
+With several agents at once it happens quickly: one has been waiting for a yes for ten minutes, and nobody saw it. It runs in another window, another terminal or on another machine. That is what Amiscara Deck is for.
 
 - **Overview.** Who is working, who is waiting, who is done. With project, branch, current activity, context fill and estimated cost.
 - **Answer without searching.** You answer approvals and questions in the panel, in the window or in the notification.
@@ -65,7 +63,7 @@ Ready made versions are published under [Releases](https://github.com/toolwerk/a
 
 ### Set up
 
-1. Move the app to `/Applications`. This matters: the entries in Claude Code name the path of a program inside the app.
+1. Move the app to `/Applications` before you install anything. The entries in Claude Code name the path of a program inside the app.
 2. Start the app. It has no Dock icon, only a symbol in the menu bar.
 3. In the panel choose "Einstellungen" (settings) and click "Einbauen" (install) under "Claude Code".
 4. Allow notifications when macOS asks.
@@ -90,7 +88,7 @@ The symbol in the menu bar shows whether somebody is waiting for you. You can sw
 - **Left click** opens the panel.
 - **Right click** opens a menu: open the window, settings, check for updates, quit.
 
-The panel lists the agents waiting for you at the top. Every state has its own shape, not only a color:
+The panel lists the agents waiting for you at the top. Besides its color every state has a shape of its own:
 
 | Mark | State |
 |---|---|
@@ -227,9 +225,13 @@ On the other machine Deck's daemon runs and the hooks are installed there:
 cargo build --release -p deck-daemon -p deck-hook -p deck-cli
 ```
 
+Install the hooks:
+
 ```sh
 target/release/amiscara-deck hooks install
 ```
+
+Start the daemon:
 
 ```sh
 target/release/amiscara-deckd
@@ -298,7 +300,7 @@ All data is kept in `~/Library/Application Support/Amiscara Deck`.
 
 ## Removing it
 
-The order matters: remove the entries first, then delete the app.
+Remove the entries first and delete the app afterwards. That way Claude Code keeps no entry without a program.
 
 1. In the settings click "Ausbauen" for Claude Code and for Codex.
 2. Switch off "Beim Anmelden starten".
@@ -314,9 +316,13 @@ The backups next to `settings.json` stay until you delete them.
 
 You need Xcode, Rust (stable) and [xcodegen](https://github.com/yonaskolb/XcodeGen).
 
+Set up once:
+
 ```sh
 ./setup.sh
 ```
+
+Then build the app:
 
 ```sh
 xcodebuild -project apps/AmiscaraDeck/AmiscaraDeck.xcodeproj -scheme AmiscaraDeck -configuration Release -derivedDataPath target/xcode-release build
