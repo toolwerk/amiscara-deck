@@ -72,7 +72,8 @@ impl Running {
 
 fn cli(args: &[&str]) -> Command {
     let mut c = Command::new(env!("CARGO_BIN_EXE_amiscara-deck"));
-    c.args(args).env_clear();
+    // The texts of these tests are German.
+    c.args(args).env_clear().env("DECK_LANGUAGE", "de");
     c
 }
 

@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use deck_client::{Client, Error};
+use deck_i18n::{t, t_with};
 use deck_proto::message::DaemonMessage;
 
 use crate::view;
@@ -23,13 +24,17 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
             "--socket" => socket = it.next().map(PathBuf::from),
             "--json" => json = true,
             other => {
-                let _ = writeln!(err, "Unbekannte Option: {other}");
+                let _ = writeln!(
+                    err,
+                    "{}",
+                    t_with("Unknown option: {option}", &[("option", other)])
+                );
                 return None;
             }
         }
     }
     let Some(socket) = socket.or_else(deck_proto::paths::default_socket) else {
-        let _ = writeln!(err, "Kein Home-Ordner gefunden: bitte --socket angeben.");
+        let _ = writeln!(err, "{}", t("No home folder found: please give --socket."));
         return None;
     };
     Some(Opts { socket, json })
@@ -50,21 +55,19 @@ fn runtime() -> std::io::Result<tokio::runtime::Runtime> {
 
 fn explain(e: &Error, socket: &std::path::Path) -> String {
     match e {
-        Error::NoDaemon(_) => format!(
-            "Kein Dienst unter {} erreichbar. Starten mit amiscara-deckd.",
-            socket.display()
+        Error::NoDaemon(_) => view::no_daemon(socket),
+        Error::VersionMismatch { daemon, ours } => t_with(
+            "The daemon speaks protocol {daemon}, this program {ours}. Restart the daemon.",
+            &[("daemon", &daemon.to_string()), ("ours", &ours.to_string())],
         ),
-        Error::VersionMismatch { daemon, ours } => format!(
-            "Der Dienst spricht Protokoll {daemon}, dieses Programm {ours}. Dienst neu starten."
-        ),
-        other => format!("{other}"),
+        other => view::error(other),
     }
 }
 
 pub fn list(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     let Some(o) = parse(opts, err) else { return 2 };
     let Ok(rt) = runtime() else {
-        let _ = writeln!(err, "Fehler: keine Laufzeit.");
+        let _ = writeln!(err, "{}", t("Error: no runtime."));
         return 1;
     };
     match rt.block_on(deck_client::fetch(&o.socket, "amiscara-deck list")) {
@@ -82,7 +85,7 @@ pub fn list(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             0
         }
         Err(e) => {
-            let _ = writeln!(err, "Fehler: {}", explain(&e, &o.socket));
+            let _ = writeln!(err, "{}", explain(&e, &o.socket));
             1
         }
     }
@@ -91,14 +94,14 @@ pub fn list(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
 pub fn watch(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     let Some(o) = parse(opts, err) else { return 2 };
     let Ok(rt) = runtime() else {
-        let _ = writeln!(err, "Fehler: keine Laufzeit.");
+        let _ = writeln!(err, "{}", t("Error: no runtime."));
         return 1;
     };
     rt.block_on(async {
         let mut client = match Client::connect(&o.socket, "amiscara-deck watch").await {
             Ok(c) => c,
             Err(e) => {
-                let _ = writeln!(err, "Fehler: {}", explain(&e, &o.socket));
+                let _ = writeln!(err, "{}", explain(&e, &o.socket));
                 return 1;
             }
         };
@@ -116,11 +119,11 @@ pub fn watch(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             let msg = match client.next().await {
                 Ok(m) => m,
                 Err(Error::Closed) => {
-                    let _ = writeln!(err, "Der Dienst hat die Verbindung beendet.");
+                    let _ = writeln!(err, "{}", t("The daemon closed the connection."));
                     return 1;
                 }
                 Err(e) => {
-                    let _ = writeln!(err, "Fehler: {}", explain(&e, &o.socket));
+                    let _ = writeln!(err, "{}", explain(&e, &o.socket));
                     return 1;
                 }
             };
@@ -137,7 +140,11 @@ pub fn watch(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
                             .get(id)
                             .and_then(|a| a.project.clone())
                             .unwrap_or_else(|| id.clone());
-                        let _ = writeln!(out, "{}: entfernt", view::cell(&name, 24));
+                        let _ = writeln!(
+                            out,
+                            "{}",
+                            t_with("{name}: removed", &[("name", &view::cell(&name, 24))])
+                        );
                     }
                     _ => {}
                 }

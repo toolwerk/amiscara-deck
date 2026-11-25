@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use deck_daemon::launchd;
+use deck_i18n::{t, t_with};
 
 struct Opts {
     program: PathBuf,
@@ -27,7 +28,11 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
             "--plist" => plist = it.next().map(PathBuf::from),
             "--no-launchctl" => no_launchctl = true,
             other => {
-                let _ = writeln!(err, "Unbekannte Option: {other}");
+                let _ = writeln!(
+                    err,
+                    "{}",
+                    t_with("Unknown option: {option}", &[("option", other)])
+                );
                 return None;
             }
         }
@@ -44,7 +49,8 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
     ) else {
         let _ = writeln!(
             err,
-            "Pfade nicht ermittelbar: bitte --program, --data-dir und --plist angeben."
+            "{}",
+            t("Paths not found: please give --program, --data-dir and --plist.")
         );
         return None;
     };
@@ -77,7 +83,14 @@ pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -
         "uninstall" => uninstall(&o, out, err),
         "status" => status(&o, out),
         other => {
-            let _ = writeln!(err, "Unbekannter Befehl: daemon {other}");
+            let _ = writeln!(
+                err,
+                "{}",
+                t_with(
+                    "Unknown command: {command}",
+                    &[("command", &format!("daemon {other}"))]
+                )
+            );
             2
         }
     }
@@ -90,35 +103,49 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     if !ready {
         let _ = writeln!(
             err,
-            "Der Dienst fehlt oder ist nicht ausführbar: {}\nNichts eingerichtet.",
-            o.program.display()
+            "{}",
+            t_with(
+                "The daemon is missing or not executable: {path}\nNothing set up.",
+                &[("path", &o.program.display().to_string())]
+            )
         );
         return 1;
     }
     let text = launchd::plist(&o.program, &o.data_dir);
     if std::fs::read_to_string(&o.plist).is_ok_and(|t| t == text) {
-        let _ = writeln!(out, "Schon eingerichtet: {}", o.plist.display());
+        let _ = writeln!(
+            out,
+            "{}",
+            t_with(
+                "Already set up: {path}",
+                &[("path", &o.plist.display().to_string())]
+            )
+        );
     } else {
         if let Some(dir) = o.plist.parent()
             && let Err(e) = std::fs::create_dir_all(dir)
         {
-            let _ = writeln!(err, "Fehler: {e}");
+            let _ = writeln!(err, "{}", crate::view::error(&e));
             return 1;
         }
         if let Err(e) = std::fs::write(&o.plist, text) {
-            let _ = writeln!(err, "Fehler: {e}");
+            let _ = writeln!(err, "{}", crate::view::error(&e));
             return 1;
         }
-        let _ = writeln!(out, "Geschrieben: {}", o.plist.display());
+        let _ = writeln!(
+            out,
+            "{}",
+            t_with(
+                "Written: {path}",
+                &[("path", &o.plist.display().to_string())]
+            )
+        );
     }
     if o.no_launchctl {
         return 0;
     }
     let Some(uid) = uid() else {
-        let _ = writeln!(
-            err,
-            "Benutzerkennung nicht ermittelbar, launchctl nicht aufgerufen."
-        );
+        let _ = writeln!(err, "{}", t("User id not found, launchctl not called."));
         return 1;
     };
     let domain = format!("gui/{uid}");
@@ -127,13 +154,17 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     if launchctl(&["bootstrap", &domain, &o.plist.to_string_lossy()]) {
         let _ = writeln!(
             out,
-            "Der Dienst startet ab jetzt bei der Anmeldung und läuft schon."
+            "{}",
+            t("The daemon now starts at login and is already running.")
         );
         0
     } else {
         let _ = writeln!(
             err,
-            "launchctl bootstrap ist fehlgeschlagen. Die Datei liegt bereit, der Dienst startet bei der nächsten Anmeldung."
+            "{}",
+            t(
+                "launchctl bootstrap failed. The file is in place, the daemon starts at the next login."
+            )
         );
         1
     }
@@ -147,15 +178,22 @@ fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     }
     match std::fs::remove_file(&o.plist) {
         Ok(()) => {
-            let _ = writeln!(out, "Entfernt: {}", o.plist.display());
+            let _ = writeln!(
+                out,
+                "{}",
+                t_with(
+                    "Removed: {path}",
+                    &[("path", &o.plist.display().to_string())]
+                )
+            );
             0
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            let _ = writeln!(out, "Nichts eingerichtet, nichts entfernt.");
+            let _ = writeln!(out, "{}", t("Nothing set up, nothing removed."));
             0
         }
         Err(e) => {
-            let _ = writeln!(err, "Fehler: {e}");
+            let _ = writeln!(err, "{}", crate::view::error(&e));
             1
         }
     }
@@ -163,25 +201,37 @@ fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
 
 fn status(o: &Opts, out: &mut dyn Write) -> u8 {
     let want = launchd::plist(&o.program, &o.data_dir);
-    let state = match std::fs::read_to_string(&o.plist) {
-        Ok(t) if t == want => "eingerichtet",
-        Ok(_) => "eingerichtet, aber anders (install gleicht es an)",
-        Err(_) => "nicht eingerichtet",
+    let (ok, state) = match std::fs::read_to_string(&o.plist) {
+        Ok(text) if text == want => (true, t("set up")),
+        Ok(_) => (
+            false,
+            t("set up, but different (install brings it in line)"),
+        ),
+        Err(_) => (false, t("not set up")),
     };
     let _ = writeln!(
         out,
-        "Start bei der Anmeldung: {state} ({})",
-        o.plist.display()
+        "{}",
+        t_with(
+            "Start at login: {state} ({path})",
+            &[("state", &state), ("path", &o.plist.display().to_string())]
+        )
     );
+    let missing = if Path::new(&o.program).exists() {
+        String::new()
+    } else {
+        format!(" {}", t("(missing)"))
+    };
     let _ = writeln!(
         out,
-        "Dienst: {}{}",
-        o.program.display(),
-        if Path::new(&o.program).exists() {
-            ""
-        } else {
-            " (fehlt)"
-        }
+        "{}",
+        t_with(
+            "Daemon: {path}{missing}",
+            &[
+                ("path", &o.program.display().to_string()),
+                ("missing", &missing)
+            ]
+        )
     );
-    if state == "eingerichtet" { 0 } else { 3 }
+    if ok { 0 } else { 3 }
 }

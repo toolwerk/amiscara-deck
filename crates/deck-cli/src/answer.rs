@@ -5,8 +5,11 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use deck_client::{Client, Error};
+use deck_i18n::{t, t_with};
 use deck_proto::agent::RequestState;
 use deck_proto::message::{AnswerVia, DaemonMessage, Decision};
+
+use crate::view;
 
 /// How long to wait for the daemon to show that the answer arrived.
 const CONFIRM: Duration = Duration::from_secs(3);
@@ -16,7 +19,10 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     let (Some(id), Some(verb)) = (rest.next(), rest.next()) else {
         let _ = writeln!(
             err,
-            "Aufruf: amiscara-deck answer <Anfrage> allow|deny [--always <Nr>] [--message <Text>] [--socket <Datei>]"
+            "{}",
+            t(
+                "Usage: amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--socket <file>]"
+            )
         );
         return 2;
     };
@@ -30,14 +36,18 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             "--always" => match rest.next().and_then(|n| n.parse::<usize>().ok()) {
                 Some(n) => always = Some(n),
                 None => {
-                    let _ = writeln!(err, "--always braucht eine Zahl.");
+                    let _ = writeln!(err, "{}", t("--always needs a number."));
                     return 2;
                 }
             },
             "--seen" => seen = true,
             "--message" => message = rest.next().map(|m| m.to_string()),
             other => {
-                let _ = writeln!(err, "Unbekannte Option: {other}");
+                let _ = writeln!(
+                    err,
+                    "{}",
+                    t_with("Unknown option: {option}", &[("option", other)])
+                );
                 return 2;
             }
         }
@@ -51,42 +61,38 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             message: message.clone(),
         },
         ("allow", _, Some(_)) => {
-            let _ = writeln!(err, "--message gibt es nur bei deny.");
+            let _ = writeln!(err, "{}", t("--message only goes with deny."));
             return 2;
         }
         ("deny", Some(_), _) => {
-            let _ = writeln!(err, "--always gibt es nur bei allow.");
+            let _ = writeln!(err, "{}", t("--always only goes with allow."));
             return 2;
         }
         _ => {
-            let _ = writeln!(err, "Erlaubt sind allow und deny.");
+            let _ = writeln!(err, "{}", t("Use allow or deny."));
             return 2;
         }
     };
     let Some(socket) = socket.or_else(deck_proto::paths::default_socket) else {
-        let _ = writeln!(err, "Kein Home-Ordner gefunden: bitte --socket angeben.");
+        let _ = writeln!(err, "{}", t("No home folder found: please give --socket."));
         return 2;
     };
     let Ok(rt) = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
     else {
-        let _ = writeln!(err, "Fehler: keine Laufzeit.");
+        let _ = writeln!(err, "{}", t("Error: no runtime."));
         return 1;
     };
     rt.block_on(async {
         let mut client = match Client::connect(&socket, "amiscara-deck answer").await {
             Ok(c) => c,
             Err(Error::NoDaemon(_)) => {
-                let _ = writeln!(
-                    err,
-                    "Kein Dienst unter {} erreichbar. Starten mit amiscara-deckd.",
-                    socket.display()
-                );
+                let _ = writeln!(err, "{}", view::no_daemon(&socket));
                 return 1;
             }
             Err(e) => {
-                let _ = writeln!(err, "Fehler: {e}");
+                let _ = writeln!(err, "{}", view::error(&e));
                 return 1;
             }
         };
@@ -96,13 +102,17 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             .values()
             .find_map(|a| a.request.clone().filter(|r| r.id == *id))
         else {
-            let _ = writeln!(err, "Keine Anfrage mit der Kennung {id}.");
+            let _ = writeln!(err, "{}", t_with("No request with the id {id}.", &[("id", id)]));
             return 1;
         };
         if request.state != RequestState::Held {
             let _ = writeln!(
                 err,
-                "Die Anfrage {id} wird nicht gehalten, sie wartet im Terminal."
+                "{}",
+                t_with(
+                    "The request {id} is not held, it waits in the terminal.",
+                    &[("id", id)]
+                )
             );
             return 1;
         }
@@ -110,16 +120,21 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
         if !request.questions.is_empty() && matches!(decision, Decision::Allow { .. }) {
             let _ = writeln!(
                 err,
-                "Das ist eine Frage. Beantworten Sie sie im Deck oder dort, wo der Agent läuft."
+                "{}",
+                t("This is a question. Answer it in Deck or where the agent runs.")
             );
             return 1;
         }
         // Shortened card: show everything first, allow only when it was read.
         if request.truncated && matches!(decision, Decision::Allow { expanded: false, .. }) {
+            let full = view::request_text(&request.full, &request.extra);
             let _ = writeln!(
                 err,
-                "Die Anfrage ist gekürzt. Der ganze Text:\n\n{}\n\nNichts erlaubt. Nach dem Lesen mit --seen erlauben.",
-                request.full
+                "{}",
+                t_with(
+                    "The request is shortened. The whole text:\n\n{text}\n\nNothing allowed. After reading, allow with --seen.",
+                    &[("text", &full)]
+                )
             );
             return 1;
         }
@@ -131,19 +146,23 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
                 .iter()
                 .map(|r| format!("{}: {}", r.index, r.rules.join(", ")))
                 .collect();
+            let offered = if offered.is_empty() {
+                t("none")
+            } else {
+                offered.join("; ")
+            };
             let _ = writeln!(
                 err,
-                "Diese Regel wird nicht angeboten. Angeboten: {}",
-                if offered.is_empty() {
-                    "keine".into()
-                } else {
-                    offered.join("; ")
-                }
+                "{}",
+                t_with(
+                    "This rule is not offered. Offered: {offered}",
+                    &[("offered", &offered)]
+                )
             );
             return 1;
         }
         if client.answer(id, decision.clone(), AnswerVia::Cli).await.is_err() {
-            let _ = writeln!(err, "Fehler: Antwort konnte nicht gesendet werden.");
+            let _ = writeln!(err, "{}", t("Error: the answer could not be sent."));
             return 1;
         }
         let confirmed = tokio::time::timeout(CONFIRM, async {
@@ -168,16 +187,17 @@ pub fn run(opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
                 out,
                 "{}",
                 if matches!(decision, Decision::Allow { .. }) {
-                    "Erlaubt."
+                    t("Allowed.")
                 } else {
-                    "Abgelehnt."
+                    t("Denied.")
                 }
             );
             0
         } else {
             let _ = writeln!(
                 err,
-                "Keine Bestätigung: Die Anfrage war schon beantwortet oder abgelaufen."
+                "{}",
+                t("No confirmation: the request was already answered or ran out.")
             );
             1
         }
