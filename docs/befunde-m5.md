@@ -39,7 +39,7 @@ Codex speichert das Vertrauen in `config.toml` unter `[hooks.state."<Datei>:<ere
 
 Stand 2026-11-25, Codex CLI 0.171.0. Aufgezeichnet mit `spikes/m5/record-events.py`, bereinigt mit `export-testdata.py` nach `testdata/hooks-codex/` (gleichnamige Ereignisse mit Nummer, `PostToolUse-Bash-2`; `replay.rs` spielt sie in dieser Folge ab). Geprüft gegen Deck mit `handtest-codex.py c4`. Ablauf: eine Sitzung mit `workspace-write` liest eine Datei, ändert eine Zeile, führt einen Befehl außerhalb des Arbeitsordners aus (Dialog, im Terminal erlaubt) und endet mit `/exit`. Danach `codex resume --last` mit einem Auftrag.
 
-Felder, die alle Ereignisse tragen: `session_id`, `transcript_path` (unter `$CODEX_HOME/sessions/`), `cwd`, `hook_event_name`, `model`, `permission_mode` (auch bei `workspace-write` immer `default`). Ab dem ersten Auftrag kommt `turn_id` dazu.
+Felder, die alle Ereignisse tragen: `session_id`, `transcript_path` (unter `$CODEX_HOME/sessions/`), `cwd`, `hook_event_name`. Alle außer SessionEnd tragen dazu `model` und `permission_mode` (auch bei `workspace-write` immer `default`). Ab dem ersten Auftrag kommt `turn_id` dazu.
 
 | Ereignis | Eigene Felder | In Deck |
 |---|---|---|
@@ -58,10 +58,11 @@ Was dabei auffiel:
 - Lesen läuft über `Bash` (`cat`), ein eigenes Lese-Werkzeug gibt es nicht. Deck zeigt dann den Befehl.
 - **Ende:** `/exit` schickt SessionEnd, Deck zeigt "beendet". Die beendete Sitzung bleibt nicht als laufend stehen.
 - **Fortsetzen:** `codex resume --last` behält die `session_id`. Deck führt sie als denselben Agenten weiter: Idle ohne Auftrag, mit dem nächsten Auftrag wieder Working. Die Zahl der Züge beginnt neu.
-- Ein Befehl, den die Sandbox scheitern lässt, meldet PostToolUse, kein PostToolUseFailure. Codex fragt danach mit PreToolUse und PermissionRequest neu.
+- Ein Befehl, den die Sandbox scheitern lässt, kommt als PostToolUse an, die Fehlermeldung steht in `tool_response`. Ob Codex zusätzlich PostToolUseFailure schickt, ist offen: Das Ereignis war nicht eingetragen. Codex fragt danach mit PreToolUse und PermissionRequest neu.
 - Der Zweig kommt wie bei Claude Code aus `.git/HEAD` des Arbeitsordners, nicht aus dem Ereignis.
 
 ## Offen
 
 - Das Vertrauen selbst (Bestätigung über `/hooks`, Verhalten nach einer Änderung) bleibt ein Handtest.
 - Ob die `deny`-Meldung das Modell erreicht, ist nicht geprüft.
+- Eine Freigabe-Anfrage für `apply_patch` ist nicht aufgezeichnet: Unter `workspace-write` änderte Codex die Datei ohne Rückfrage. Wie die Karte einer solchen Anfrage aussieht, ist ungeprüft.
