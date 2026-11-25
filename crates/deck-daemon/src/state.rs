@@ -36,12 +36,15 @@ struct File {
 struct Head {
     version: u32,
     settings: Settings,
+    #[serde(default)]
+    next_request: u64,
 }
 
 /// Read the state. `None` for a missing, unreadable, garbled or newer file:
 /// the daemon then starts empty and the next save replaces it. A file of
-/// version 1 keeps its settings; its agents and their history are in the old
-/// form and start empty, an agent comes back with its next event.
+/// version 1 keeps its settings and its counter of request ids; its agents and
+/// their history are in the old form and start empty, an agent comes back with
+/// its next event.
 pub fn load(path: &Path, host: &str, now_ms: u64) -> Option<(Store, Settings)> {
     let text = std::fs::read_to_string(path).ok()?;
     let head: Head = serde_json::from_str(&text).ok()?;
@@ -50,7 +53,19 @@ pub fn load(path: &Path, host: &str, now_ms: u64) -> Option<(Store, Settings)> {
             let file: File = serde_json::from_str(&text).ok()?;
             Some((Store::restore(host, file.snapshot, now_ms), file.settings))
         }
-        SETTINGS_ONLY => Some((Store::new(host), head.settings)),
+        // The counter goes on: an old notification or command must not hit a
+        // new request with the same id.
+        SETTINGS_ONLY => Some((
+            Store::restore(
+                host,
+                Snapshot {
+                    next_request: head.next_request,
+                    agents: Vec::new(),
+                },
+                now_ms,
+            ),
+            head.settings,
+        )),
         _ => None,
     }
 }

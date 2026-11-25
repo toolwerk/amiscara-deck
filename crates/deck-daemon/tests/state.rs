@@ -331,7 +331,8 @@ async fn a_broken_or_foreign_state_file_means_an_empty_start_not_a_crash() {
 }
 
 /// A file of the first version holds activity and history as German
-/// sentences. Its settings stay, its agents come back with their next event.
+/// sentences. Its settings and its counter of request ids stay, its agents
+/// come back with their next event.
 #[tokio::test]
 async fn a_state_of_version_1_keeps_its_settings_and_starts_without_agents() {
     let d = dir();
@@ -368,6 +369,10 @@ async fn a_state_of_version_1_keeps_its_settings_and_starts_without_agents() {
         serde_json::from_str(&std::fs::read_to_string(data.join("state.json")).expect("read"))
             .expect("json");
     assert_eq!(saved["version"], 2, "written in the new form");
+    assert_eq!(
+        saved["next_request"], 7,
+        "request ids go on, an old notification cannot hit a new request"
+    );
     let b = start_in(&data, "work").await;
     let (_, settings, agents) = b.welcome().await;
     assert_eq!(agents.len(), 1);
