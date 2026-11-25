@@ -20,6 +20,10 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 - Nach einer Ablehnung in Deck liest der Agent "Denied in Amiscara Deck" statt eines deutschen Satzes
 - Die Versionshinweise im Update-Dialog erscheinen in der Sprache der App, auf Deutsch oder Englisch
 
+### Fixed
+
+- Codex: Ändert der Agent eine Datei, zeigt Deck "bearbeitet" mit dem Dateinamen statt des Werkzeugs `apply_patch`. Die Ereignisse einer ganzen Codex-Sitzung sind am echten Programm geprüft
+
 ## [0.1.0] - 2026-11-25
 
 Erste öffentliche Version. Die Oberfläche ist deutsch. Sie braucht macOS 27 auf Apple Silicon und Claude Code ab 2.1.331.

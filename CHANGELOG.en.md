@@ -21,3 +21,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 - The command line writes minutes as "min", like the app
 - After a denial in Deck the agent reads "Denied in Amiscara Deck" instead of a German sentence
 - The release notes in the update dialog appear in the language of the app, German or English
+
+### Fixed
+
+- Codex: when the agent changes a file, Deck shows "editing" with the file name instead of the tool `apply_patch`. The events of a whole Codex session are checked against the real program
