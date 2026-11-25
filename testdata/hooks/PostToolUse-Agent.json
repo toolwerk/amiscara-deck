@@ -1,0 +1,45 @@
+{
+ "event": "PostToolUse",
+ "input": {
+  "session_id": "3fc349d7-1d39-4299-982f-1526f282f2e3",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/scratchpad",
+  "prompt_id": "fafab914-8798-466f-a5ee-e630f2a1b181",
+  "permission_mode": "default",
+  "effort": {
+   "level": "medium"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Agent",
+  "tool_input": {
+   "description": "Reply ok",
+   "prompt": "Reply with the single word: ok",
+   "subagent_type": "general-purpose"
+  },
+  "tool_response": {
+   "isAsync": true,
+   "status": "async_launched",
+   "agentId": "a7398614bbda2ae5f",
+   "description": "Reply ok",
+   "resolvedModel": "claude-haiku-5-5",
+   "prompt": "Reply with the single word: ok",
+   "outputFile": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/tasks/a7398614bbda2ae5f.output",
+   "canReadOutputFile": true,
+   "canContinueAgent": true
+  },
+  "tool_use_id": "toolu_015am9PUykTEKkQkjwA766Ax",
+  "duration_ms": 7
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

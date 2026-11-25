@@ -1,0 +1,20 @@
+[package]
+name = "deck-sim"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-proto = { path = "../deck-proto" }
+serde_json = "1"
+tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt", "sync", "time"] }
+
+[dev-dependencies]
+deck-daemon = { path = "../deck-daemon" }
+deck-client = { path = "../deck-client" }
+tempfile = "3"
+tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }
+
+[lints]
+workspace = true

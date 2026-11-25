@@ -1,0 +1,17 @@
+[package]
+name = "deck-hooks"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+serde = "1"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

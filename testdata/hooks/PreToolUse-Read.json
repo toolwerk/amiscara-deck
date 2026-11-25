@@ -1,0 +1,31 @@
+{
+ "event": "PreToolUse",
+ "input": {
+  "session_id": "3fc349d7-1d39-4299-982f-1526f282f2e3",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/scratchpad",
+  "prompt_id": "fafab914-8798-466f-a5ee-e630f2a1b181",
+  "permission_mode": "default",
+  "effort": {
+   "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Read",
+  "tool_input": {
+   "file_path": "/nonexistent/m0.txt"
+  },
+  "tool_use_id": "toolu_017HSDPHapQAasKRjvaWAAiJ"
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

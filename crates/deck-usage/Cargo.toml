@@ -1,0 +1,16 @@
+[package]
+name = "deck-usage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-proto = { path = "../deck-proto" }
+serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

@@ -1,0 +1,28 @@
+[package]
+name = "deck-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[dependencies]
+deck-client = { path = "../deck-client" }
+deck-hooks = { path = "../deck-hooks" }
+deck-proto = { path = "../deck-proto" }
+deck-remote = { path = "../deck-remote" }
+amiscara-ssh = { git = "https://github.com/toolwerk/amiscara-ssh", tag = "v0.8.0" }
+thiserror = "2"
+tokio = { version = "1.53.3", features = ["rt-multi-thread", "sync", "time", "macros"] }
+uniffi = "0.32.2"
+
+[dev-dependencies]
+deck-daemon = { path = "../deck-daemon" }
+serde_json = "1"
+tempfile = "3"
+tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,12 @@
+target/
+.DS_Store
+*.xcodeproj
+apps/AmiscaraDeck/Generated/
+__pycache__/
+CLAUDE.local.md
+HANDOFF.md
+.worktrees/
+.tbd/
+.claude/settings.local.json
+spikes/m0/out/
+spikes/m5/out/

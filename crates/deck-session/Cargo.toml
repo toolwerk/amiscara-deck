@@ -1,0 +1,14 @@
+[package]
+name = "deck-session"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-proto = { path = "../deck-proto" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[lints]
+workspace = true

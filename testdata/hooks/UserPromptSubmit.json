@@ -1,0 +1,24 @@
+{
+ "event": "UserPromptSubmit",
+ "input": {
+  "session_id": "3fc349d7-1d39-4299-982f-1526f282f2e3",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/scratchpad",
+  "prompt_id": "9db49300-8d3e-4523-9fcc-ddea56012568",
+  "permission_mode": "default",
+  "hook_event_name": "UserPromptSubmit",
+  "prompt": "<task-notification>\n<task-id>a7398614bbda2ae5f</task-id>\n<tool-use-id>toolu_015am9PUykTEKkQkjwA766Ax</tool-use-id>\n<output-file>/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/tasks/a7398614bbda2ae5f.output</output-file>\n<status>completed</status>\n<summary>Agent \"Reply ok\" finished</summary>\n<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>\n<result>ok</result>\n<usage><subagent_tokens>23137</subagent_tokens><tool_uses>0</tool_uses><duration_ms>1171</duration_ms></usage>\n</task-notification>"
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

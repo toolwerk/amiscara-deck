@@ -1,0 +1,25 @@
+{
+ "event": "Notification",
+ "input": {
+  "session_id": "d681854d-7655-4aa8-bdb3-6f4b9eef83e1",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/d681854d-7655-4aa8-bdb3-6f4b9eef83e1.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/d681854d-7655-4aa8-bdb3-6f4b9eef83e1/scratchpad",
+  "prompt_id": "71e17788-6b64-4e25-af1b-d4e1c6ec3df0",
+  "hook_event_name": "Notification",
+  "message": "Claude is waiting for your input",
+  "notification_type": "idle_prompt"
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

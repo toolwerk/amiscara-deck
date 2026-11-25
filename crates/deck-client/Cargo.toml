@@ -1,0 +1,20 @@
+[package]
+name = "deck-client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-proto = { path = "../deck-proto" }
+thiserror = "2"
+tokio = { version = "1.53.3", features = ["io-util", "net", "rt", "time"] }
+
+[dev-dependencies]
+deck-daemon = { path = "../deck-daemon" }
+serde_json = "1"
+tempfile = "3"
+tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }
+
+[lints]
+workspace = true

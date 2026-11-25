@@ -1,0 +1,25 @@
+{
+ "event": "Notification",
+ "input": {
+  "session_id": "c7d401e8-86af-436a-a666-20a1cc9109b9",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/c7d401e8-86af-436a-a666-20a1cc9109b9.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/c7d401e8-86af-436a-a666-20a1cc9109b9/scratchpad",
+  "prompt_id": "5f02a961-1f21-4396-814e-dbbeb7befafb",
+  "hook_event_name": "Notification",
+  "message": "Claude needs your permission",
+  "notification_type": "permission_prompt"
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

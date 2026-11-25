@@ -1,0 +1,16 @@
+[package]
+name = "deck-remote"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-client = { path = "../deck-client" }
+deck-proto = { path = "../deck-proto" }
+amiscara-ssh = { git = "https://github.com/toolwerk/amiscara-ssh", tag = "v0.8.0" }
+thiserror = "2"
+tokio = { version = "1.53.3", features = ["time"] }
+
+[lints]
+workspace = true

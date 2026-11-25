@@ -1,0 +1,30 @@
+{
+ "event": "Stop",
+ "input": {
+  "session_id": "3fc349d7-1d39-4299-982f-1526f282f2e3",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/3fc349d7-1d39-4299-982f-1526f282f2e3/scratchpad",
+  "prompt_id": "9db49300-8d3e-4523-9fcc-ddea56012568",
+  "permission_mode": "default",
+  "effort": {
+   "level": "medium"
+  },
+  "hook_event_name": "Stop",
+  "stop_hook_active": false,
+  "last_assistant_message": "Done, with one failure. The read of `/nonexistent/m0.txt` failed because the file does not exist. The subagent replied \"ok\".",
+  "background_tasks": [],
+  "session_crons": []
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

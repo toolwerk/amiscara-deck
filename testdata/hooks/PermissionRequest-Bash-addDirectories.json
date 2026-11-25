@@ -1,0 +1,46 @@
+{
+ "event": "PermissionRequest",
+ "input": {
+  "session_id": "c7d401e8-86af-436a-a666-20a1cc9109b9",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/c7d401e8-86af-436a-a666-20a1cc9109b9.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/c7d401e8-86af-436a-a666-20a1cc9109b9/scratchpad",
+  "prompt_id": "af42096c-f1a3-4cfe-849e-b1922fe39be5",
+  "permission_mode": "default",
+  "effort": {
+   "level": "medium"
+  },
+  "hook_event_name": "PermissionRequest",
+  "tool_name": "Bash",
+  "tool_input": {
+   "command": "touch m0-s1.txt",
+   "description": "Create empty file m0-s1.txt"
+  },
+  "permission_suggestions": [
+   {
+    "type": "addDirectories",
+    "directories": [
+     "/work/project"
+    ],
+    "destination": "session"
+   },
+   {
+    "type": "setMode",
+    "mode": "acceptEdits",
+    "destination": "session"
+   }
+  ]
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

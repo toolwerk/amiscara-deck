@@ -1,0 +1,33 @@
+{
+ "event": "PreToolUse",
+ "input": {
+  "session_id": "e4942afb-2f16-460b-9bab-38a9a3c51f61",
+  "transcript_path": "/Users/example/.claude/projects/-work-project-scratchpad-m0-work/e4942afb-2f16-460b-9bab-38a9a3c51f61.jsonl",
+  "cwd": "/work/project",
+  "scratchpad_dir": "/private/tmp/claude-501/-work-project-scratchpad-m0-work/e4942afb-2f16-460b-9bab-38a9a3c51f61/scratchpad",
+  "prompt_id": "780e30d0-1475-4174-9a7d-026a50486418",
+  "permission_mode": "default",
+  "effort": {
+   "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Bash",
+  "tool_input": {
+   "command": "curl --version",
+   "description": "Print curl version information"
+  },
+  "tool_use_id": "toolu_01E4Jtd32RY2uM7xuCat3mi3"
+ },
+ "env": {
+  "CLAUDE_PROJECT_DIR": "/work/project"
+ },
+ "parents": [
+  "claude",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+  "timeout",
+  "/bin/zsh",
+  "/Users/example/Library/Application Support/Claude/claude-code/2.1.330/4262a1273231/claude.app/Contents/MacOS/claude",
+  "/Applications/Claude.app/Contents/Helpers/disclaimer",
+  "/Applications/Claude.app/Contents/MacOS/Claude"
+ ]
+}

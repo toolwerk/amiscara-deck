@@ -1,0 +1,7 @@
+// Manual signing for the archive of scripts/release.sh (-xcconfig): only the
+// Developer ID certificate is used, no development certificate is created and
+// no provisioning profile is needed (Deck has no special entitlements).
+DEVELOPMENT_TEAM = 7N2W4T6UPV
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = Developer ID Application
+PROVISIONING_PROFILE_SPECIFIER =
