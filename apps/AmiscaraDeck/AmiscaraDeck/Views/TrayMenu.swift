@@ -3,11 +3,12 @@ import SwiftUI
 
 /// What the context menu of the menu bar symbol offers.
 enum TrayMenuEntry: CaseIterable {
-    case window, settings, quit
+    case window, settings, updates, quit
 
     var title: String {
         switch self {
         case .window: "Fenster öffnen"
+        case .updates: "Nach Updates suchen …"
         case .settings: "Einstellungen …"
         case .quit: "Amiscara Deck beenden"
         }
@@ -25,6 +26,9 @@ final class TrayMenu: NSObject {
     /// Opens a window by its id. Set by the label of the menu bar extra.
     var openWindow: (String) -> Void = { _ in }
     var quit: () -> Void = { NSApplication.shared.terminate(nil) }
+    /// Looks for an update; nil in builds without an updater, and then the menu
+    /// does not offer it.
+    var checkForUpdates: (() -> Void)?
     /// Shows the menu under the symbol. Replaced in tests: a real menu blocks.
     var show: (NSMenu, NSView) -> Void = { menu, view in
         let below = view.isFlipped ? view.bounds.height + 5 : -5
@@ -62,7 +66,7 @@ final class TrayMenu: NSObject {
 
     func makeMenu() -> NSMenu {
         let menu = NSMenu()
-        for entry in TrayMenuEntry.allCases {
+        for entry in TrayMenuEntry.allCases where entry != .updates || checkForUpdates != nil {
             if entry == .quit { menu.addItem(.separator()) }
             let item = NSMenuItem(title: entry.title, action: #selector(chosen(_:)), keyEquivalent: entry == .quit ? "q" : "")
             item.target = self
@@ -81,6 +85,7 @@ final class TrayMenu: NSObject {
         switch entry {
         case .window: openWindow("main")
         case .settings: openWindow("settings")
+        case .updates: checkForUpdates?()
         case .quit: quit()
         }
     }

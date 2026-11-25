@@ -77,6 +77,7 @@ struct DeckSettingsView: View {
                 }
             }
             RemotesSection(model: model)
+            UpdateSection(updater: .shared)
             Section("Start") {
                 Toggle("Beim Anmelden starten", isOn: Binding(get: { autostart }, set: setAutostart))
             }
@@ -139,5 +140,23 @@ struct DeckSettingsView: View {
             hooksMessage = "Autostart: \(error.localizedDescription)"
         }
         autostart = SMAppService.mainApp.status == .enabled
+    }
+}
+
+/// Updates of the app. Without an updater (a build of one's own) it says so.
+struct UpdateSection: View {
+    @Bindable var updater: UpdaterController
+
+    var body: some View {
+        Section("Updates") {
+            if updater.isAvailable {
+                Toggle("Automatisch nach Updates suchen", isOn: $updater.automaticallyChecks)
+                Button("Jetzt suchen …") { updater.checkForUpdates() }
+            } else {
+                Text("Diese App wurde selbst gebaut und aktualisiert sich nicht.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.secondary)
+            }
+        }
     }
 }

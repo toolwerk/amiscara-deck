@@ -2,6 +2,7 @@
 
 ## Einmal je Mac
 
+0. Signierschlüssel für Updates. Er liegt im Anmelde-Schlüsselbund unter dem Konto `amiscara-deck`, sein öffentlicher Teil steht in `project.yml` als `SUPublicEDKey`. **Nie ersetzen:** Installierte Apps nehmen dann keine Updates mehr an. Auf einem zweiten Mac wird derselbe Schlüssel übertragen (`generate_keys --account amiscara-deck -x <Datei>` und `-f <Datei>`), die Datei danach löschen.
 1. Zertifikat "Developer ID Application" im Anmelde-Schlüsselbund.
 2. Zugang für die Notarisierung hinterlegen. `notarytool` fragt Apple-ID und app-spezifisches Passwort ab (von appleid.apple.com, nicht das Kontopasswort). Fragt es zuerst nach einem API-Schlüssel, genügt Enter.
 
@@ -29,9 +30,18 @@ python3 scripts/release-notes.py cut 0.1.0 2026-01-31
 scripts/release.sh
 ```
 
-Das Ergebnis liegt in `target/release-app`: das Zip und die Notizen zur Version.
+Das Ergebnis liegt in `target/release-app`: das Zip, die Notizen zur Version und `appcast.xml`, der Feed für Updates.
 
-4. Tag `v<Version>` setzen und das Release mit Zip und Notizen anlegen.
+4. Die App aus `target/release-app/export` einmal selbst ausprobieren.
+5. Veröffentlichen. Das legt das Release `v<Version>` an und ersetzt den Feed im Release `updates`, den jede installierte App liest. Das Skript fragt vorher nach.
+
+```sh
+scripts/publish.sh
+```
+
+## Wie Updates ankommen
+
+Installierte Apps prüfen beim Start und einmal am Tag den Feed, laden eine neue Version im Hintergrund und setzen sie beim Beenden ein. Beim nächsten Start beendet die App den alten Hintergrunddienst und startet ihren eigenen. Selbst gebaute Debug-Versionen aktualisieren sich nicht.
 
 ## Probelauf
 

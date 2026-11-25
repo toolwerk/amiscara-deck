@@ -22,6 +22,7 @@ Der Dialog im Terminal bleibt immer da. Wer zuerst antwortet, zählt. Pläne zur
 - Eine gekürzte Anfrage lässt sich erst erlauben, nachdem der ganze Text gezeigt wurde. Versteckte Zeichen werden sichtbar gemacht.
 - Der Dienst öffnet keinen Netzwerk-Port. Er spricht über einen Unix-Socket, den nur Ihr Benutzer lesen kann. Andere Rechner erreicht die App über SSH.
 - Verlauf und Entscheidungslog bleiben lokal und werden nach der eingestellten Frist gelöscht. Es gibt keine Telemetrie.
+- Ins Netz geht die App nur, um nach Updates zu suchen (abschaltbar in den Einstellungen) und um Rechner zu erreichen, die Sie selbst eintragen. Updates sind signiert.
 
 ## Voraussetzungen
 

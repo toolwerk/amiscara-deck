@@ -866,3 +866,45 @@ async fn a_message_written_after_the_stop_hook_still_counts() {
     }
     d.stop().await;
 }
+
+#[tokio::test]
+async fn the_welcome_names_the_build_and_a_ui_can_end_the_daemon() {
+    let d = start().await;
+    let s = UnixStream::connect(&d.socket).await.expect("connect");
+    let (r, mut w) = s.into_split();
+    let hello = encode_line(&UiMessage::Hello {
+        protocol: PROTOCOL_VERSION,
+        name: "t".into(),
+    })
+    .expect("encode");
+    w.write_all(hello.as_bytes()).await.expect("hello");
+    let mut reader = BufReader::new(r);
+    let mut first = String::new();
+    reader.read_line(&mut first).await.expect("welcome");
+    let DaemonMessage::Welcome { build, .. } = decode_line(&first).expect("decode") else {
+        panic!("welcome")
+    };
+    // The daemon runs inside this test program.
+    let me = std::env::current_exe().expect("exe");
+    assert_eq!(build, deck_proto::build::fingerprint(&me));
+    assert!(build.is_some());
+
+    let mut hook = d.hook("PermissionRequest-Bash-addRules", S, Tool::Claude);
+    tokio::time::sleep(Duration::from_millis(200)).await;
+    w.write_all(
+        encode_line(&UiMessage::Shutdown)
+            .expect("encode")
+            .as_bytes(),
+    )
+    .await
+    .expect("shutdown");
+    let reply = finished(&mut hook, Duration::from_secs(5))
+        .await
+        .expect("let go");
+    assert_eq!(reply.output, None, "a held request goes to the terminal");
+    tokio::time::timeout(Duration::from_secs(5), d.task)
+        .await
+        .expect("the daemon ends")
+        .expect("task");
+    assert!(!d.socket.exists());
+}

@@ -131,6 +131,8 @@ enum Command {
 #[derive(uniffi::Object)]
 pub struct DeckConnection {
     commands: mpsc::UnboundedSender<Command>,
+    /// The fingerprint the daemon told in its welcome.
+    daemon_build: Option<String>,
 }
 
 #[uniffi::export]
@@ -211,6 +213,16 @@ impl DeckConnection {
         });
     }
 
+    /// The fingerprint of the daemon this connection talks to.
+    pub fn daemon_build(&self) -> Option<String> {
+        self.daemon_build.clone()
+    }
+
+    /// Ask the daemon to end cleanly.
+    pub fn shutdown_daemon(&self) {
+        self.send(UiMessage::Shutdown);
+    }
+
     /// Forget the history of every agent and the log of decisions.
     pub fn clear_history(&self) {
         self.send(UiMessage::ClearHistory);
@@ -255,8 +267,12 @@ fn start(
     if let Some(today) = state.today_micro_usd {
         observer.on_costs(today);
     }
+    let daemon_build = state.build.clone();
     runtime().spawn(follow(client, keep, rx, observer));
-    Arc::new(DeckConnection { commands: tx })
+    Arc::new(DeckConnection {
+        commands: tx,
+        daemon_build,
+    })
 }
 
 /// Another machine, as the user entered it.
@@ -355,6 +371,12 @@ fn tell(observer: &dyn DeckObserver, msg: DaemonMessage) {
         | DaemonMessage::VersionMismatch { .. }
         | DaemonMessage::Unknown => {}
     }
+}
+
+/// The fingerprint of a program file, to compare with `daemon_build`.
+#[uniffi::export]
+pub fn build_fingerprint(path: String) -> Option<String> {
+    deck_proto::build::fingerprint(Path::new(&path))
 }
 
 /// The socket in the default data folder of the daemon.

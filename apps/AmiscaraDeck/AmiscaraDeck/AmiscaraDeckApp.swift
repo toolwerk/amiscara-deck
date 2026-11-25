@@ -9,6 +9,9 @@ struct AmiscaraDeckApp: App {
         // The unit tests host the app: they must not start a daemon of their own
         // in the real data folder of the user.
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            if UpdaterController.shared.isAvailable {
+                TrayMenu.shared.checkForUpdates = { UpdaterController.shared.checkForUpdates() }
+            }
             let signals = SystemSignals(model: model)
             model.signals = signals
             // A tap on a notification shows what is asked.

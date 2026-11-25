@@ -5,7 +5,12 @@
 #   scripts/release.sh --install         also copy the app to /Applications
 #   scripts/release.sh --skip-notarize   build and sign only (a dry run, not for others)
 #
+# Besides the zip it writes appcast.xml, the update feed (scripts/sparkle-feed.sh).
+# Nothing is published here: scripts/publish.sh does that.
+#
 # One-time setup, see docs/release.md:
+#   - Sparkle signing key in the login keychain (account amiscara-deck), its
+#     public key in project.yml as SUPublicEDKey
 #   - "Developer ID Application" certificate in the login keychain
 #   - xcrun notarytool store-credentials AmiscaraDeck --team-id 7N2W4T6UPV
 set -euo pipefail
@@ -39,6 +44,9 @@ if $notarize; then
     xcrun notarytool history "${notary_auth[@]}" >/dev/null 2>&1 \
         || die "notarytool cannot sign in (profile '$profile' or API key missing); see docs/release.md"
     require_clean_tree
+    sparkle_key=$(sed -n 's/^ *SUPublicEDKey: \(.*\)$/\1/p' "$spec")
+    [[ -n "$sparkle_key" && "$sparkle_key" != __* ]] \
+        || die "SUPublicEDKey in project.yml is still the placeholder; the release could not update itself"
 fi
 version=$(marketing_version)
 build=$(build_number)
@@ -93,6 +101,12 @@ else
 fi
 
 ditto -c -k --keepParent "$app" "$out/$name.zip"
+
+# Only a notarized build may reach installed apps.
+if $notarize; then
+    step "Update feed"
+    scripts/sparkle-feed.sh "$out/$name.zip" "$version" "$build"
+fi
 
 if $install; then
     step "Install to /Applications"

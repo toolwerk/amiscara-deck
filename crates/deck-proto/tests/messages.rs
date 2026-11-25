@@ -94,6 +94,7 @@ fn every_message_survives_a_round_trip() {
         settings: Settings::default(),
         agents: vec![agent()],
         today_micro_usd: Some(7),
+        build: Some("abc".into()),
     });
     roundtrip(DaemonMessage::VersionMismatch { daemon: 2, ui: 1 });
     roundtrip(DaemonMessage::AgentChanged(Box::new(agent())));

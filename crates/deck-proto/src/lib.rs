@@ -1,6 +1,7 @@
 //! Types shared by hook program, daemon and UIs: hook inputs, agent, request, messages.
 
 pub mod agent;
+pub mod build;
 pub mod hook;
 pub mod message;
 pub mod paths;

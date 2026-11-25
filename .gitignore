@@ -1,4 +1,5 @@
 target/
+*.sparklekey
 .DS_Store
 *.xcodeproj
 apps/AmiscaraDeck/Generated/
