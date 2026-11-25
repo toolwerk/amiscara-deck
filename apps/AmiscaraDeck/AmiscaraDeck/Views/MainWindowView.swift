@@ -145,7 +145,7 @@ struct AgentDetailView: View {
                             ForEach(Array(agent.history.reversed().enumerated()), id: \.offset) { _, entry in
                                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                                     Text(RelativeTime.short(sinceMs: entry.atMs, nowMs: nowMs))
-                                        .deckFont(11).monospacedDigit()
+                                        .font(.system(size: 11 * scale).monospacedDigit())
                                         .foregroundStyle(Theme.secondary)
                                         .frame(width: 48 * scale, alignment: .trailing)
                                     Text(ActivityText.text(entry.event))
