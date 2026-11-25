@@ -265,8 +265,9 @@ fn sessions_do_not_mix() {
 }
 
 /// The Codex samples in the order they were recorded: one turn that reads,
-/// edits and asks for a command outside the work folder (allowed in the
-/// terminal), the end of the session, then `codex resume --last`.
+/// edits, fails a command in the sandbox and asks again for it outside the
+/// work folder (allowed in the terminal), the end of the session, then
+/// `codex resume --last` with one more turn.
 #[test]
 fn a_whole_codex_session_as_recorded() {
     let mut r = Run::codex();
@@ -297,7 +298,7 @@ fn a_whole_codex_session_as_recorded() {
         })
     );
     r.feed("PostToolUse-Bash", S);
-    assert_eq!(r.store.get(S).expect("agent").status, Status::Working);
+    assert_eq!(r.status(S), Status::Working);
 
     r.feed("PreToolUse-apply_patch", S);
     assert_eq!(
@@ -308,6 +309,18 @@ fn a_whole_codex_session_as_recorded() {
     );
     r.feed("PostToolUse-apply_patch", S);
 
+    // The sandbox lets the first try fail: Codex reports it as PostToolUse.
+    r.feed("PreToolUse-Bash-2", S);
+    r.feed("PostToolUse-Bash-2", S);
+    assert_eq!(r.status(S), Status::Working);
+
+    r.feed("PreToolUse-Bash-3", S);
+    assert_eq!(
+        r.store.get(S).expect("agent").activity,
+        Some(Activity::Run {
+            command: Some("touch ../outside.txt".into())
+        })
+    );
     r.feed("PermissionRequest-Bash", S);
     let a = r.store.get(S).expect("agent");
     assert_eq!(a.status, Status::Blocked);
@@ -315,21 +328,35 @@ fn a_whole_codex_session_as_recorded() {
     assert_eq!(req.state, RequestState::PassedThrough);
     assert_eq!(req.summary, "touch ../outside.txt");
 
-    r.feed("PostToolUse-Bash", S);
+    r.feed("PostToolUse-Bash-3", S);
     let a = r.store.get(S).expect("agent");
     assert_eq!((a.status, a.request.is_none()), (Status::Working, true));
 
     r.feed("Stop", S);
-    assert_eq!(r.store.get(S).expect("agent").status, Status::Done);
+    assert_eq!(r.status(S), Status::Done);
     r.feed("SessionEnd", S);
-    assert_eq!(r.store.get(S).expect("agent").status, Status::Exited);
+    assert_eq!(r.status(S), Status::Exited);
+    assert_eq!(r.store.get(S).expect("agent").turns, Some(1));
 
     // `codex resume --last` keeps the session id: a new run of the same agent.
     r.feed("SessionStart-resume", S);
     let a = r.store.get(S).expect("agent");
     assert_eq!(a.status, Status::Idle);
-    assert_eq!(a.last_prompt, None);
+    assert_eq!((a.last_prompt.as_deref(), a.turns), (None, None));
     assert_eq!(a.project.as_deref(), Some("project"));
+
+    r.feed("UserPromptSubmit-2", S);
+    let a = r.store.get(S).expect("agent");
+    assert_eq!(a.status, Status::Working);
+    assert_eq!(
+        (a.last_prompt.as_deref(), a.turns),
+        (Some("Reply with the single word ok"), Some(1))
+    );
+    r.feed("Stop-2", S);
+    assert_eq!(r.status(S), Status::Done);
+    r.feed("SessionEnd-2", S);
+    assert_eq!(r.status(S), Status::Exited);
+    assert_eq!(r.store.agents().len(), 1);
 }
 
 const ALL: &[&str] = &[

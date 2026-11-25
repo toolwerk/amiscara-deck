@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """M3-07: turn the events of record-events.py into test data without personal
 details: testdata/hooks-codex/<Event>[-<tool_name>].json, SessionStart as
-SessionStart-<source>. The first event of each name is kept.
+SessionStart-<source>. A later event of the same name gets a number
+(`PostToolUse-Bash-2`), so the files keep the whole recording in its order.
 
 Paths are replaced (work folder, CODEX_HOME, home folder, login name). If a
 login name, an e-mail address or another home folder is left, nothing is
@@ -56,9 +57,11 @@ def main():
     for f in files:
         with open(f) as fh:
             rec = json.load(fh)
-        name = name_of(rec["event"], rec["input"])
-        if name in chosen:
-            continue
+        base = name_of(rec["event"], rec["input"])
+        name, n = base, 1
+        while name in chosen:
+            n += 1
+            name = f"{base}-{n}"
         sample = {
             "event": rec["event"],
             "input": rec["input"],
