@@ -8,7 +8,7 @@ struct NotificationWarning: View {
         if let warning = model.notificationState.warning {
             VStack(alignment: .leading, spacing: 6) {
                 Text(warning)
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.waiting)
                     .fixedSize(horizontal: false, vertical: true)
                 Button(L10n.t("Open System Settings")) { NotificationState.openSystemSettings() }
@@ -47,15 +47,15 @@ struct AttentionSection: View {
             Toggle(L10n.t("Symbol pulses while someone waits"), isOn: $model.attention.pulse)
             if model.focusQuiet {
                 Text(FocusWording.quietNow)
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.waiting)
             }
             Text(FocusWording.howTo)
-                .font(.system(size: 11))
+                .deckFont(11)
                 .foregroundStyle(Theme.secondary)
             Button(L10n.t("Open Focus settings")) { FocusWording.openSystemSettings() }
             Text(L10n.t("Window, sound and reminder come when Deck would also send a notification: in “Automatic” only when you are not at the terminal."))
-                .font(.system(size: 11))
+                .deckFont(11)
                 .foregroundStyle(Theme.secondary)
         }
     }

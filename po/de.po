@@ -867,3 +867,24 @@ msgstr "{name}: neu, {status}"
 
 msgid "asks: {summary}"
 msgstr "fragt: {summary}"
+
+msgid "Small"
+msgstr "Klein"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Large"
+msgstr "Groß"
+
+msgid "Extra large"
+msgstr "Sehr groß"
+
+msgid "Appearance"
+msgstr "Darstellung"
+
+msgid "Text size"
+msgstr "Schriftgröße"
+
+msgid "In the window also with ⌘+, ⌘- and ⌘0."
+msgstr "Im Fenster auch mit ⌘+, ⌘- und ⌘0."

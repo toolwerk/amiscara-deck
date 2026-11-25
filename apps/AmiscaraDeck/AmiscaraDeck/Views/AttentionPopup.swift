@@ -9,7 +9,9 @@ struct AttentionView: View {
     /// Buttons answer only after a moment: the window appears by itself and must
     /// not catch a click that was meant for something else.
     static let armAfter: Duration = .milliseconds(700)
+    /// Does not grow with the text, so the window fits on a small screen.
     static let maxHeight: CGFloat = 520
+    @Environment(\.deckScale) private var scale
     @State private var armed = false
     @State private var measured: CGFloat = 0
 
@@ -19,12 +21,12 @@ struct AttentionView: View {
         VStack(spacing: 0) {
             HStack {
                 Text(L10n.t("Waiting for you"))
-                    .font(.system(size: 14, weight: .semibold))
+                    .deckFont(14, weight: .semibold)
                     .foregroundStyle(Theme.text)
                 Spacer()
                 Button(action: close) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 11, weight: .bold))
+                        .deckFont(11, weight: .bold)
                         .foregroundStyle(Theme.secondary)
                         .frame(width: 24, height: 24)
                         .contentShape(Rectangle())
@@ -45,7 +47,7 @@ struct AttentionView: View {
                 .frame(height: min(measured > 0 ? measured : 160, Self.maxHeight))
             }
         }
-        .frame(width: 380)
+        .frame(width: PanelView.width * scale)
         .background(Theme.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Theme.amber, lineWidth: 1))
@@ -60,7 +62,7 @@ struct AttentionView: View {
         VStack(spacing: 8) {
             if waiting.isEmpty {
                 Text(L10n.t("Nobody is waiting."))
-                    .font(.system(size: 13))
+                    .deckFont(13)
                     .foregroundStyle(Theme.secondary)
                     .padding(16)
             }
@@ -108,7 +110,7 @@ final class SystemSignals: NSObject, AttentionSignals, NSWindowDelegate {
 
     private func makePanel(model: DeckModel) -> FloatingPanel {
         let panel = FloatingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 240),
+            contentRect: NSRect(x: 0, y: 0, width: PanelView.width, height: 240),
             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false
         )
         panel.isFloatingPanel = true
@@ -119,7 +121,9 @@ final class SystemSignals: NSObject, AttentionSignals, NSWindowDelegate {
         panel.backgroundColor = .clear
         panel.hasShadow = true
         panel.isReleasedWhenClosed = false
-        let controller = NSHostingController(rootView: AttentionView(model: model) { [weak self] in self?.closePopup() })
+        let controller = NSHostingController(
+            rootView: AttentionView(model: model) { [weak self] in self?.closePopup() }.deckTextSize(model)
+        )
         controller.sizingOptions = .preferredContentSize
         panel.contentViewController = controller
         panel.delegate = self

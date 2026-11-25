@@ -395,6 +395,22 @@ msgstr ""
 msgid "No daemon at {path}."
 msgstr ""
 
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TextSize.swift
+msgid "Small"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TextSize.swift
+msgid "Normal"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TextSize.swift
+msgid "Large"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TextSize.swift
+msgid "Extra large"
+msgstr ""
+
 #: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift
 msgid "Amiscara Deck, {n} agents waiting"
 msgstr ""
@@ -533,6 +549,18 @@ msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
 msgid "This app was built locally and does not update itself."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Appearance"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Text size"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "In the window also with ⌘+, ⌘- and ⌘0."
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift

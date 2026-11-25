@@ -21,12 +21,12 @@ struct QuestionAnswerView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(RequestWording.intro(tool: request.toolName))
-                    .font(.system(size: 12, weight: .semibold))
+                    .deckFont(12, weight: .semibold)
                     .foregroundStyle(Theme.waiting)
                 Spacer(minLength: 8)
                 if count > 1 {
                     Text(QuestionWording.position(q, of: count))
-                        .font(.system(size: 11))
+                        .deckFont(11)
                         .foregroundStyle(Theme.secondary)
                 }
             }
@@ -51,7 +51,7 @@ struct QuestionAnswerView: View {
                 }
             }
             Text(L10n.t("To give an answer of your own, type it in the program the agent runs in."))
-                .font(.system(size: 11))
+                .deckFont(11)
                 .foregroundStyle(Theme.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -60,12 +60,12 @@ struct QuestionAnswerView: View {
     private func question(_ q: Int, _ question: QuestionView) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(question.question)
-                .font(.system(size: 13, weight: .medium))
+                .deckFont(13, weight: .medium)
                 .foregroundStyle(Theme.text)
                 .fixedSize(horizontal: false, vertical: true)
             if question.multiSelect {
                 Text(L10n.t("Several possible"))
-                    .font(.system(size: 11))
+                    .deckFont(11)
                     .foregroundStyle(Theme.secondary)
             }
             ForEach(Array(question.options.enumerated()), id: \.offset) { o, option in
@@ -85,11 +85,11 @@ struct QuestionAnswerView: View {
                     .foregroundStyle(on ? Theme.teal : Theme.secondary)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(view.label)
-                        .font(.system(size: 13))
+                        .deckFont(13)
                         .foregroundStyle(Theme.text)
                     if let d = view.description {
                         Text(d)
-                            .font(.system(size: 11))
+                            .deckFont(11)
                             .foregroundStyle(Theme.secondary)
                     }
                 }

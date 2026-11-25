@@ -41,6 +41,7 @@ enum RequestWording {
 struct RequestCardView: View {
     let request: RequestView
     let model: DeckModel
+    @Environment(\.deckScale) private var scale
 
     private var expanded: Bool { model.isExpanded(request.id) }
     /// The whole text with section names in the language of the app.
@@ -61,7 +62,7 @@ struct RequestCardView: View {
         case .passedThrough: inTerminal
         case .answered:
             Text(L10n.t("Answered"))
-                .font(.system(size: 12))
+                .deckFont(12)
                 .foregroundStyle(Theme.secondary)
         }
     }
@@ -70,7 +71,7 @@ struct RequestCardView: View {
         VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(expanded && request.truncated ? L10n.t("Full text") : RequestWording.intro(tool: request.toolName))
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.secondary)
                 if expanded && request.truncated {
                     if isLong {
@@ -84,11 +85,11 @@ struct RequestCardView: View {
                 }
                 if request.truncated && !expanded {
                     Text(L10n.t("Shortened. Allow works only after you have seen everything."))
-                        .font(.system(size: 11))
+                        .deckFont(11)
                         .foregroundStyle(Theme.waiting)
                 } else if request.truncated {
                     Text(L10n.t("Hidden characters appear as ⟦U+202E⟧. A typed ⟦ appears twice."))
-                        .font(.system(size: 11))
+                        .deckFont(11)
                         .foregroundStyle(Theme.secondary)
                 }
             }
@@ -125,11 +126,11 @@ struct RequestCardView: View {
                 model.allow(request: request, always: option.index)
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    (Text(L10n.t("Always allow: ")) + Text(AlwaysAllowText.rules(option)).font(.system(size: 12, design: .monospaced)))
-                        .font(.system(size: 12))
+                    (Text(L10n.t("Always allow: ")) + Text(AlwaysAllowText.rules(option)).font(.system(size: 12 * scale, design: .monospaced)))
+                        .deckFont(12)
                         .foregroundStyle(Theme.tertiary)
                     Text(AlwaysAllowText.target(option.destination))
-                        .font(.system(size: 11))
+                        .deckFont(11)
                         .foregroundStyle(AlwaysAllowText.isBroad(option.destination) ? Theme.waiting : Theme.secondary)
                 }
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
@@ -143,7 +144,7 @@ struct RequestCardView: View {
         VStack(alignment: .leading, spacing: 6) {
             if RequestWording.isInteractive(tool: request.toolName) {
                 Text(RequestWording.intro(tool: request.toolName))
-                    .font(.system(size: 12, weight: .semibold))
+                    .deckFont(12, weight: .semibold)
                     .foregroundStyle(Theme.waiting)
                 // The whole question or plan: there is nothing to decide here,
                 // only to read. Long ones scroll inside the card.
@@ -156,14 +157,14 @@ struct RequestCardView: View {
                 mono(request.summary)
             }
             Text(RequestWording.terminalHint(tool: request.toolName))
-                .font(.system(size: 12))
+                .deckFont(12)
                 .foregroundStyle(Theme.secondary)
         }
     }
 
     private func mono(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 12, design: .monospaced))
+            .deckFont(12, design: .monospaced)
             .foregroundStyle(Theme.text)
             .lineSpacing(2)
             .textSelection(.enabled)
@@ -174,7 +175,7 @@ struct RequestCardView: View {
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 14, weight: .semibold))
+            .deckFont(14, weight: .semibold)
             .foregroundStyle(Theme.onTeal)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(Theme.teal.opacity(configuration.isPressed ? 0.8 : 1), in: RoundedRectangle(cornerRadius: 8))
@@ -184,7 +185,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 14, weight: .medium))
+            .deckFont(14, weight: .medium)
             .foregroundStyle(Theme.text)
             .frame(maxWidth: .infinity, minHeight: 44)
             .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.control))

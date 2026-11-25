@@ -138,6 +138,13 @@ final class DeckModel {
             settleSignals()
         }
     }
+    /// How large the texts are, as the user chose it on this machine.
+    var textSize: TextSize = .normal {
+        didSet {
+            guard textSize != oldValue else { return }
+            textSizeStore.save(textSize)
+        }
+    }
     /// The dim half of a blinking symbol.
     private(set) var pulseDim = false
     /// What macOS does with our notifications.
@@ -146,6 +153,7 @@ final class DeckModel {
     private(set) var focusQuiet = false
     @ObservationIgnored var focusProbe: (@Sendable () -> Bool)?
     @ObservationIgnored var attentionStore = AttentionStore()
+    @ObservationIgnored var textSizeStore = TextSizeStore()
     @ObservationIgnored var signals: AttentionSignals?
     @ObservationIgnored var remindAfter: Duration = .seconds(60)
     @ObservationIgnored var pulseEvery: Duration = .milliseconds(700)
@@ -188,6 +196,7 @@ final class DeckModel {
         // Not under tests: the system center would ask for permission there.
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             model.attention = model.attentionStore.load()
+            model.textSize = model.textSizeStore.load()
             model.permissionProbe = { await NotificationState.probe() }
             model.focusProbe = { FocusState.shared.isQuiet }
             Task { await FocusState.shared.restore() }

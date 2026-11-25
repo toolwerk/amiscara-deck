@@ -38,7 +38,7 @@ struct RemoteNotes: View {
         if !lines.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
                 ForEach(lines, id: \.self) { line in
-                    Text(line).font(.system(size: 11)).foregroundStyle(Theme.waiting)
+                    Text(line).deckFont(11).foregroundStyle(Theme.waiting)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,18 +62,18 @@ struct RemotesSection: View {
         Section(L10n.t("Other machines")) {
             if model.remotes.isEmpty {
                 Text(L10n.t("None. Deck can show the agents of another machine and give approvals there, over SSH."))
-                    .font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    .deckFont(12).foregroundStyle(Theme.secondary)
             }
             ForEach(model.remotes, id: \.id) { endpoint in
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(endpoint.setting.name).font(.system(size: 13, weight: .semibold))
+                        Text(endpoint.setting.name).deckFont(13, weight: .semibold)
                         Text("\(endpoint.setting.user)@\(endpoint.setting.host)")
-                            .font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                            .deckFont(12).foregroundStyle(Theme.secondary)
                         Spacer()
                         Button(L10n.t("Remove")) { model.removeRemote(id: endpoint.id) }
                     }
-                    Text(RemoteWording.detail(endpoint)).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    Text(RemoteWording.detail(endpoint)).deckFont(12).foregroundStyle(Theme.secondary)
                     if case .needsTrust = endpoint.link {
                         Button(L10n.t("Trust this key")) { endpoint.trust() }
                     }

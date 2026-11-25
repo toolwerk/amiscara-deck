@@ -13,9 +13,11 @@ struct DeckSettingsView: View {
     @State private var codexThere = false
     @State private var autostart = SMAppService.mainApp.status == .enabled
     @State private var confirmClear = false
+    @Environment(\.deckScale) private var scale
 
     var body: some View {
         Form {
+            AppearanceSection(model: model)
             Section(L10n.t("Approvals")) {
                 ModeSwitchView(model: model)
                 WaitTimeSlider(model: model)
@@ -23,17 +25,17 @@ struct DeckSettingsView: View {
             AttentionSection(model: model)
             Section("Claude Code") {
                 if let v = claudeVersion {
-                    Text(HooksText.versionLine(v)).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    Text(HooksText.versionLine(v)).deckFont(12).foregroundStyle(Theme.secondary)
                     if let w = HooksText.versionWarning(v) {
-                        Text(w).font(.system(size: 12)).foregroundStyle(Theme.waiting)
+                        Text(w).deckFont(12).foregroundStyle(Theme.waiting)
                     }
                 }
                 if let s = hooksStatus {
-                    Text(HooksText.summary(s)).font(.system(size: 13))
+                    Text(HooksText.summary(s)).deckFont(13)
                     if let f = HooksText.foreign(s) {
-                        Text(f).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                        Text(f).deckFont(12).foregroundStyle(Theme.secondary)
                     }
-                    Text(s.settingsPath).font(.system(size: 11)).foregroundStyle(Theme.secondary).textSelection(.enabled)
+                    Text(s.settingsPath).deckFont(11).foregroundStyle(Theme.secondary).textSelection(.enabled)
                 } else {
                     Text(L10n.t("Status unknown.")).foregroundStyle(Theme.secondary)
                 }
@@ -45,10 +47,10 @@ struct DeckSettingsView: View {
                         .disabled((hooksStatus?.installed ?? 0) == 0)
                 }
                 if let m = hooksMessage {
-                    Text(m).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    Text(m).deckFont(12).foregroundStyle(Theme.secondary)
                 }
                 Text(L10n.t("Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."))
-                    .font(.system(size: 11)).foregroundStyle(Theme.secondary)
+                    .deckFont(11).foregroundStyle(Theme.secondary)
             }
             if codexThere {
                 Section("Codex") {
@@ -57,12 +59,12 @@ struct DeckSettingsView: View {
                         set: { model.setCodexApprovals($0) }
                     ))
                     if model.settings.codexApprovals {
-                        Text(HooksText.codexApprovalNote).font(.system(size: 11)).foregroundStyle(Theme.secondary)
+                        Text(HooksText.codexApprovalNote).deckFont(11).foregroundStyle(Theme.secondary)
                     }
                     if let s = codexStatus {
-                        Text(HooksText.summary(s)).font(.system(size: 13))
+                        Text(HooksText.summary(s)).deckFont(13)
                         if let f = HooksText.foreign(s) {
-                            Text(f).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                            Text(f).deckFont(12).foregroundStyle(Theme.secondary)
                         }
                     }
                     HStack {
@@ -73,9 +75,9 @@ struct DeckSettingsView: View {
                             .disabled((codexStatus?.installed ?? 0) == 0)
                     }
                     if let m = codexMessage {
-                        Text(m).font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                        Text(m).deckFont(12).foregroundStyle(Theme.secondary)
                     }
-                    Text(HooksText.codexNote).font(.system(size: 11)).foregroundStyle(Theme.secondary)
+                    Text(HooksText.codexNote).deckFont(11).foregroundStyle(Theme.secondary)
                 }
             }
             RemotesSection(model: model)
@@ -99,7 +101,7 @@ struct DeckSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480)
+        .frame(width: 480 * scale)
         .onAppear(perform: refresh)
         .task { await model.refreshNotificationState() }
     }
@@ -157,9 +159,26 @@ struct UpdateSection: View {
                 Button(L10n.t("Check now …")) { updater.checkForUpdates() }
             } else {
                 Text(L10n.t("This app was built locally and does not update itself."))
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.secondary)
             }
+        }
+    }
+}
+
+/// The text size of all windows of Deck.
+struct AppearanceSection: View {
+    @Bindable var model: DeckModel
+
+    var body: some View {
+        Section(L10n.t("Appearance")) {
+            Picker(L10n.t("Text size"), selection: $model.textSize) {
+                ForEach(TextSize.allCases, id: \.self) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            Text(L10n.t("In the window also with ⌘+, ⌘- and ⌘0."))
+                .deckFont(11)
+                .foregroundStyle(Theme.secondary)
         }
     }
 }

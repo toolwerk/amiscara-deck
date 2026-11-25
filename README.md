@@ -193,6 +193,10 @@ Die Karten im Panel bleiben sichtbar.
 
 ![Das Fenster mit sechs Agenten auf zwei Rechnern und der Spalte mit Einzelheiten](docs/images/fenster.png)
 
+### Schriftgröße
+
+In den Einstellungen unter "Darstellung" wählen Sie die Schriftgröße: Klein, Normal, Groß oder Sehr groß. Sie gilt für Panel, Fenster, schwebendes Fenster und Einstellungen. Panel und Fenster werden dabei breiter. Im Fenster geht es auch mit ⌘+, ⌘- und ⌘0. Mitteilungen, das Menü am Symbol und das Symbol selbst bleiben gleich.
+
 ### Kontext und Kosten
 
 - Die **Kontextfüllung** liest Deck aus dem Protokoll der Sitzung.

@@ -14,12 +14,12 @@ struct AgentCardView: View {
             HStack(spacing: 8) {
                 StatusDot(status: agent.status, inTerminal: agent.request?.state == .passedThrough)
                 Text(agent.displayName)
-                    .font(.system(size: 14, weight: .semibold))
+                    .deckFont(14, weight: .semibold)
                     .foregroundStyle(Theme.text)
                     .lineLimit(1)
                 if showHost {
                     Text(agent.host)
-                        .font(.system(size: 11))
+                        .deckFont(11)
                         .foregroundStyle(Theme.secondary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1)
@@ -27,12 +27,12 @@ struct AgentCardView: View {
                 }
                 Spacer(minLength: 8)
                 Text(stateText)
-                    .font(.system(size: 12))
+                    .deckFont(12)
                     .foregroundStyle(Theme.color(agent.status))
                     .lineLimit(1)
             }
             Text(detailLine)
-                .font(.system(size: 12))
+                .deckFont(12)
                 .foregroundStyle(Theme.secondary)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -44,7 +44,7 @@ struct AgentCardView: View {
             }
             if agent.tool == .codex {
                 Text(codexTag)
-                    .font(.system(size: 11))
+                    .deckFont(11)
                     .foregroundStyle(Theme.secondary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -106,7 +106,7 @@ struct ContextBar: View {
             }
             .frame(height: 4)
             Text(L10n.t("Context {percent} %", ["percent": percent]))
-                .font(.system(size: 11))
+                .deckFont(11)
                 .foregroundStyle(Theme.secondary)
         }
         .accessibilityElement(children: .ignore)

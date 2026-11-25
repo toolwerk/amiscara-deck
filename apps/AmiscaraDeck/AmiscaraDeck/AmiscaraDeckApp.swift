@@ -26,6 +26,7 @@ struct AmiscaraDeckApp: App {
     var body: some Scene {
         MenuBarExtra {
             PanelHost(model: model)
+                .deckTextSize(model)
         } label: {
             TrayLabel(model: model)
         }
@@ -33,10 +34,12 @@ struct AmiscaraDeckApp: App {
 
         Window("Amiscara Deck", id: "main") {
             MainWindowView(model: model)
+                .deckTextSize(model)
         }
 
         Window(L10n.t("Settings"), id: "settings") {
             DeckSettingsView(model: model, hooks: .live())
+                .deckTextSize(model)
         }
         .windowResizability(.contentSize)
     }
