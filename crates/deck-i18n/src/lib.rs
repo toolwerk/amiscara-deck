@@ -113,22 +113,39 @@ enum Field {
     Str(usize),
 }
 
-/// The entries of a po file that are translated and not fuzzy. Anything it
-/// cannot read is left out: the text then stays English.
-fn parse_po(text: &str) -> HashMap<String, Translation> {
-    let mut out = HashMap::new();
-    for block in text.split("\n\n") {
+/// One entry of a po file as written: maybe empty, maybe fuzzy.
+struct Entry {
+    id: String,
+    plural: Option<String>,
+    strs: Vec<String>,
+    fuzzy: bool,
+}
+
+/// Every entry of a po file, header included. Entries end at a line that is
+/// empty or holds only spaces or a carriage return, as `scripts/i18n.py` reads
+/// them, so a file that passes its check reads the same here.
+fn entries(text: &str) -> Vec<Entry> {
+    let mut out = Vec::new();
+    let mut block: Vec<&str> = Vec::new();
+    for line in text.lines().map(str::trim).chain(std::iter::once("")) {
+        if !line.is_empty() {
+            block.push(line);
+            continue;
+        }
+        if block.is_empty() {
+            continue;
+        }
         let mut fuzzy = false;
         let mut id: Option<String> = None;
         let mut plural: Option<String> = None;
         let mut strs: Vec<String> = Vec::new();
         let mut field: Option<Field> = None;
-        for line in block.lines().map(str::trim) {
+        for line in block.drain(..) {
             if line.starts_with("#,") && line.contains("fuzzy") {
                 fuzzy = true;
                 continue;
             }
-            if line.is_empty() || line.starts_with('#') {
+            if line.starts_with('#') {
                 continue;
             }
             let (target, rest) = if let Some(r) = line.strip_prefix("msgid_plural ") {
@@ -163,10 +180,30 @@ fn parse_po(text: &str) -> HashMap<String, Translation> {
                 None => {}
             }
         }
-        let Some(id) = id.filter(|i| !i.is_empty()) else {
-            continue;
-        };
-        if fuzzy || strs.is_empty() || strs.iter().any(String::is_empty) {
+        if let Some(id) = id {
+            out.push(Entry {
+                id,
+                plural,
+                strs,
+                fuzzy,
+            });
+        }
+    }
+    out
+}
+
+/// The entries of a po file that are translated and not fuzzy. Anything it
+/// cannot read is left out: the text then stays English.
+fn parse_po(text: &str) -> HashMap<String, Translation> {
+    let mut out = HashMap::new();
+    for Entry {
+        id,
+        plural,
+        mut strs,
+        fuzzy,
+    } in entries(text)
+    {
+        if id.is_empty() || fuzzy || strs.is_empty() || strs.iter().any(String::is_empty) {
             continue;
         }
         let translation = match plural {
@@ -314,6 +351,31 @@ msgstr ""
         assert!(!po.contains_key("Quit"), "fuzzy counts as missing");
         assert!(!po.contains_key("Open"), "empty counts as missing");
         assert!(!po.contains_key(""), "the header is no text");
+    }
+
+    #[test]
+    fn entries_end_at_lines_with_only_spaces_or_a_carriage_return() {
+        let po = parse_po(
+            "msgid \"A\"\r\nmsgstr \"Ä\"\r\n \r\nmsgid \"B\"\nmsgstr \"Bé\"\n\t\nmsgid \"C\"\nmsgstr \"Cé\"",
+        );
+        assert_eq!(po["A"].one, "Ä");
+        assert_eq!(po["B"].one, "Bé");
+        assert_eq!(po["C"].one, "Cé");
+    }
+
+    /// What `scripts/i18n.py check` passes, this reader finds as well: every
+    /// text of the template has its German translation here.
+    #[test]
+    fn every_text_of_the_template_is_translated_here() {
+        let template = entries(include_str!("../../../po/deck.pot"));
+        let ids: Vec<String> = template
+            .into_iter()
+            .map(|e| e.id)
+            .filter(|i| !i.is_empty())
+            .collect();
+        assert!(ids.len() > 200, "{}", ids.len());
+        let missing: Vec<&String> = ids.iter().filter(|i| !german().contains_key(*i)).collect();
+        assert!(missing.is_empty(), "{missing:?}");
     }
 
     #[test]
