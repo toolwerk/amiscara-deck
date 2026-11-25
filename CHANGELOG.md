@@ -4,9 +4,17 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Added
+
+- Deck spricht Englisch: App, Mitteilungen, Menü am Symbol, Fokus-Filter und Befehlszeile folgen der Sprache von macOS bzw. der Umgebung. Die Texte kommen aus `po/deck.pot` und `po/de.po`, `scripts/i18n.py check` findet fehlende Übersetzungen
+- Das englische README zeigt englische Bilder
+
 ### Changed
 
 - Das README führt zum Download der fertigen Version
+- Tätigkeit und Verlauf schickt der Dienst als Daten, jede Oberfläche formuliert sie in ihrer Sprache, auch für Agenten anderer Rechner. Protokoll 2: Dienst und App anderer Rechner gleichzeitig aktualisieren
+- Nach dem Update bleiben die Einstellungen erhalten, laufende Agenten erscheinen mit ihrem nächsten Ereignis wieder, ihr bisheriger Verlauf fällt weg
+- Die Befehlszeile schreibt Minuten als "min" wie die App
 
 ## [0.1.0] - 2026-11-25
 

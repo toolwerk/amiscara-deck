@@ -19,7 +19,7 @@ Ein Menüleisten-Werkzeug für den Mac. Es zeigt alle KI-Coding-Agenten auf Ihre
   </picture>
 </p>
 
-Alle Bilder zeigen erfundene Beispieldaten.
+Die App spricht Deutsch oder Englisch, je nach Sprache von macOS. Eine eigene Sprache nur für Deck stellen Sie in den Systemeinstellungen unter Allgemein, Sprache & Region, Apps ein. Alle Bilder zeigen erfundene Beispieldaten.
 
 ## Inhalt
 
@@ -266,7 +266,7 @@ Die App bringt das Programm `amiscara-deck` mit:
 | `daemon status\|install\|uninstall` | den Dienst beim Anmelden starten, ohne die App |
 | `sim demo` | erfundene Agenten abspielen, zum Ausprobieren ohne Tokens |
 
-`amiscara-deck help` zeigt alle Optionen.
+`amiscara-deck help` zeigt alle Optionen. Die Ausgabe ist deutsch oder englisch, je nach `LANG` (oder `DECK_LANGUAGE`).
 
 ## Updates
 
@@ -344,11 +344,22 @@ Die Logik liegt in Rust unter `crates/`. Befunde aus den Prüfungen am echten Pr
 
 ### Bilder neu erzeugen
 
-Die Bilder dieser Seite zeichnet die App selbst, mit erfundenen Daten:
+Die Bilder dieser Seite zeichnet die App selbst, mit erfundenen Daten. Die englischen landen in `docs/images/en`:
 
 ```sh
 TEST_RUNNER_DECK_SCREENSHOT_DIR="$PWD/docs/images" xcodebuild -project apps/AmiscaraDeck/AmiscaraDeck.xcodeproj -scheme AmiscaraDeck -derivedDataPath target/xcode CODE_SIGNING_ALLOWED=NO test -only-testing:AmiscaraDeckTests/ScreenshotTests
 ```
+
+### Texte übersetzen
+
+Texte im Code sind englisch und markiert: `L10n.t("…")` in Swift, `t("…")` in Rust, Platzhalter als `{name}`. Die Vorlage `po/deck.pot` entsteht aus dem Code, Deutsch steht in `po/de.po`. Nach einer Änderung an einem Text:
+
+```sh
+python3 scripts/i18n.py extract
+python3 scripts/i18n.py check
+```
+
+`check` schlägt fehl, wenn die Vorlage nicht zum Code passt oder ein Text in `de.po` fehlt, leer, unsicher (`fuzzy`) ist oder andere Platzhalter hat. Der Bau macht daraus `Localizable.strings` für die Mac-App.
 
 ### Mitarbeiten
 
