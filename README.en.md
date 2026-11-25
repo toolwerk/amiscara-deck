@@ -210,7 +210,7 @@ If Deck does not know a model yet, it assumes 200,000 tokens. Put the right size
 
 ## Codex
 
-Deck shows Codex sessions. Tested with Codex CLI 0.171.0: project, branch, prompt, activity and status are right, also after ending and resuming a session.
+Deck shows Codex sessions. Tested with Codex CLI 0.171.0: project, branch, prompt, activity and status are right, also after ending and resuming a session. Codex reports a session only with the first prompt, Deck does not show it before that.
 
 1. In the settings click "Install" under "Codex". The section appears when Codex is installed.
 2. In Codex run `/hooks` once and confirm the entries.

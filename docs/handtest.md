@@ -69,7 +69,7 @@ Je Terminal einmal: Terminal (macOS), iTerm2, Ghostty, Terminal im Editor (VS Co
 | Nr | Schritt | Erwartet | Ergebnis |
 |---|---|---|---|
 | C1 | Einstellungen, Codex, "Einbauen" | Hinweis, die Hooks in Codex über `/hooks` zu bestätigen | |
-| C2 | In Codex `/hooks` bestätigen, eine Sitzung starten | Agent erscheint mit "Codex · nur lesend" | |
+| C2 | In Codex `/hooks` bestätigen, eine Sitzung starten und einen Auftrag geben | Agent erscheint mit dem ersten Auftrag, mit "Codex · nur lesend" (Codex meldet den Start erst dann) | |
 | C3 | Freigaben für Codex aus: Codex fragt eine Freigabe an | der Dialog steht sofort im Terminal, Deck zeigt "wartet im Terminal" und entscheidet nie | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Dialog sofort, nie gehalten |
 | C5 | Freigaben für Codex an, "Automatik", eine andere App ist vorn | Mitteilung; Erlauben lässt den Befehl laufen, kein Dialog in Codex | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): gehalten, Mitteilung, Erlauben über das Protokoll. Knopf der Mitteilung von Hand |
 | C6 | Wie C5, aber vor dem Antworten ins Terminal wechseln | innerhalb weniger Sekunden (nächste Anwesenheitsmeldung) erscheint der Dialog in Codex | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Dialog 0,7 s nach der Anwesenheitsmeldung |

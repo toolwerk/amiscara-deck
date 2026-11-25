@@ -37,7 +37,7 @@ Codex speichert das Vertrauen in `config.toml` unter `[hooks.state."<Datei>:<ere
 
 ## Ereignisse einer ganzen Sitzung (M3-07)
 
-Stand 2026-11-25, Codex CLI 0.171.0. Aufgezeichnet mit `spikes/m5/record-events.py`, bereinigt mit `export-testdata.py` nach `testdata/hooks-codex/`. Geprüft gegen Deck mit `handtest-codex.py c4`. Ablauf: eine Sitzung mit `workspace-write` liest eine Datei, ändert eine Zeile, führt einen Befehl außerhalb des Arbeitsordners aus (Dialog, im Terminal erlaubt) und endet mit `/exit`. Danach `codex resume --last` mit einem Auftrag.
+Stand 2026-11-25, Codex CLI 0.171.0. Aufgezeichnet mit `spikes/m5/record-events.py`, bereinigt mit `export-testdata.py` nach `testdata/hooks-codex/` (gleichnamige Ereignisse mit Nummer, `PostToolUse-Bash-2`; `replay.rs` spielt sie in dieser Folge ab). Geprüft gegen Deck mit `handtest-codex.py c4`. Ablauf: eine Sitzung mit `workspace-write` liest eine Datei, ändert eine Zeile, führt einen Befehl außerhalb des Arbeitsordners aus (Dialog, im Terminal erlaubt) und endet mit `/exit`. Danach `codex resume --last` mit einem Auftrag.
 
 Felder, die alle Ereignisse tragen: `session_id`, `transcript_path` (unter `$CODEX_HOME/sessions/`), `cwd`, `hook_event_name`, `model`, `permission_mode` (auch bei `workspace-write` immer `default`). Ab dem ersten Auftrag kommt `turn_id` dazu.
 
