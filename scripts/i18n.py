@@ -141,8 +141,15 @@ def _strip_comments(text, rust):
             blank(i, j)
             i = j
         elif text.startswith("/*", i) and not text.startswith("/*i18n*/", i):
-            j = text.find("*/", i + 2)
-            j = len(text) if j < 0 else j + 2
+            # Rust and Swift nest block comments.
+            depth, j = 1, i + 2
+            while j < len(text) and depth:
+                if text.startswith("/*", j):
+                    depth, j = depth + 1, j + 2
+                elif text.startswith("*/", j):
+                    depth, j = depth - 1, j + 2
+                else:
+                    j += 1
             blank(i, j)
             i = j
         elif raw:
