@@ -25,12 +25,18 @@ length=$(sed -nE 's/.*length="([0-9]+)".*/\1/p' <<<"$signature")
 [[ -n "$ed_signature" && -n "$length" ]] || die "cannot read the output of sign_update"
 
 tag="v$version"
-appcast="$(dirname "$zip")/appcast.xml"
+out=$(dirname "$zip")
+appcast="$out/appcast.xml"
+# The feed carries the notes in both languages; the app shows its own.
+for lang in en de; do
+    python3 scripts/release-notes.py show "$version" --lang "$lang" >"$out/notes-$lang.md"
+done
 OUTPUT_PATH="$appcast" VERSION="$version" BUILD="$build" \
     ZIP_URL="https://github.com/toolwerk/amiscara-deck/releases/download/$tag/$(basename "$zip")" \
     ZIP_LENGTH="$length" ZIP_ED_SIGNATURE="$ed_signature" \
     MIN_SYSTEM="$(sed -n 's/^ *macOS: "\(.*\)"$/\1/p' "$spec" | head -1)" \
-    NOTES_URL="https://github.com/toolwerk/amiscara-deck/releases/tag/$tag" \
+    NOTES_EN_PATH="$out/notes-en.md" NOTES_DE_PATH="$out/notes-de.md" \
+    RELEASE_URL="https://github.com/toolwerk/amiscara-deck/releases/tag/$tag" \
     PUB_DATE="$(LC_ALL=C date -u '+%a, %d %b %Y %H:%M:%S +0000')" \
     python3 scripts/appcast.py
 step "Feed: $appcast (for release $tag)"

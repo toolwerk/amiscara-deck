@@ -15,12 +15,24 @@ xcrun notarytool store-credentials AmiscaraDeck --team-id 7N2W4T6UPV
 - `MARKETING_VERSION` in `apps/AmiscaraDeck/project.yml` und `version` in `Cargo.toml` sind gleich und folgen SemVer. Das Release-Skript prüft das.
 - `CURRENT_PROJECT_VERSION` ist die Build-Nummer. Jeder notarisierte Build bekommt eine eigene, nie eine kleinere: `scripts/bump-build.sh`.
 
-## Ablauf
+## Versionshinweise
 
-1. Im `CHANGELOG.md` den Abschnitt "Unreleased" zur Version machen:
+Die Hinweise stehen zweimal da: Deutsch in `CHANGELOG.md`, Englisch in `CHANGELOG.en.md`. Jeder Merge trägt in beide ein, im gleichen Abschnitt und in gleicher Reihenfolge. Version 0.1.0 und älter gibt es nur auf Deutsch.
 
 ```sh
-python3 scripts/release-notes.py cut 0.1.0 2026-01-31
+python3 scripts/release-notes.py check
+```
+
+`check` vergleicht "Unreleased" und alle Versionen nach 0.1.0: gleiche Überschriften, gleiche Abschnitte und je Abschnitt gleich viele Einträge. Die CI ruft das bei jedem Pull Request auf. Reihenfolge und Wortlaut prüft es nicht.
+
+`scripts/release.sh` bricht ab, bevor es baut, wenn der Version eine der beiden Fassungen fehlt.
+
+## Ablauf
+
+1. Den Abschnitt "Unreleased" zur Version machen. Der Befehl ändert beide Dateien, oder keine:
+
+```sh
+python3 scripts/release-notes.py cut 0.2.0 2026-01-31
 ```
 
 2. Build-Nummer erhöhen, beides über einen Pull Request nach `main` bringen.
@@ -30,10 +42,10 @@ python3 scripts/release-notes.py cut 0.1.0 2026-01-31
 scripts/release.sh
 ```
 
-Das Ergebnis liegt in `target/release-app`: das Zip, die Notizen zur Version und `appcast.xml`, der Feed für Updates.
+Das Ergebnis liegt in `target/release-app`: das Zip, die Notizen zur Version in beiden Sprachen und `appcast.xml`, der Feed für Updates. Der Feed enthält die Notizen selbst, je Sprache einmal.
 
 4. Die App aus `target/release-app/export` einmal selbst ausprobieren.
-5. Veröffentlichen. Das legt das Release `v<Version>` an und ersetzt den Feed im Release `updates`, den jede installierte App liest. Das Skript fragt vorher nach.
+5. Veröffentlichen. Das legt das Release `v<Version>` an, mit den Notizen erst auf Deutsch, dann auf Englisch, und ersetzt den Feed im Release `updates`, den jede installierte App liest. Das Skript fragt vorher nach.
 
 ```sh
 scripts/publish.sh
@@ -41,7 +53,7 @@ scripts/publish.sh
 
 ## Wie Updates ankommen
 
-Installierte Apps prüfen beim Start und einmal am Tag den Feed, laden eine neue Version im Hintergrund und setzen sie beim Beenden ein. Beim nächsten Start beendet die App den alten Hintergrunddienst und startet ihren eigenen. Selbst gebaute Debug-Versionen aktualisieren sich nicht.
+Installierte Apps prüfen beim Start und einmal am Tag den Feed, laden eine neue Version im Hintergrund und setzen sie beim Beenden ein. Beim nächsten Start beendet die App den alten Hintergrunddienst und startet ihren eigenen. Der Update-Dialog zeigt die Versionshinweise in der Sprache der App: Deutsch, wenn Deutsch eingestellt ist, sonst Englisch. Selbst gebaute Debug-Versionen aktualisieren sich nicht.
 
 ## Probelauf
 
@@ -52,3 +64,5 @@ scripts/release.sh --skip-notarize
 ```
 
 Das Skript bricht ab, wenn eines der mitgelieferten Programme nicht mit Developer ID, "hardened runtime" und Zeitstempel signiert ist.
+
+Auch der Probelauf braucht die Hinweise in beiden Sprachen. Solange im Projekt noch 0.1.0 steht, bricht er deshalb ab, ebenso `--install`: Diese Version gibt es nur auf Deutsch. Mit der nächsten Version läuft er wieder: nach `cut`, mit der neuen Nummer in `MARKETING_VERSION` und in `Cargo.toml`.
