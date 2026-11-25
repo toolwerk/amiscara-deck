@@ -1,0 +1,30 @@
+{
+ "event": "PreToolUse",
+ "input": {
+  "session_id": "01a2148a-7572-7b81-aead-5e4c007491c7",
+  "turn_id": "01a2148b-40ce-76e1-995c-3cb8cef7112c",
+  "transcript_path": "/Users/example/.codex/sessions/2026/11/25/rollout-2026-11-25T22-09-08-01a2148a-7572-7b81-aead-5e4c007491c7.jsonl",
+  "cwd": "/work/project",
+  "hook_event_name": "PreToolUse",
+  "model": "gpt-6.2-sol",
+  "permission_mode": "default",
+  "tool_name": "apply_patch",
+  "tool_input": {
+   "command": "*** Begin Patch\n*** Update File: notes.txt\n@@\n-second line\n+changed by codex\n*** End Patch"
+  },
+  "tool_use_id": "exec-d71d0e6e-c516-4c62-a96e-f1e2eadbab16"
+ },
+ "env": {
+  "TERM_PROGRAM": "claude-desktop",
+  "PWD": "/work/project"
+ },
+ "parents": [
+  "codex",
+  "Python",
+  "zsh",
+  "claude",
+  "zsh",
+  "Claude Helper",
+  "Claude"
+ ]
+}

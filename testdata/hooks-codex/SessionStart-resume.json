@@ -1,0 +1,25 @@
+{
+ "event": "SessionStart",
+ "input": {
+  "session_id": "01a2148a-7572-7b81-aead-5e4c007491c7",
+  "transcript_path": "/Users/example/.codex/sessions/2026/11/25/rollout-2026-11-25T22-09-08-01a2148a-7572-7b81-aead-5e4c007491c7.jsonl",
+  "cwd": "/work/project",
+  "hook_event_name": "SessionStart",
+  "model": "gpt-6.2-sol",
+  "permission_mode": "default",
+  "source": "resume"
+ },
+ "env": {
+  "TERM_PROGRAM": "claude-desktop",
+  "PWD": "/work/project"
+ },
+ "parents": [
+  "codex",
+  "Python",
+  "zsh",
+  "claude",
+  "zsh",
+  "Claude Helper",
+  "Claude"
+ ]
+}
