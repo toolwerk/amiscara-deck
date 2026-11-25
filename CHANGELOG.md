@@ -24,6 +24,8 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- Updates: the app checks the signed feed of the releases once a day (Sparkle), installs a new version when it quits, and offers the check in the settings and the menu of the symbol; `scripts/sparkle-feed.sh` writes the feed, `scripts/publish.sh` publishes after asking (#68)
+- After an update the app ends the older background service and starts its own (a fingerprint of the running program in the welcome, a clean shutdown on request)
 - Release scripts: `scripts/release.sh` builds, signs with Developer ID (helpers included, checked), notarizes, staples and zips the app; `bump-build.sh` and release notes from the changelog (`docs/release.md`); README rewritten for the public, third-party schema removed (#66, #67, #69)
 - Extra signals, each with its own switch in the settings: a floating window with the waiting agents that opens by itself without taking the keyboard (buttons answer only after a moment), a sound, one reminder after a minute, the number of waiting agents next to the menu bar symbol (on by default) and a blinking symbol. Window, sound and reminder follow the daemon's notifications, so "Automatik" and Focus modes hold for them
 - The panel and the settings say when macOS does not show the notifications of Deck and open the right page of the system settings; a tap on a notification opens the window with what is asked (found in the hand test)

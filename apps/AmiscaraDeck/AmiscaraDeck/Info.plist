@@ -30,5 +30,15 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 Frank Neumann-Staude</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/toolwerk/amiscara-deck/releases/download/updates/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>KqFt0gy34ymw3g8KD6zagv7Pdbv7q5p6XeXrku/tvGQ=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 </dict>
 </plist>

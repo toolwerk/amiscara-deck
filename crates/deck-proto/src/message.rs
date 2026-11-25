@@ -141,6 +141,9 @@ pub enum UiMessage {
     SetSettings(Settings),
     /// Delete the history of all sessions and the log of decisions.
     ClearHistory,
+    /// Stop the daemon cleanly: held requests are let go. The app sends this to
+    /// replace a daemon that is older than the one it brings.
+    Shutdown,
 }
 
 /// Where a decision was made.
@@ -180,6 +183,9 @@ pub enum DaemonMessage {
         /// of Claude Code. Absent from an older daemon.
         #[serde(default)]
         today_micro_usd: Option<u64>,
+        /// The fingerprint of the running daemon (`build::fingerprint`).
+        #[serde(default)]
+        build: Option<String>,
     },
     /// Protocol numbers differ; the daemon closes the connection.
     VersionMismatch {

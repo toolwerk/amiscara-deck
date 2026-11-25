@@ -43,6 +43,8 @@ pub struct State {
     pub agents: BTreeMap<String, Agent>,
     /// What today cost, in millionths of a US dollar (an estimate).
     pub today_micro_usd: Option<u64>,
+    /// The fingerprint of the running daemon; `None` from an older one.
+    pub build: Option<String>,
 }
 
 impl State {
@@ -125,6 +127,7 @@ impl Client {
                 settings,
                 agents,
                 today_micro_usd,
+                build,
                 ..
             } => Ok(Client {
                 reader,
@@ -134,6 +137,7 @@ impl Client {
                     settings,
                     agents: agents.into_iter().map(|a| (a.id.clone(), a)).collect(),
                     today_micro_usd,
+                    build,
                 },
             }),
             DaemonMessage::VersionMismatch { daemon, ui } => {

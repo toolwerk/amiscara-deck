@@ -119,6 +119,11 @@ struct Shared {
     inner: Mutex<Inner>,
     /// Set to true when the daemon stops: UIs are told by a closed connection.
     stop: watch::Sender<bool>,
+    /// A UI asked the daemon to end.
+    quit: tokio::sync::Notify,
+    /// The fingerprint of this program, taken at the start: the file may be
+    /// replaced by an update while it runs.
+    build: Option<String>,
     state_path: PathBuf,
     log_path: PathBuf,
     costs_path: PathBuf,
@@ -265,6 +270,7 @@ impl Shared {
             settings: inner.settings.clone(),
             agents: inner.store.agents(),
             today_micro_usd: Some(inner.costs.today()),
+            build: self.build.clone(),
         };
         (encode_line(&welcome).unwrap_or_default(), id, rx)
     }
@@ -610,6 +616,10 @@ impl Daemon {
                     waiters: HashMap::new(),
                 }),
                 stop: watch::channel(false).0,
+                quit: tokio::sync::Notify::new(),
+                build: std::env::current_exe()
+                    .ok()
+                    .and_then(|p| deck_proto::build::fingerprint(&p)),
             }),
         })
     }
@@ -625,6 +635,7 @@ impl Daemon {
         loop {
             tokio::select! {
                 _ = &mut shutdown => break,
+                _ = self.shared.quit.notified() => break,
                 _ = tick.tick() => {
                     self.shared.expire(now_ms());
                     self.shared.save_if_dirty();
@@ -686,6 +697,7 @@ fn ui_message(msg: UiMessage, shared: &Shared, subscriber: u64) {
             via,
         } => shared.answer(&request_id, decision, via),
         UiMessage::ClearHistory => shared.clear_history(),
+        UiMessage::Shutdown => shared.quit.notify_one(),
         UiMessage::SetSettings(s) => shared.set_settings(s),
         UiMessage::Presence(p) => shared.set_presence(subscriber, p),
         UiMessage::Hello { .. } => {}

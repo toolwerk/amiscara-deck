@@ -36,6 +36,9 @@ final class FakeLink: DeckLink, @unchecked Sendable {
     }
     func answerDeny(requestId: String, message: String?, via: AnswerViaKind) { record("deny \(requestId) \(message ?? "-")") }
     func clearHistory() { record("clear") }
+    var build: String?
+    func daemonBuild() -> String? { build }
+    func shutdownDaemon() { record("shutdown") }
     func answerQuestion(requestId: String, picks: [[UInt32]], via: AnswerViaKind) { record("answer \(requestId) \(picks)") }
     func setSettings(settings: SettingsView) { record("settings \(settings.waitSecs)") }
     func reportPresence(presence: PresenceReport) { record("presence \(presence.idleSecs)") }
@@ -46,6 +49,8 @@ final class FakeLauncher: DaemonStarting, @unchecked Sendable {
     private let lock = NSLock()
     private var _starts = 0
     var starts: Int { lock.withLock { _starts } }
+    var expected: String?
+    var expectedBuild: String? { expected }
     func start() -> Bool { lock.withLock { _starts += 1 }; return true }
 }
 
@@ -59,6 +64,9 @@ final class ScriptedConnector: @unchecked Sendable {
 
     init(_ outcomes: [Outcome]) { self.outcomes = outcomes }
 
+    /// The builds of the daemons the next connections reach.
+    var builds: [String] = []
+
     var connector: DeckConnector {
         { [self] _, observer in
             try lock.withLock {
@@ -66,6 +74,7 @@ final class ScriptedConnector: @unchecked Sendable {
                 switch outcome {
                 case .connect:
                     let link = FakeLink()
+                    if !builds.isEmpty { link.build = builds.removeFirst() }
                     observers.append(observer)
                     links.append(link)
                     return link
@@ -231,5 +240,51 @@ final class AgentOrderTests: XCTestCase {
         XCTAssertNotNil(makeAgent("a", request: makeRequest(state: .held)).heldRequest)
         XCTAssertNil(makeAgent("a", request: makeRequest(state: .passedThrough)).heldRequest)
         XCTAssertNil(makeAgent("a", request: makeRequest(state: .answered)).heldRequest)
+    }
+}
+
+extension DeckModelTests {
+    func testAnOlderDaemonIsEndedOnceAndReplaced() async {
+        let script = ScriptedConnector([.connect, .connect, .connect])
+        script.builds = ["old", "older", "other"]
+        let launcher = FakeLauncher()
+        launcher.expected = "new"
+        let m = model(script, launcher: launcher)
+        m.start()
+        await waitUntil("second connection") { script.connects == 2 }
+        XCTAssertEqual(script.links[0].calls, ["shutdown", "close"])
+        // Still another build: kept all the same, never a loop.
+        await waitUntil("connected") { m.link == .connected }
+        try? await Task.sleep(for: .milliseconds(100))
+        XCTAssertEqual(script.connects, 2)
+        XCTAssertFalse(script.links[1].calls.contains("shutdown"))
+        m.stop()
+    }
+
+    func testTheSameBuildAndAnUnknownOneStay() async {
+        for (expected, running) in [("a", "a"), (nil, "a"), ("a", nil)] as [(String?, String?)] {
+            let script = ScriptedConnector([.connect])
+            if let running { script.builds = [running] }
+            let launcher = FakeLauncher()
+            launcher.expected = expected
+            let m = model(script, launcher: launcher)
+            m.start()
+            await waitUntil("connected") { m.link == .connected }
+            XCTAssertEqual(script.link?.calls, [])
+            m.stop()
+        }
+    }
+
+    func testTheFingerprintTellsFilesApart() throws {
+        let dir = FileManager.default.temporaryDirectory.appending(path: "deck-fp-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let a = dir.appending(path: "a")
+        try Data("one".utf8).write(to: a)
+        let first = DaemonLauncher(executable: a).expectedBuild
+        try Data("two".utf8).write(to: a)
+        XCTAssertNotNil(first)
+        XCTAssertNotEqual(first, DaemonLauncher(executable: a).expectedBuild)
+        XCTAssertNil(DaemonLauncher(executable: dir.appending(path: "none")).expectedBuild)
     }
 }

@@ -9,6 +9,8 @@ protocol DeckLink: AnyObject, Sendable {
     func clearHistory()
     func setSettings(settings: SettingsView)
     func reportPresence(presence: PresenceReport)
+    func daemonBuild() -> String?
+    func shutdownDaemon()
     func close()
 }
 
@@ -153,6 +155,9 @@ final class DeckModel {
     @ObservationIgnored private var permissionTask: Task<Void, Never>?
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var connection: DeckLink?
+    /// An older daemon was ended once in this run: never again, so two programs
+    /// that disagree cannot end each other for ever.
+    @ObservationIgnored private var replacedDaemon = false
     @ObservationIgnored private var presence: PresenceMonitor?
 
     init(
@@ -425,6 +430,15 @@ final class DeckModel {
             }.value
             switch result {
             case .success(let conn):
+                if isOutdated(conn) {
+                    // After an update the old daemon still runs: end it, and the
+                    // next round starts the one of this app.
+                    replacedDaemon = true
+                    conn.shutdownDaemon()
+                    conn.close()
+                    try? await Task.sleep(for: retryDelay)
+                    continue
+                }
                 connection = conn
                 link = .connected
                 presence?.resend()
@@ -457,6 +471,12 @@ final class DeckModel {
             // A daemon that does not come gets asked for less often.
             pause = min(pause * 2, .seconds(15))
         }
+    }
+
+    /// The daemon that runs is another build than the one this app brings.
+    private func isOutdated(_ conn: DeckLink) -> Bool {
+        guard !replacedDaemon, let expected = launcher.expectedBuild, let running = conn.daemonBuild() else { return false }
+        return running != expected
     }
 
     /// A request that is no longer open (answered, or the terminal answered): its

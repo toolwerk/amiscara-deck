@@ -5,6 +5,12 @@ import Foundation
 protocol DaemonStarting: Sendable {
     /// Start the daemon. Returns false if it could not be started.
     func start() -> Bool
+    /// The fingerprint of the daemon `start` would run, if it can be told.
+    var expectedBuild: String? { get }
+}
+
+extension DaemonStarting {
+    var expectedBuild: String? { nil }
 }
 
 struct DaemonLauncher: DaemonStarting {
@@ -21,6 +27,10 @@ struct DaemonLauncher: DaemonStarting {
 
     init(executable: URL? = DaemonLauncher.daemonURL()) {
         self.executable = executable
+    }
+
+    var expectedBuild: String? {
+        executable.flatMap { buildFingerprint(path: $0.path) }
     }
 
     func start() -> Bool {
