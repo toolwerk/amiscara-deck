@@ -1,4 +1,5 @@
-//! Amiscara Deck for Linux and Windows: an icon in the tray and a panel.
+//! Amiscara Deck for Linux and Windows: an icon in the tray, a panel and a
+//! main window.
 //!
 //! No logic of its own: the daemon holds the state, `deck-client` follows it.
 //! This program passes every change to the panel (event `deck://state`) and
@@ -31,6 +32,19 @@ struct View {
     /// Why there is no connection, for the panel.
     problem: Option<String>,
     agents: Vec<Agent>,
+    /// What today cost on this machine, in millionths of a US dollar.
+    today_micro_usd: Option<u64>,
+}
+
+impl View {
+    fn offline(problem: String) -> Self {
+        View {
+            connected: false,
+            problem: Some(problem),
+            agents: Vec::new(),
+            today_micro_usd: None,
+        }
+    }
 }
 
 enum Command {
@@ -54,6 +68,16 @@ fn current(last: tauri::State<'_, Last>) -> Option<View> {
 #[tauri::command]
 fn catalog(locale: String) -> BTreeMap<String, String> {
     deck_i18n::catalog(deck_i18n::Language::from_locale(&locale))
+}
+
+/// Show the main window, for the link in the panel. The panel goes away: it
+/// stays on top and would cover the window.
+#[tauri::command]
+fn open_main(app: AppHandle) {
+    if let Some(panel) = window(&app, "panel") {
+        let _ = panel.hide();
+    }
+    show(&app, "main");
 }
 
 /// Allow or deny a held request. Only a card shown in full may be allowed:
@@ -132,14 +156,7 @@ fn update_tray(tray: &TrayIcon, waiting: usize, connected: bool) {
 async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) {
     loop {
         let Some(socket) = deck_proto::paths::default_socket() else {
-            publish(
-                &app,
-                View {
-                    connected: false,
-                    problem: Some(deck_i18n::t("No data folder found.")),
-                    agents: Vec::new(),
-                },
-            );
+            publish(&app, View::offline(deck_i18n::t("No data folder found.")));
             return;
         };
         match Client::connect(&socket, "Amiscara Deck (desktop)").await {
@@ -148,6 +165,7 @@ async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) 
                     connected: true,
                     problem: None,
                     agents: sorted(c.state().agents.values().cloned()),
+                    today_micro_usd: c.state().today_micro_usd,
                 };
                 publish(&app, view(&client));
                 loop {
@@ -174,42 +192,43 @@ async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) 
                 }
                 publish(
                     &app,
-                    View {
-                        connected: false,
-                        problem: Some(deck_i18n::t("The daemon closed the connection.")),
-                        agents: Vec::new(),
-                    },
+                    View::offline(deck_i18n::t("The daemon closed the connection.")),
                 );
             }
             Err(e) => publish(
                 &app,
-                View {
-                    connected: false,
-                    problem: Some(match e {
-                        deck_client::Error::NoDaemon(_) => {
-                            deck_i18n::t("No daemon reachable. Start it with amiscara-deckd.")
-                        }
-                        other => other.to_string(),
-                    }),
-                    agents: Vec::new(),
-                },
+                View::offline(match e {
+                    deck_client::Error::NoDaemon(_) => {
+                        deck_i18n::t("No daemon reachable. Start it with amiscara-deckd.")
+                    }
+                    other => other.to_string(),
+                }),
             ),
         }
         tokio::time::sleep(RETRY).await;
     }
 }
 
-fn panel(app: &AppHandle) -> Option<WebviewWindow> {
-    app.get_webview_window("panel")
+fn window(app: &AppHandle, label: &str) -> Option<WebviewWindow> {
+    app.get_webview_window(label)
+}
+
+fn show(app: &AppHandle, label: &str) {
+    if let Some(w) = window(app, label) {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
 }
 
 fn toggle_panel(app: &AppHandle) {
-    let Some(w) = panel(app) else { return };
+    let Some(w) = window(app, "panel") else {
+        return;
+    };
     if w.is_visible().unwrap_or(false) {
         let _ = w.hide();
     } else {
-        let _ = w.show();
-        let _ = w.set_focus();
+        show(app, "panel");
     }
 }
 
@@ -218,7 +237,9 @@ fn main() {
     let result = tauri::Builder::default()
         .manage(Link(tx))
         .manage(Last::default())
-        .invoke_handler(tauri::generate_handler![catalog, answer, current])
+        .invoke_handler(tauri::generate_handler![
+            catalog, answer, current, open_main
+        ])
         .setup(move |app| {
             let open =
                 MenuItem::with_id(app, "open", deck_i18n::t("Open panel"), true, None::<&str>)?;
@@ -229,7 +250,14 @@ fn main() {
                 true,
                 None::<&str>,
             )?;
-            let menu = Menu::with_items(app, &[&open, &quit])?;
+            let main_window = MenuItem::with_id(
+                app,
+                "main",
+                deck_i18n::t("Open main window"),
+                true,
+                None::<&str>,
+            )?;
+            let menu = Menu::with_items(app, &[&open, &main_window, &quit])?;
             let tray = TrayIconBuilder::with_id("deck")
                 .icon(Image::from_bytes(TRAY_IDLE)?)
                 .menu(&menu)
@@ -238,6 +266,7 @@ fn main() {
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "open" => toggle_panel(app),
+                    "main" => show(app, "main"),
                     "quit" => app.exit(0),
                     _ => {}
                 })
@@ -253,15 +282,17 @@ fn main() {
                 })
                 .build(app)?;
             update_tray(&tray, 0, false);
-            // Closing the panel hides it; the program stays in the tray.
-            if let Some(w) = panel(app.handle()) {
-                let hide = w.clone();
-                w.on_window_event(move |e| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = e {
-                        api.prevent_close();
-                        let _ = hide.hide();
-                    }
-                });
+            // Closing a window hides it; the program stays in the tray.
+            for label in ["panel", "main"] {
+                if let Some(w) = window(app.handle(), label) {
+                    let hide = w.clone();
+                    w.on_window_event(move |e| {
+                        if let tauri::WindowEvent::CloseRequested { api, .. } = e {
+                            api.prevent_close();
+                            let _ = hide.hide();
+                        }
+                    });
+                }
             }
             // Started by the user: show the panel. A start at login passes
             // `--hidden` and stays in the tray.

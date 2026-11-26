@@ -53,27 +53,27 @@ msgstr ""
 msgid "compacting"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Session started"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Task received"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Approval requested"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Compacting context"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Turn ended"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Turn ended with an error"
 msgstr ""
 
@@ -81,15 +81,15 @@ msgstr ""
 msgid "Session ended"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Approval allowed"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Approval denied"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts
 msgid "Question answered"
 msgstr ""
 
@@ -113,39 +113,39 @@ msgstr ""
 msgid "options"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "All"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "Waiting"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "Working"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "Done"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "Other"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "{used} of {window}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "{n}K"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "{n}M"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentFilter.swift apps/deck-desktop/src/deck.ts
 msgid "{whole}.{tenth}M"
 msgstr ""
 
@@ -225,11 +225,11 @@ msgstr ""
 msgid "Deck holds nothing. Answers only in the terminal."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "{n} s"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ApprovalSettings.swift apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "{n} min"
 msgstr ""
 
@@ -245,23 +245,23 @@ msgstr ""
 msgid "Notifications do not appear as alerts. In System Settings, choose “Banners” or “Alerts”."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift apps/deck-desktop/src/deck.ts
 msgid "$0.00"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift apps/deck-desktop/src/deck.ts
 msgid "< $0.01"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift apps/deck-desktop/src/deck.ts
 msgid "${dollars}.{cents}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Today ≈ {amount}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/CostText.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Estimate of Claude Code, not a billed amount."
 msgstr ""
 
@@ -363,23 +363,23 @@ msgstr ""
 msgid "The agent is waiting for a new task."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "Allow"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "Deny"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "View"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "{n} h"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/RelativeTime.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "{n} d"
 msgstr ""
 
@@ -491,7 +491,7 @@ msgstr ""
 msgid "Start at login"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "History"
 msgstr ""
 
@@ -519,7 +519,7 @@ msgstr ""
 msgid "Nothing to change."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/deck-desktop/src/App.svelte crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/deck-desktop/src/store.svelte.ts crates/deck-cli/src/view.rs
 msgid "Error: {error}"
 msgstr ""
 
@@ -587,43 +587,43 @@ msgstr ""
 msgid "In the window also with ⌘+, ⌘- and ⌘0."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte apps/deck-desktop/src/MainWindow.svelte
 msgid "No agent yet. Start Claude Code in a terminal."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "No agent in this selection."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Last task"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Key figures"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Context"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "unknown"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Turns"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Subagents"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Cost (estimate)"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/deck-desktop/src/MainWindow.svelte
 msgid "Nothing recorded yet."
 msgstr ""
 
@@ -697,7 +697,7 @@ msgid_plural "{n} agents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte apps/deck-desktop/src/MainWindow.svelte
 msgid "Connecting to the daemon …"
 msgstr ""
 
@@ -913,15 +913,15 @@ msgstr ""
 msgid "Wants to use {tool}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "Answer in the program the agent runs in. Deck does not approve plans."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "Deck does not hold this question. Answer in the program the agent runs in."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
 msgid "Deck does not hold this request. Answer in the terminal."
 msgstr ""
 
@@ -1271,4 +1271,8 @@ msgstr ""
 
 #: apps/deck-desktop/src-tauri/src/main.rs
 msgid "Open panel"
+msgstr ""
+
+#: apps/deck-desktop/src-tauri/src/main.rs apps/deck-desktop/src/App.svelte
+msgid "Open main window"
 msgstr ""

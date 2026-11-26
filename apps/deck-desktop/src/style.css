@@ -1,0 +1,61 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6faf9;
+  --card: #ffffff;
+  --text: #1b2b2a;
+  --muted: #5d706e;
+  --accent: #0e7c74;
+  --wait: #ff9500;
+  --line: #dbe7e4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b2a2e;
+    --card: #10363a;
+    --text: #e6f4f1;
+    --muted: #9fbab6;
+    --line: #1d4a4e;
+  }
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 system-ui, "Segoe UI", Ubuntu, sans-serif;
+}
+button {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+button.allow {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex: none;
+}
+.dot.working {
+  background: var(--accent);
+}
+.dot.blocked {
+  background: var(--wait);
+}
+.dot.error {
+  background: #d64545;
+}
+.note {
+  color: var(--muted);
+}
+.warn {
+  color: var(--wait);
+}

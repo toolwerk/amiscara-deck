@@ -957,3 +957,6 @@ msgstr "Kein Datenordner gefunden."
 
 msgid "Open panel"
 msgstr "Panel öffnen"
+
+msgid "Open main window"
+msgstr "Hauptfenster öffnen"
