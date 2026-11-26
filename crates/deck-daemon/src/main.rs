@@ -1,10 +1,8 @@
 //! `amiscara-deckd`: the background service of Amiscara Deck.
 
-#[cfg(unix)]
 #[tokio::main]
 async fn main() -> std::process::ExitCode {
     use deck_daemon::{Config, Daemon};
-    use tokio::signal::unix::{SignalKind, signal};
 
     let mut config = match Config::from_env() {
         Ok(c) => c,
@@ -34,23 +32,39 @@ async fn main() -> std::process::ExitCode {
         "amiscara-deckd: listening on {}",
         daemon.socket_path().display()
     );
-    let (Ok(mut term), Ok(mut int)) = (
-        signal(SignalKind::terminate()),
-        signal(SignalKind::interrupt()),
-    ) else {
+    let Some(stop) = stop_signal() else {
         eprintln!("amiscara-deckd: cannot listen for signals");
         return std::process::ExitCode::FAILURE;
     };
-    daemon
-        .run(async {
-            tokio::select! { _ = term.recv() => {}, _ = int.recv() => {} }
-        })
-        .await;
+    daemon.run(stop).await;
     std::process::ExitCode::SUCCESS
 }
 
-#[cfg(not(unix))]
-fn main() {
-    eprintln!("amiscara-deckd: this platform is not supported yet");
-    std::process::exit(1);
+/// SIGTERM or SIGINT.
+#[cfg(unix)]
+fn stop_signal() -> Option<impl Future<Output = ()>> {
+    use tokio::signal::unix::{SignalKind, signal};
+    let mut term = signal(SignalKind::terminate()).ok()?;
+    let mut int = signal(SignalKind::interrupt()).ok()?;
+    Some(async move {
+        tokio::select! { _ = term.recv() => {}, _ = int.recv() => {} }
+    })
+}
+
+/// Ctrl+C, closing the console, logging off or shutting down.
+#[cfg(windows)]
+fn stop_signal() -> Option<impl Future<Output = ()>> {
+    use tokio::signal::windows;
+    let mut c = windows::ctrl_c().ok()?;
+    let mut close = windows::ctrl_close().ok()?;
+    let mut logoff = windows::ctrl_logoff().ok()?;
+    let mut shutdown = windows::ctrl_shutdown().ok()?;
+    Some(async move {
+        tokio::select! {
+            _ = c.recv() => {},
+            _ = close.recv() => {},
+            _ = logoff.recv() => {},
+            _ = shutdown.recv() => {},
+        }
+    })
 }

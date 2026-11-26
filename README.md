@@ -34,6 +34,7 @@ Die App spricht Deutsch oder Englisch, je nach Sprache von macOS. Eine eigene Sp
 - [Codex](#codex)
 - [Andere Rechner](#andere-rechner)
 - [Linux](#linux)
+- [Windows](#windows)
 - [Befehlszeile](#befehlszeile)
 - [Updates](#updates)
 - [Sicherheit und Datenschutz](#sicherheit-und-datenschutz)
@@ -267,6 +268,26 @@ scripts/package-linux.sh
 ```
 
 Die Archive liegen danach in `dist/`.
+
+## Windows
+
+Unter Windows ist Deck ganz am Anfang. Dienst, Hook-Programm und Befehlszeile laufen, eine Oberfläche gibt es noch nicht. Dienst und Hook-Programm sprechen über eine Named Pipe, die nur Ihr Benutzer öffnen kann.
+
+Das Paket entpacken und in PowerShell einrichten:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+`install.ps1` legt die Programme nach `%LOCALAPPDATA%\Programs\Amiscara Deck`, baut die Hooks in `%USERPROFILE%\.claude\settings.json` ein und startet den Dienst. Er läuft bis zum Abmelden, der Start beim Anmelden folgt. `install.ps1 -Uninstall` baut die Hooks aus und beendet den Dienst.
+
+Den Dienst nicht als Administrator starten: Dann kann das Hook-Programm ihn nicht erreichen, und Claude Code zeigt seinen normalen Dialog. Claude Code in WSL erreicht den Dienst unter Windows noch nicht.
+
+Das Paket selbst bauen, auf macOS oder Linux mit Docker oder Podman:
+
+```sh
+scripts/package-windows.sh
+```
 
 ## Befehlszeile
 

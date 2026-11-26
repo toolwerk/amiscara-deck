@@ -1,13 +1,27 @@
 //! Just enough shell to write a command with a path in it and to find the
 //! program again in a command that was written earlier.
 
-/// The path as one shell word: left alone if it is plain, else in single quotes.
+/// The path as one shell word: left alone if it is plain, else in single
+/// quotes. On Windows in double quotes, which both Git Bash and `cmd` read.
 pub fn quote(s: &str) -> String {
     if !s.is_empty()
         && s.chars()
             .all(|c| c.is_ascii_alphanumeric() || "_./-+=:@%".contains(c))
     {
         return s.to_owned();
+    }
+    if cfg!(windows) {
+        // A Windows path holds no `"`; `$` and `` ` `` would expand in bash.
+        // Claude Code runs hooks through Git Bash on Windows, so the escapes
+        // are bash escapes; `cmd` would keep the backslash.
+        let escaped: String = s
+            .chars()
+            .flat_map(|c| match c {
+                '"' | '$' | '`' | '\\' => vec!['\\', c],
+                c => vec![c],
+            })
+            .collect();
+        return format!("\"{escaped}\"");
     }
     format!("'{}'", s.replace('\'', "'\\''"))
 }
@@ -62,6 +76,17 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(windows)]
+    fn windows_paths_are_quoted_for_bash_and_cmd_alike() {
+        assert_eq!(quote("C:/x/deck-hook.exe"), "C:/x/deck-hook.exe");
+        assert_eq!(
+            quote("C:/Users/A B/deck-hook.exe"),
+            "\"C:/Users/A B/deck-hook.exe\""
+        );
+    }
+
+    #[test]
+    #[cfg(not(windows))]
     fn plain_paths_stay_plain_and_others_are_quoted() {
         assert_eq!(
             quote("/usr/local/bin/deck-hook"),

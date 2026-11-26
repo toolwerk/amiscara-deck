@@ -1,11 +1,10 @@
 //! Background service `amiscara-deckd`: socket, start and stop.
 //!
-//! One Unix socket (mode 0600, inside a folder with mode 0700) for the hook
-//! program and the UIs. M1-05 takes the hook messages and feeds the state of
+//! One Unix socket (mode 0600, inside a folder with mode 0700), on Windows a
+//! named pipe for the user only (see `deck_ipc`), for the hook program and
+//! the UIs. M1-05 takes the hook messages and feeds the state of
 //! `deck-session`; streaming to UIs (M1-10) and holding requests (M1-11,
 //! M1-12) follow.
-
-#![cfg(unix)]
 
 mod costs;
 mod decisions;

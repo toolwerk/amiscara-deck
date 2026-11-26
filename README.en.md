@@ -34,6 +34,7 @@ The app speaks English or German, following the language of macOS. You can set a
 - [Codex](#codex)
 - [Other machines](#other-machines)
 - [Linux](#linux)
+- [Windows](#windows)
 - [Command line](#command-line)
 - [Updates](#updates)
 - [Security and privacy](#security-and-privacy)
@@ -267,6 +268,26 @@ scripts/package-linux.sh
 ```
 
 The archives are then in `dist/`.
+
+## Windows
+
+On Windows Deck is at its very beginning. The daemon, the hook program and the command line run, there is no interface yet. Daemon and hook program talk over a named pipe that only your user can open.
+
+Unpack the package and set it up in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+`install.ps1` puts the programs into `%LOCALAPPDATA%\Programs\Amiscara Deck`, installs the hooks in `%USERPROFILE%\.claude\settings.json` and starts the daemon. It runs until you log off, starting at login follows. `install.ps1 -Uninstall` removes the hooks and ends the daemon.
+
+Do not start the daemon as administrator: then the hook program cannot reach it, and Claude Code shows its normal dialog. Claude Code in WSL does not reach the daemon on Windows yet.
+
+To build the package yourself, on macOS or Linux with Docker or Podman:
+
+```sh
+scripts/package-windows.sh
+```
 
 ## Command line
 

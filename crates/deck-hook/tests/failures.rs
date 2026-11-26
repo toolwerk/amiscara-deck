@@ -1,3 +1,4 @@
+#![cfg(unix)]
 //! Every failure ends the same way: nothing printed, exit code 0, so Claude Code
 //! shows its normal dialog. Deck must never be the reason an agent hangs.
 

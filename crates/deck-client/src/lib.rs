@@ -2,8 +2,6 @@
 //! change, and send answers. The command line and (through `deck-ffi`) the
 //! menu bar app use this.
 
-#![cfg(unix)]
-
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -14,7 +12,6 @@ use deck_proto::message::{
     AnswerVia, DaemonMessage, Decision, Settings, UiMessage, decode_line, encode_line,
 };
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, BufReader};
-use tokio::net::UnixStream;
 
 /// A line from the daemon is a state of a few agents; this is far above that.
 const MAX_LINE: u64 = 16 * 1024 * 1024;
@@ -82,8 +79,7 @@ pub struct Client {
 impl Client {
     /// Connect, say hello and take the full state.
     pub async fn connect(socket: &Path, name: &str) -> Result<Self, Error> {
-        let stream = match tokio::time::timeout(CONNECT_TIMEOUT, UnixStream::connect(socket)).await
-        {
+        let stream = match tokio::time::timeout(CONNECT_TIMEOUT, deck_ipc::connect(socket)).await {
             Ok(Ok(s)) => s,
             Ok(Err(e))
                 if matches!(
@@ -99,9 +95,9 @@ impl Client {
         Self::over(stream, name).await
     }
 
-    /// Connect over any stream that carries the protocol: a Unix socket, or a
-    /// channel of an SSH connection that leads to the socket of a daemon on
-    /// another machine. Say hello and take the full state.
+    /// Connect over any stream that carries the protocol: the local socket or
+    /// pipe, or a channel of an SSH connection that leads to the socket of a
+    /// daemon on another machine. Say hello and take the full state.
     pub async fn over<S>(stream: S, name: &str) -> Result<Self, Error>
     where
         S: AsyncRead + AsyncWrite + Send + Unpin + 'static,

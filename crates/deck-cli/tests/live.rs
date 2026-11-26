@@ -1,3 +1,4 @@
+#![cfg(unix)]
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};

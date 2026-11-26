@@ -9,10 +9,7 @@
 //! Code shows its normal dialog in the terminal. Deck must never be the reason
 //! that an agent hangs or fails.
 
-#![cfg(unix)]
-
 use std::io::{Read, Write};
-use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -134,22 +131,9 @@ pub fn run(
     };
     let line = encode_line(&msg).ok()?;
 
-    let addr = std::os::unix::net::SocketAddr::from_pathname(&opts.socket).ok()?;
-    let mut stream = connect(&addr, opts.connect_timeout)?;
-    stream.set_write_timeout(Some(opts.write_timeout)).ok()?;
-    // Set before anything is sent: macOS refuses it once the daemon has
-    // answered and hung up, and the answer would be lost.
-    stream.set_read_timeout(Some(opts.reply_timeout)).ok()?;
-    stream.write_all(line.as_bytes()).ok()?;
-    stream.flush().ok()?;
-
     // Only a PermissionRequest can be answered; everything else is a message
     // and does not wait.
-    if event != "PermissionRequest" {
-        return None;
-    }
-    let mut reply = String::new();
-    std::io::BufRead::read_line(&mut std::io::BufReader::new(&stream), &mut reply).ok()?;
+    let reply = exchange(opts, &line, event == "PermissionRequest")?;
     let reply: HookReply = decode_line(&reply).ok()?;
     let output = reply.output?;
     // Only a PermissionRequest answer in the documented shape goes out.
@@ -160,13 +144,97 @@ pub fn run(
     .then(|| output.to_string())
 }
 
-fn connect(addr: &std::os::unix::net::SocketAddr, timeout: Duration) -> Option<UnixStream> {
+/// Send `line` to the daemon and, if `answer` is set, read its one-line
+/// reply. `None` on any error or timeout.
+#[cfg(unix)]
+fn exchange(opts: &Options, line: &str, answer: bool) -> Option<String> {
+    use std::os::unix::net::{SocketAddr, UnixStream};
+
+    let addr = SocketAddr::from_pathname(&opts.socket).ok()?;
     // `UnixStream` has no connect timeout in std. A connect to a Unix socket
     // answers at once (accepted, refused or missing), so a thread bounds the rare hang.
+    let mut stream = within(opts.connect_timeout, move || {
+        UnixStream::connect_addr(&addr).ok()
+    })?;
+    stream.set_write_timeout(Some(opts.write_timeout)).ok()?;
+    // Set before anything is sent: macOS refuses it once the daemon has
+    // answered and hung up, and the answer would be lost.
+    stream.set_read_timeout(Some(opts.reply_timeout)).ok()?;
+    stream.write_all(line.as_bytes()).ok()?;
+    stream.flush().ok()?;
+    if !answer {
+        return None;
+    }
+    let mut reply = String::new();
+    std::io::BufRead::read_line(&mut std::io::BufReader::new(&stream), &mut reply).ok()?;
+    Some(reply)
+}
+
+/// Windows: the daemon listens on a named pipe whose random name it wrote
+/// into the socket path; the pipe is opened here like a file. A pipe handle
+/// has no timeouts, so threads bound every step; when this program ends, a
+/// thread still waiting ends with it.
+#[cfg(windows)]
+fn exchange(opts: &Options, line: &str, answer: bool) -> Option<String> {
+    use std::os::windows::fs::OpenOptionsExt;
+    /// `SECURITY_IDENTIFICATION`: the server may learn who connects, but not
+    /// act as that user (std adds `SECURITY_SQOS_PRESENT`).
+    const SECURITY_IDENTIFICATION: u32 = 1 << 16;
+
+    /// All instances of the pipe are taken: the daemon is between accepting
+    /// one client and offering the next instance.
+    const ERROR_PIPE_BUSY: i32 = 231;
+
+    let name = deck_proto::paths::read_pipe_name(&opts.socket).ok()?;
+    let limit = opts.connect_timeout;
+    let pipe = within(limit, move || {
+        let start = std::time::Instant::now();
+        loop {
+            match std::fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .security_qos_flags(SECURITY_IDENTIFICATION)
+                .open(&name)
+            {
+                Ok(pipe) => return Some(pipe),
+                Err(e) if e.raw_os_error() == Some(ERROR_PIPE_BUSY) && start.elapsed() < limit => {
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                Err(_) => return None,
+            }
+        }
+    })?;
+    let pipe = std::sync::Arc::new(pipe);
+    let writer = pipe.clone();
+    let line = line.to_owned();
+    within(opts.write_timeout, move || {
+        let mut w: &std::fs::File = &writer;
+        w.write_all(line.as_bytes()).ok()?;
+        w.flush().ok()
+    })?;
+    if !answer {
+        return None;
+    }
+    within(opts.reply_timeout, move || {
+        let mut reply = String::new();
+        std::io::BufRead::read_line(&mut std::io::BufReader::new(&*pipe), &mut reply).ok()?;
+        Some(reply)
+    })
+}
+
+#[cfg(not(any(unix, windows)))]
+fn exchange(_: &Options, _: &str, _: bool) -> Option<String> {
+    None
+}
+
+/// Run `f` in a thread; `None` if it does not finish within `limit`.
+fn within<T: Send + 'static>(
+    limit: Duration,
+    f: impl FnOnce() -> Option<T> + Send + 'static,
+) -> Option<T> {
     let (tx, rx) = std::sync::mpsc::channel();
-    let addr = addr.clone();
     std::thread::spawn(move || {
-        let _ = tx.send(UnixStream::connect_addr(&addr).ok());
+        let _ = tx.send(f());
     });
-    rx.recv_timeout(timeout).ok().flatten()
+    rx.recv_timeout(limit).ok().flatten()
 }

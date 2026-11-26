@@ -102,7 +102,7 @@ pub fn default_claude_settings() -> Option<PathBuf> {
     if let Some(d) = std::env::var_os("CLAUDE_CONFIG_DIR").filter(|d| !d.is_empty()) {
         return Some(PathBuf::from(d).join("settings.json"));
     }
-    std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".claude/settings.json"))
+    deck_proto::paths::home_dir().map(|h| h.join(".claude").join("settings.json"))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -131,8 +131,20 @@ impl Status {
     }
 }
 
+/// The program path as it stands in the command. On Windows with forward
+/// slashes: Claude Code runs hooks through a shell there, and both Git Bash
+/// and `cmd` take `C:/...`, while a backslash means something else to bash.
+fn program_text(program: &Path) -> String {
+    let text = program.to_string_lossy();
+    if cfg!(windows) {
+        text.replace('\\', "/")
+    } else {
+        text.into_owned()
+    }
+}
+
 fn command_for(program: &Path, target: Target) -> String {
-    let program = shell::quote(&program.to_string_lossy());
+    let program = shell::quote(&program_text(program));
     match target {
         Target::Claude => program,
         // The program learns from the argument which tool calls it.
@@ -242,7 +254,7 @@ fn install_into(
     target: Target,
 ) -> Result<(), Error> {
     check_shape(root, path)?;
-    let prog = program.to_string_lossy().into_owned();
+    let prog = program_text(program);
     let command = command_for(program, target);
     let obj = root.as_object_mut().expect("checked: object");
     let section = obj
@@ -320,7 +332,7 @@ fn uninstall_from(
     target: Target,
 ) -> Result<(), Error> {
     check_shape(root, path)?;
-    let prog = program.to_string_lossy().into_owned();
+    let prog = program_text(program);
     let Some(section) = hooks_section(root, path)? else {
         return Ok(());
     };
@@ -362,7 +374,7 @@ pub fn default_codex_hooks() -> Option<PathBuf> {
     if let Some(d) = std::env::var_os("CODEX_HOME").filter(|d| !d.is_empty()) {
         return Some(PathBuf::from(d).join("hooks.json"));
     }
-    std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".codex/hooks.json"))
+    deck_proto::paths::home_dir().map(|h| h.join(".codex").join("hooks.json"))
 }
 
 /// Remove our hooks for Claude Code and nothing else.
@@ -386,7 +398,7 @@ pub fn status(settings: &Path, program: &Path) -> Result<Status, Error> {
 pub fn status_for(target: Target, settings: &Path, program: &Path) -> Result<Status, Error> {
     let (mut root, existed) = file::read(settings)?;
     check_shape(&mut root, settings)?;
-    let prog = program.to_string_lossy().into_owned();
+    let prog = program_text(program);
     let command = command_for(program, target);
     let section = root.get("hooks").and_then(Value::as_object);
     let mut foreign = 0;

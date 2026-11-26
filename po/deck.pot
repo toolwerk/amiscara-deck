@@ -1033,6 +1033,10 @@ msgstr ""
 msgid "Paths not found: please give --program, --data-dir and --plist (or --unit)."
 msgstr ""
 
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "Start at login is not available on Windows yet. Start amiscara-deckd yourself."
+msgstr ""
+
 #: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
 msgid "Unknown command: {command}"
 msgstr ""

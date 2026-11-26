@@ -12,6 +12,7 @@ path = "src/main.rs"
 [dependencies]
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 deck-proto = { path = "../deck-proto" }
+deck-ipc = { path = "../deck-ipc" }
 deck-session = { path = "../deck-session" }
 deck-usage = { path = "../deck-usage" }
 gethostname = "1"

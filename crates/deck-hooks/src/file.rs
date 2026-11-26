@@ -1,7 +1,7 @@
 //! Reading and replacing the settings file safely.
 
+use deck_proto::fsperm;
 use std::io::Write;
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -27,7 +27,7 @@ fn io(context: impl Into<String>) -> impl FnOnce(std::io::Error) -> Error {
 }
 
 pub fn is_executable(meta: &std::fs::Metadata) -> bool {
-    meta.is_file() && meta.permissions().mode() & 0o111 != 0
+    fsperm::is_executable(meta)
 }
 
 /// The file behind a symlink, so the link itself stays a link.
@@ -127,21 +127,21 @@ pub fn edit(path: &Path, f: impl Fn(&mut Value) -> Result<(), Error>) -> Result<
             std::process::id()
         ));
         let mode = std::fs::metadata(&target)
-            .map(|m| m.permissions().mode() & 0o777)
+            .ok()
+            .and_then(|m| fsperm::mode(&m))
             .unwrap_or(0o644);
         let result = (|| -> Result<(), Error> {
             // Private from the first byte: the file may hold tokens. `create_new`
             // also refuses a file or link that someone put at this name.
             let _ = std::fs::remove_file(&tmp);
-            let mut file = std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .mode(mode)
-                .open(&tmp)
-                .map_err(io(format!("create {}", tmp.display())))?;
+            let mut file = fsperm::create_mode(
+                std::fs::OpenOptions::new().write(true).create_new(true),
+                mode,
+            )
+            .open(&tmp)
+            .map_err(io(format!("create {}", tmp.display())))?;
             // The mode given on creation is cut by the umask; set it exactly.
-            file.set_permissions(std::fs::Permissions::from_mode(mode))
-                .map_err(io(format!("chmod {}", tmp.display())))?;
+            fsperm::set_mode(&file, mode).map_err(io(format!("chmod {}", tmp.display())))?;
             file.write_all(new.as_bytes()).map_err(io("write"))?;
             file.sync_all().map_err(io("sync"))?;
             // Someone else wrote in the meantime: do not overwrite that.
@@ -194,18 +194,18 @@ fn backup(target: &Path, text: &str) -> Result<PathBuf, Error> {
         n += 1;
     };
     let mode = std::fs::metadata(target)
-        .map(|m| m.permissions().mode() & 0o777)
+        .ok()
+        .and_then(|m| fsperm::mode(&m))
         .unwrap_or(0o600);
     // Same rights as the file from the first byte (it may hold tokens), and
     // never over an existing file or link.
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(mode)
-        .open(&path)
-        .map_err(io(format!("create {}", path.display())))?;
-    file.set_permissions(std::fs::Permissions::from_mode(mode))
-        .map_err(io(format!("chmod {}", path.display())))?;
+    let mut file = fsperm::create_mode(
+        std::fs::OpenOptions::new().write(true).create_new(true),
+        mode,
+    )
+    .open(&path)
+    .map_err(io(format!("create {}", path.display())))?;
+    fsperm::set_mode(&file, mode).map_err(io(format!("chmod {}", path.display())))?;
     file.write_all(text.as_bytes())
         .map_err(io(format!("write {}", path.display())))?;
     file.sync_all()

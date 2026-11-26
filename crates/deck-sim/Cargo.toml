@@ -7,6 +7,7 @@ authors.workspace = true
 
 [dependencies]
 deck-proto = { path = "../deck-proto" }
+deck-ipc = { path = "../deck-ipc" }
 serde_json = "1"
 tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt", "sync", "time"] }
 

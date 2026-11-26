@@ -6,6 +6,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- Windows: Dienst, Hook-Programm und Befehlszeile laufen und sprechen über eine Named Pipe nur für den eigenen Benutzer. `scripts/package-windows.sh` baut ein Paket mit `install.ps1`, die CI prüft Windows und legt das Paket als Artefakt ab
 - Linux: `amiscara-deck daemon install` richtet den Dienst als systemd-Benutzereinheit ein, `scripts/package-linux.sh` baut statische Pakete für x86_64 und aarch64 mit `install.sh`
 - Mehrere Claude-Code-Profile lassen sich in den Einstellungen unabhängig einbinden
 - Schriftgröße in vier Stufen in den Einstellungen, im Fenster auch mit ⌘+, ⌘- und ⌘0
