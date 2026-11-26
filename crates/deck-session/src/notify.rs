@@ -52,18 +52,33 @@ impl Report {
 /// app is the path of its bundle (`/Applications/Ghostty.app`); a process above
 /// the agent belongs to it when its path lies inside that bundle. Works for any
 /// terminal and for the terminal inside an editor, without a list of names.
+///
+/// On Linux and Windows the frontmost app is the path of its program, which
+/// equals the path of one parent. Windows paths (`C:\\...`) compare without
+/// regard to case, as the file system does.
 pub fn terminal_in_front(frontmost: Option<&str>, parents: &[Parent]) -> bool {
     let Some(app) = frontmost
-        .map(|a| a.trim_end_matches('/'))
+        .map(|a| a.trim_end_matches(['/', '\\']))
         .filter(|a| !a.is_empty())
     else {
         return false;
     };
+    let windows = app.contains('\\');
+    let fold = |s: &str| {
+        if windows {
+            s.to_lowercase()
+        } else {
+            s.to_owned()
+        }
+    };
+    let sep = if windows { '\\' } else { '/' };
+    let app = fold(app);
     parents.iter().any(|p| {
-        p.name == app
-            || p.name
-                .strip_prefix(app)
-                .is_some_and(|rest| rest.starts_with('/'))
+        let name = fold(&p.name);
+        name == app
+            || name
+                .strip_prefix(app.as_str())
+                .is_some_and(|rest| rest.starts_with(sep))
     })
 }
 

@@ -294,7 +294,7 @@ scripts/package-windows.sh
 
 ## Oberfläche für Linux und Windows
 
-Die erste Fassung zeigt ein Symbol in der Leiste und ein Panel. Das Symbol wird orange, sobald eine Freigabe wartet. Das Panel listet die Agenten, wartende Freigaben stehen oben mit **Erlauben** und **Ablehnen**. Lange Anfragen zeigen erst **Ansehen**, wie auf dem Mac. Fragen und Pläne beantworten Sie weiter dort, wo der Agent läuft. Die Anwesenheit folgt.
+Die erste Fassung zeigt ein Symbol in der Leiste und ein Panel. Das Symbol wird orange, sobald eine Freigabe wartet. Das Panel listet die Agenten, wartende Freigaben stehen oben mit **Erlauben** und **Ablehnen**. Lange Anfragen zeigen erst **Ansehen**, wie auf dem Mac. Fragen und Pläne beantworten Sie weiter dort, wo der Agent läuft.
 
 Wartet ein Agent, kommt eine Mitteilung. Wann, entscheidet der Dienst wie auf dem Mac. Ist die Anfrage kurz, stehen in der Mitteilung **Erlauben** und **Ablehnen**. Bei einer langen Anfrage steht dort **Ansehen**, das Panel öffnet sich dann mit dem ganzen Text. Unter Windows bleibt die Mitteilung stehen, bis Sie antworten. Unter Linux hängen die Knöpfe vom Desktop ab: GNOME und KDE zeigen sie. Ohne Knöpfe öffnet ein Klick auf die Mitteilung das Panel.
 
@@ -302,9 +302,9 @@ Das Hauptfenster öffnen Sie über den Link unten im Panel oder über "Hauptfens
 
 Die Oberfläche braucht den laufenden Dienst (siehe [Linux](#linux) und [Windows](#windows)). Beim Start öffnet sich das Panel, Schließen versteckt es nur. Ein Klick auf das Symbol (unter Linux im Menü am Symbol "Panel öffnen") öffnet es wieder.
 
-Ohne Anwesenheit hält die Automatik jede Freigabe in Deck, solange die Oberfläche läuft. Wer lieber im Terminal antwortet, beendet die Oberfläche über das Menü am Symbol.
+Für die Automatik meldet die Oberfläche dem Dienst, wo Sie sind: das vordere Programm, wie lange Sie nichts getippt haben und ob der Bildschirm gesperrt ist. Sitzen Sie am Terminal des Agenten, schweigt Deck wie auf dem Mac. Unter Windows klappt das mit jedem Terminal. Unter Linux kennt Deck das vordere Programm mit X11, mit KDE und mit Hyprland. GNOME mit Wayland verrät es nicht. Dort meldet Deck in der Automatik jede Freigabe, lieber einmal zu oft. Agenten in WSL erkennt Deck nicht am Terminal, auch für sie kommt in der Automatik immer eine Mitteilung.
 
-Selbst bauen (Node.js und Rust, unter Linux zusätzlich WebKitGTK):
+Selbst bauen (Node.js und Rust, unter Linux zusätzlich WebKitGTK, libdbus und libxcb-randr):
 
 ```sh
 cd apps/deck-desktop

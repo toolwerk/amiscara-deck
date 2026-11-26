@@ -9,6 +9,7 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
 mod notes;
+mod presence;
 mod system_notes;
 
 use std::collections::BTreeMap;
@@ -17,7 +18,7 @@ use std::time::Duration;
 
 use deck_client::Client;
 use deck_proto::agent::{Agent, RequestState, Status};
-use deck_proto::message::{AnswerVia, DaemonMessage, Decision};
+use deck_proto::message::{AnswerVia, DaemonMessage, Decision, Presence, UiMessage};
 use serde::Serialize;
 use tauri::image::Image;
 use tauri::menu::{Menu, MenuItem};
@@ -60,6 +61,31 @@ enum Command {
         expanded: bool,
         via: AnswerVia,
     },
+    /// Where the user is, measured by [`watch_presence`].
+    Presence(Presence),
+}
+
+/// Measure where the user is and pass it on when it changed, and at least
+/// every [`presence::HEARTBEAT`].
+async fn watch_presence(link: mpsc::UnboundedSender<Command>) {
+    let mut sources = presence::Sources::new().await;
+    let mut last: Option<Presence> = None;
+    let mut sent_at: Option<std::time::Instant> = None;
+    loop {
+        let now_ms = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX));
+        let current = presence::report(sources.read().await, now_ms);
+        let due = sent_at.is_none_or(|t| t.elapsed() >= presence::HEARTBEAT);
+        if due || presence::differs(&current, last.as_ref()) {
+            if link.send(Command::Presence(current.clone())).is_err() {
+                return;
+            }
+            last = Some(current);
+            sent_at = Some(std::time::Instant::now());
+        }
+        tokio::time::sleep(presence::TICK).await;
+    }
 }
 
 struct Link(mpsc::UnboundedSender<Command>);
@@ -249,6 +275,8 @@ async fn follow(
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
     let notifier = system_notes::Notifier::new(&app.config().identifier);
+    // The last presence: a new daemon hears it at once.
+    let mut presence: Option<Presence> = None;
     loop {
         let Some(socket) = deck_proto::paths::default_socket() else {
             publish(&app, View::offline(deck_i18n::t("No data folder found.")));
@@ -263,6 +291,17 @@ async fn follow(
                     today_micro_usd: c.state().today_micro_usd,
                 };
                 publish(&app, view(&client));
+                // What was asked while there was no daemon is out of date;
+                // only the presence counts.
+                while let Ok(cmd) = commands.try_recv() {
+                    if let Command::Presence(p) = cmd {
+                        presence = Some(p);
+                    }
+                }
+                if let Some(p) = &presence {
+                    // A broken connection shows in the next read.
+                    let _ = client.send(&UiMessage::Presence(p.clone())).await;
+                }
                 loop {
                     tokio::select! {
                         msg = client.next() => match msg {
@@ -280,6 +319,13 @@ async fn follow(
                                     Decision::Deny { message: None }
                                 };
                                 if client.answer(&request_id, decision, via).await.is_err() {
+                                    break;
+                                }
+                            }
+                            Some(Command::Presence(p)) => {
+                                let sent = client.send(&UiMessage::Presence(p.clone())).await;
+                                presence = Some(p);
+                                if sent.is_err() {
                                     break;
                                 }
                             }
@@ -397,6 +443,7 @@ fn main() {
             if !std::env::args().any(|a| a == "--hidden") {
                 toggle_panel(app.handle());
             }
+            tauri::async_runtime::spawn(watch_presence(link.clone()));
             tauri::async_runtime::spawn(follow(app.handle().clone(), link, rx));
             Ok(())
         })

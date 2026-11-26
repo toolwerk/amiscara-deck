@@ -294,7 +294,7 @@ scripts/package-windows.sh
 
 ## Interface for Linux and Windows
 
-The first version shows an icon in the tray and a panel. The icon turns orange as soon as an approval waits. The panel lists the agents, waiting approvals are on top with **Allow** and **Deny**. Long requests show **View** first, as on the Mac. Questions and plans are still answered where the agent runs. Presence follows.
+The first version shows an icon in the tray and a panel. The icon turns orange as soon as an approval waits. The panel lists the agents, waiting approvals are on top with **Allow** and **Deny**. Long requests show **View** first, as on the Mac. Questions and plans are still answered where the agent runs.
 
 When an agent waits, a notification comes. The daemon decides when, as on the Mac. For a short request the notification shows **Allow** and **Deny**. For a long one it shows **View**, which opens the panel with the whole text. On Windows the notification stays until you answer. On Linux the buttons depend on the desktop: GNOME and KDE show them. Without buttons a click on the notification opens the panel.
 
@@ -302,9 +302,9 @@ Open the main window with the link at the bottom of the panel or with "Open main
 
 The interface needs the running daemon (see [Linux](#linux) and [Windows](#windows)). The panel opens at start, closing only hides it. A click on the icon (on Linux "Open panel" in the icon menu) opens it again.
 
-Without presence, "Automatic" holds every approval in Deck while the interface runs. If you rather answer in the terminal, quit the interface from the icon menu.
+For "Automatic" the interface tells the daemon where you are: the frontmost program, how long you have not typed and whether the screen is locked. If you sit at the terminal of the agent, Deck stays quiet as on the Mac. On Windows this works with any terminal. On Linux Deck knows the frontmost program with X11, with KDE and with Hyprland. GNOME with Wayland does not tell it. There "Automatic" notifies about every approval, rather once too often. Deck does not recognize the terminal of agents in WSL, so for them "Automatic" always notifies too.
 
-To build it yourself (Node.js and Rust, on Linux also WebKitGTK):
+To build it yourself (Node.js and Rust, on Linux also WebKitGTK, libdbus and libxcb-randr):
 
 ```sh
 cd apps/deck-desktop
