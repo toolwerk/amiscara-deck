@@ -281,7 +281,9 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 
 `install.ps1` puts the programs into `%LOCALAPPDATA%\Programs\Amiscara Deck`, installs the hooks in `%USERPROFILE%\.claude\settings.json` and registers the daemon to start at login (Run key of your user, no administrator rights). It starts at once and without a window, its messages are in `deckd.log` in the data folder `%LOCALAPPDATA%\Amiscara Deck`. `install.ps1 -Uninstall` removes hooks and start at login and ends the daemon.
 
-Do not start the daemon as administrator: then the hook program cannot reach it, and Claude Code shows its normal dialog. Claude Code in WSL does not reach the daemon on Windows yet.
+Do not start the daemon as administrator: then the hook program cannot reach it, and Claude Code shows its normal dialog.
+
+If Claude Code runs in WSL, `install.ps1 -Wsl` installs the hooks there as well (in the default distribution, another one with `-Distro <name>`). They call the hook program of Windows through `/mnt/c`, which reaches the daemon on Windows. Deck does not see branch and terminal of agents in WSL.
 
 To build the package yourself, on macOS or Linux with Docker or Podman:
 

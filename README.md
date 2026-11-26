@@ -281,7 +281,9 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 
 `install.ps1` legt die Programme nach `%LOCALAPPDATA%\Programs\Amiscara Deck`, baut die Hooks in `%USERPROFILE%\.claude\settings.json` ein und trägt den Dienst für den Start beim Anmelden ein (Run-Schlüssel Ihres Benutzers, ohne Administratorrechte). Er startet sofort und ohne Fenster, seine Meldungen stehen in `deckd.log` im Datenordner `%LOCALAPPDATA%\Amiscara Deck`. `install.ps1 -Uninstall` baut Hooks und Start beim Anmelden aus und beendet den Dienst.
 
-Den Dienst nicht als Administrator starten: Dann kann das Hook-Programm ihn nicht erreichen, und Claude Code zeigt seinen normalen Dialog. Claude Code in WSL erreicht den Dienst unter Windows noch nicht.
+Den Dienst nicht als Administrator starten: Dann kann das Hook-Programm ihn nicht erreichen, und Claude Code zeigt seinen normalen Dialog.
+
+Läuft Claude Code in WSL, baut `install.ps1 -Wsl` die Hooks auch dort ein (in der Standard-Distribution, eine andere mit `-Distro <Name>`). Sie rufen das Hook-Programm von Windows über `/mnt/c` auf, das den Dienst unter Windows erreicht. Zweig und Terminal erkennt Deck für Agenten in WSL nicht.
 
 Das Paket selbst bauen, auf macOS oder Linux mit Docker oder Podman:
 
