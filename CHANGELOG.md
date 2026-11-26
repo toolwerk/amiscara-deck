@@ -6,6 +6,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- Linux und Windows: Die Oberfläche meldet vorderes Programm, Leerlauf und Sperre, die Automatik entscheidet wie auf dem Mac. Das Hook-Programm nennt dafür unter Linux und Windows die vollen Pfade der Elternprozesse
 - Linux und Windows: Mitteilungen, wenn ein Agent wartet, mit Erlauben und Ablehnen für kurze Anfragen und Ansehen für lange. Unter Linux mit Knöpfen, wo der Desktop sie anbietet
 - Linux und Windows: Hauptfenster mit Filter nach Status, Kosten des Tages und einer Spalte mit Anfrage, letztem Auftrag, Kennzahlen und Verlauf des gewählten Agenten
 - Erste Oberfläche für Linux und Windows (Tauri und Svelte, `apps/deck-desktop`): Symbol in der Leiste, Panel mit Agenten, Erlauben und Ablehnen. Die CI baut Installer für beide Systeme

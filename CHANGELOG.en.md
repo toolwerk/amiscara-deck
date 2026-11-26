@@ -8,6 +8,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 
 ### Added
 
+- Linux and Windows: the interface reports frontmost program, idle time and lock, and "Automatic" decides as on the Mac. For this the hook program names the full paths of its parent processes on Linux and Windows
 - Linux and Windows: notifications when an agent waits, with Allow and Deny for short requests and View for long ones. On Linux with buttons where the desktop offers them
 - Linux and Windows: main window with a status filter, the cost of the day and a column with request, last task, key figures and history of the selected agent
 - First interface for Linux and Windows (Tauri and Svelte, `apps/deck-desktop`): tray icon, panel with agents, allow and deny. CI builds installers for both systems

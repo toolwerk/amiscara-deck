@@ -61,27 +61,17 @@ pub fn env_from(vars: impl Fn(&str) -> Option<String>, parents: Vec<Parent>) -> 
     }
 }
 
-/// The chain of parent processes, nearest first, from one `ps` call.
-/// Empty if `ps` is missing or fails.
+/// The chain of parent processes, nearest first, each by the path of its
+/// program where the system tells it (the daemon compares it with the path of
+/// the frontmost app). At most 16. Empty when the system does not tell.
 pub fn parent_chain(start_pid: u32) -> Vec<Parent> {
-    let Ok(out) = std::process::Command::new("ps")
-        .args(["-A", "-o", "pid=,ppid=,comm="])
-        .output()
-    else {
-        return Vec::new();
-    };
-    let text = String::from_utf8_lossy(&out.stdout);
-    let mut table = std::collections::HashMap::new();
-    for line in text.lines() {
-        let mut it = line.split_whitespace();
-        let (Some(pid), Some(ppid)) = (it.next(), it.next()) else {
-            continue;
-        };
-        let name = it.collect::<Vec<_>>().join(" ");
-        if let (Ok(pid), Ok(ppid)) = (pid.parse::<u32>(), ppid.parse::<u32>()) {
-            table.insert(pid, (ppid, name));
-        }
-    }
+    chain(start_pid, process_table(start_pid))
+}
+
+/// pid to parent pid and name.
+type Table = std::collections::HashMap<u32, (u32, String)>;
+
+fn chain(start_pid: u32, table: Table) -> Vec<Parent> {
     let mut chain = Vec::new();
     let mut pid = start_pid;
     while chain.len() < 16 {
@@ -92,12 +82,126 @@ pub fn parent_chain(start_pid: u32) -> Vec<Parent> {
             pid,
             name: name.clone(),
         });
-        if *ppid <= 1 {
+        if *ppid <= 1 || *ppid == pid {
             break;
         }
         pid = *ppid;
     }
     chain
+}
+
+/// macOS and other Unix systems: one `ps` call; `comm` is the full path there.
+#[cfg(all(unix, not(target_os = "linux")))]
+fn process_table(start_pid: u32) -> Table {
+    let _ = start_pid;
+    let Ok(out) = std::process::Command::new("ps")
+        .args(["-A", "-o", "pid=,ppid=,comm="])
+        .output()
+    else {
+        return Table::new();
+    };
+    parse_ps(&String::from_utf8_lossy(&out.stdout))
+}
+
+#[cfg(any(test, all(unix, not(target_os = "linux"))))]
+fn parse_ps(text: &str) -> Table {
+    let mut table = Table::new();
+    for line in text.lines() {
+        let mut it = line.split_whitespace();
+        let (Some(pid), Some(ppid)) = (it.next(), it.next()) else {
+            continue;
+        };
+        let name = it.collect::<Vec<_>>().join(" ");
+        if let (Ok(pid), Ok(ppid)) = (pid.parse::<u32>(), ppid.parse::<u32>()) {
+            table.insert(pid, (ppid, name));
+        }
+    }
+    table
+}
+
+/// Linux: `ps` gives only 15 characters of the name. `/proc` gives the
+/// parent and the path of the program; only the processes of the chain are
+/// read. A program of another user has no readable path: its short name.
+#[cfg(target_os = "linux")]
+fn process_table(start_pid: u32) -> Table {
+    let mut table = Table::new();
+    let mut pid = start_pid;
+    while table.len() < 16 {
+        let Ok(stat) = std::fs::read_to_string(format!("/proc/{pid}/stat")) else {
+            break;
+        };
+        let Some((comm, ppid)) = parse_stat(&stat) else {
+            break;
+        };
+        let name = std::fs::read_link(format!("/proc/{pid}/exe"))
+            .ok()
+            .and_then(|p| p.to_str().map(str::to_owned))
+            .unwrap_or(comm);
+        table.insert(pid, (ppid, name));
+        if ppid <= 1 {
+            break;
+        }
+        pid = ppid;
+    }
+    table
+}
+
+/// `1234 (bash) S 1200 ...`: the name may hold spaces and brackets, so the
+/// fields count from the last `)`.
+#[cfg(any(test, target_os = "linux"))]
+fn parse_stat(stat: &str) -> Option<(String, u32)> {
+    let open = stat.find('(')?;
+    let close = stat.rfind(')')?;
+    let comm = stat.get(open + 1..close)?.to_owned();
+    let ppid = stat
+        .get(close + 1..)?
+        .split_whitespace()
+        .nth(1)?
+        .parse()
+        .ok()?;
+    Some((comm, ppid))
+}
+
+/// Windows: the process list of the system, then the program paths of the
+/// chain only (opening every process would take long).
+#[cfg(windows)]
+fn process_table(start_pid: u32) -> Table {
+    use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};
+    let Ok(mut sys) = System::new() else {
+        return Table::new();
+    };
+    sys.refresh_processes_specifics(ProcessesToUpdate::All, true, ProcessRefreshKind::nothing());
+    let mut pids = Vec::new();
+    let mut pid = Pid::from_u32(start_pid);
+    while pids.len() < 16 {
+        let Some(process) = sys.process(pid) else {
+            break;
+        };
+        pids.push(pid);
+        match process.parent() {
+            Some(parent) if parent != pid => pid = parent,
+            _ => break,
+        }
+    }
+    sys.refresh_processes_specifics(
+        ProcessesToUpdate::Some(&pids),
+        false,
+        ProcessRefreshKind::nothing().with_exe(UpdateKind::Always),
+    );
+    let mut table = Table::new();
+    for pid in pids {
+        let Some(process) = sys.process(pid) else {
+            continue;
+        };
+        let name = process
+            .exe()
+            .and_then(|p| p.to_str())
+            .map(str::to_owned)
+            .unwrap_or_else(|| process.name().to_string_lossy().into_owned());
+        let ppid = process.parent().map_or(0, |p| p.as_u32());
+        table.insert(pid.as_u32(), (ppid, name));
+    }
+    table
 }
 
 /// Run once. Returns what to print on standard output, or `None` for nothing.
@@ -237,4 +341,42 @@ fn within<T: Send + 'static>(
         let _ = tx.send(f());
     });
     rx.recv_timeout(limit).ok().flatten()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_name_in_stat_may_hold_spaces_and_brackets() {
+        assert_eq!(
+            parse_stat("4711 (my (odd) prog) S 4700 4711 4700 0"),
+            Some(("my (odd) prog".to_owned(), 4700))
+        );
+        assert_eq!(parse_stat("garbage"), None);
+    }
+
+    #[test]
+    fn ps_lines_keep_paths_with_spaces() {
+        let t =
+            parse_ps("  10     1 /Applications/My Term.app/Contents/MacOS/term\n  20    10 -zsh\n");
+        assert_eq!(
+            t.get(&10).map(|(p, n)| (*p, n.as_str())),
+            Some((1, "/Applications/My Term.app/Contents/MacOS/term"))
+        );
+        assert_eq!(t.get(&20).map(|(p, _)| *p), Some(10));
+    }
+
+    #[test]
+    fn the_chain_goes_up_to_init_and_stops_at_a_loop() {
+        let mut t = Table::new();
+        t.insert(30, (20, "claude".into()));
+        t.insert(20, (10, "zsh".into()));
+        t.insert(10, (1, "term".into()));
+        let names: Vec<String> = chain(30, t).into_iter().map(|p| p.name).collect();
+        assert_eq!(names, ["claude", "zsh", "term"]);
+        let mut t = Table::new();
+        t.insert(5, (5, "self".into()));
+        assert_eq!(chain(5, t).len(), 1);
+    }
 }

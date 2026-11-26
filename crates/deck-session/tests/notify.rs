@@ -232,3 +232,45 @@ fn a_hidden_tmux_pane_notifies_even_with_the_terminal_in_front() {
         NotifyDecision::Quiet(Quiet::AtTerminal)
     );
 }
+
+#[test]
+fn on_linux_the_program_path_of_the_terminal_is_its_parent() {
+    let p = vec![
+        Parent {
+            pid: 9,
+            name: "/usr/bin/bash".into(),
+        },
+        Parent {
+            pid: 8,
+            name: "/usr/libexec/gnome-terminal-server".into(),
+        },
+    ];
+    assert!(terminal_in_front(
+        Some("/usr/libexec/gnome-terminal-server"),
+        &p
+    ));
+    assert!(!terminal_in_front(Some("/usr/bin/firefox"), &p));
+}
+
+#[test]
+fn windows_paths_match_without_regard_to_case() {
+    let p = vec![
+        Parent {
+            pid: 9,
+            name: r"C:\Program Files\PowerShell\7\pwsh.exe".into(),
+        },
+        Parent {
+            pid: 8,
+            name: r"C:\Program Files\WindowsApps\Terminal_1.2\WindowsTerminal.exe".into(),
+        },
+    ];
+    assert!(terminal_in_front(
+        Some(r"c:\program files\windowsapps\terminal_1.2\windowsterminal.exe"),
+        &p
+    ));
+    assert!(!terminal_in_front(
+        Some(r"C:\Program Files\WindowsApps\Terminal_1.2\WindowsTerminal.exe.old"),
+        &p
+    ));
+    assert!(!terminal_in_front(Some(r"C:\Windows\explorer.exe"), &p));
+}
