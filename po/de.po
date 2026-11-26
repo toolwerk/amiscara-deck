@@ -906,3 +906,36 @@ msgstr "Profil entfernen"
 
 msgid "Uninstall the hooks before removing a profile."
 msgstr "Baue die Hooks aus, bevor du ein Profil entfernst."
+
+msgid "{name}: Deck is not running there"
+msgstr "{name}: Deck läuft dort nicht"
+
+msgid "{name}: SSH server does not allow the connection to Deck"
+msgstr "{name}: SSH-Server lässt die Verbindung zu Deck nicht zu"
+
+msgid "{name}: sign-in refused"
+msgstr "{name}: Anmeldung abgelehnt"
+
+msgid "{name}: SSH key not usable"
+msgstr "{name}: SSH-Schlüssel nicht nutzbar"
+
+msgid "Deck is not running there. On a Mac open the app there, on Linux start amiscara-deckd. Deck then connects by itself."
+msgstr "Deck läuft dort nicht. Auf einem Mac die App dort öffnen, auf Linux amiscara-deckd starten. Deck verbindet dann von selbst."
+
+msgid "The SSH server there does not allow forwarding to the Deck socket. Allow it with AllowStreamLocalForwarding in its sshd_config."
+msgstr "Der SSH-Server dort erlaubt keine Weiterleitung zum Socket von Deck. In seiner sshd_config mit AllowStreamLocalForwarding erlauben."
+
+msgid "The sign-in was refused. Check the user name and that your key is known there; with the SSH agent, add it with ssh-add."
+msgstr "Die Anmeldung wurde abgelehnt. Benutzernamen prüfen und ob der Schlüssel dort bekannt ist. Mit SSH-Agent den Schlüssel mit ssh-add hinzufügen."
+
+msgid "Your SSH key could not be used. Check the key file, or whether the SSH agent is running and holds the key (ssh-add -l)."
+msgstr "Der SSH-Schlüssel ließ sich nicht nutzen. Schlüsseldatei prüfen oder ob der SSH-Agent läuft und den Schlüssel hat (ssh-add -l)."
+
+msgid "No answer. The machine may be switched off, asleep or not on the network. Deck keeps trying."
+msgstr "Keine Antwort. Der Rechner ist vielleicht aus, schläft oder nicht im Netz. Deck versucht es weiter."
+
+msgid "The machine answers but takes no SSH connection. On a Mac switch on Remote Login in the sharing settings there."
+msgstr "Der Rechner antwortet, nimmt aber keine SSH-Verbindung an. Auf einem Mac dort unter Freigaben die Entfernte Anmeldung einschalten."
+
+msgid "The machine was not found or cannot be reached. Check the host name and the network. Deck keeps trying."
+msgstr "Der Rechner wurde nicht gefunden oder ist nicht erreichbar. Rechnernamen und Netz prüfen. Deck versucht es weiter."

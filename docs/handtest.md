@@ -2,7 +2,7 @@
 
 Für Stufe 1 (M3-09) und die Nachträge aus M5 und M6. Abarbeiten mit echten Sitzungen, ein Haken je Zeile.
 
-Stand 2026-11-25, Claude Code 2.1.331: Der skriptbare Teil ist gelaufen (`spikes/m1/e2e.py` für die Szenarien A bis D, `spikes/handtest/auto.py`), mit eigenem Datenordner und eigener Einstellungsdatei. Dazu der erste Durchgang von Hand an der installierten App (PRs 120 bis 123). Offen sind die Zeilen ohne Ergebnis und alles, was noch als "von Hand" vermerkt ist: weitere Terminals, tmux, bei Codex C1, C2, C8 und C9, zwei Rechner. C3 bis C7 für Codex laufen per Skript (`spikes/m5/handtest-codex.py`, Codex CLI 0.171.0).
+Stand 2026-11-25, Claude Code 2.1.331: Der skriptbare Teil ist gelaufen (`spikes/m1/e2e.py` für die Szenarien A bis D, `spikes/handtest/auto.py`), mit eigenem Datenordner und eigener Einstellungsdatei. Dazu der erste Durchgang von Hand an der installierten App (PRs 120 bis 123). Offen sind die Zeilen ohne Ergebnis und alles, was noch als "von Hand" vermerkt ist: weitere Terminals, tmux, bei Codex C1, C2, C8 und C9, zwei Rechner (Abschnitt "Zwei Rechner"). C3 bis C7 für Codex laufen per Skript (`spikes/m5/handtest-codex.py`, Codex CLI 0.171.0).
 
 App bauen:
 
@@ -77,6 +77,21 @@ Je Terminal einmal: Terminal (macOS), iTerm2, Ghostty, Terminal im Editor (VS Co
 | C8 | Nach einem Ein- und Ausbau mit fremden Einträgen dahinter | die fremden Hooks laufen ohne neue Bestätigung in /hooks | |
 | C9 | `timeout` oder Befehl eines Eintrags ändern | Codex verlangt neues Vertrauen | |
 | C4 | Ereignisse aufzeichnen (`amiscara-deck watch`) und mit dem Datenmodell vergleichen | Projekt, Auftrag und Status stimmen; abweichende Felder als Fehler eintragen (M3-07) | Skript bestanden (25.11., Codex CLI 0.171.0, `spikes/m5/handtest-codex.py`): Projekt, Zweig, Auftrag, Tätigkeit und Status stimmen, auch nach `/exit` und `resume`. Abweichung behoben: `apply_patch` erscheint als "bearbeitet" mit Pfad (`docs/befunde-m5.md`) |
+
+## Zwei Rechner
+
+Ein zweiter Rechner unter "Andere Rechner", Entfernte Anmeldung dort eingeschaltet.
+
+| Nr | Schritt | Erwartet | Ergebnis |
+|---|---|---|---|
+| R1 | Zweiten Mac eintragen, dort laufen Deck und eine Claude-Code-Sitzung | Agenten des zweiten erscheinen mit Rechnernamen | |
+| R2 | Auf dem zweiten Mac eine Freigabe und eine Frage auslösen | beide kommen an und werden aus Deck beantwortet | |
+| R3 | Rechner mit unbekanntem Schlüssel eintragen | Deck zeigt den Fingerabdruck und verbindet erst nach "Diesem Schlüssel vertrauen" | |
+| R4 | Eintrag in `~/.ssh/known_hosts` verfälschen | Deck verbindet nicht und sagt, dass sich der Schlüssel geändert hat | |
+| R5 | Auf dem zweiten Mac App beenden und Dienst stoppen | "Deck läuft dort nicht" mit nächstem Schritt; App dort öffnen, Deck verbindet ohne Zutun | |
+| R6 | Entfernte Anmeldung auf dem zweiten Mac ausschalten | "Rechner nicht erreichbar", in den Einstellungen der Hinweis auf die Entfernte Anmeldung | |
+| R7 | Zweiten Mac ausschalten | nach höchstens 15 Sekunden "Rechner nicht erreichbar", kein endloses "verbinde …" | |
+| R8 | Linux als zweiter Rechner | | nicht geprüft |
 
 ## Bekannte Grenzen
 

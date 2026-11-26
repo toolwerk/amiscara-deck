@@ -9,6 +9,7 @@ authors.workspace = true
 deck-client = { path = "../deck-client" }
 deck-proto = { path = "../deck-proto" }
 amiscara-ssh = { git = "https://github.com/toolwerk/amiscara-ssh", tag = "v0.8.0" }
+russh = "0.64"
 thiserror = "2"
 tokio = { version = "1.53.3", features = ["time"] }
 

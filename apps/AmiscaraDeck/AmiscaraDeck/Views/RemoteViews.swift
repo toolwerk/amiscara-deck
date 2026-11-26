@@ -9,6 +9,14 @@ enum RemoteWording {
         case .connected: return nil
         case .connecting: return L10n.t("{name}: connecting …", ["name": name])
         case .unreachable: return L10n.t("{name}: machine not reachable", ["name": name])
+        case .problem(let p):
+            switch p {
+            case .noDaemon: return L10n.t("{name}: Deck is not running there", ["name": name])
+            case .forwardingProhibited: return L10n.t("{name}: SSH server does not allow the connection to Deck", ["name": name])
+            case .authFailed: return L10n.t("{name}: sign-in refused", ["name": name])
+            case .keyUnusable: return L10n.t("{name}: SSH key not usable", ["name": name])
+            case .timeout, .refused, .unreachable: return L10n.t("{name}: machine not reachable", ["name": name])
+            }
         case .needsTrust: return L10n.t("{name}: key must be confirmed (Settings)", ["name": name])
         case .hostKeyChanged: return L10n.t("{name}: key has changed (Settings)", ["name": name])
         case .versionMismatch: return L10n.t("{name}: daemon is from another version", ["name": name])
@@ -21,10 +29,31 @@ enum RemoteWording {
         case .connected: L10n.t("Connected.")
         case .connecting: L10n.t("Connecting …")
         case .unreachable(let why): L10n.t("Not reachable: {reason}", ["reason": why])
+        case .problem(let p): problemDetail(p)
         case .needsTrust(let p): L10n.t("Unknown key, fingerprint {fingerprint}.", ["fingerprint": p.fingerprint])
         case .hostKeyChanged(let why): why
         case .versionMismatch(let daemon):
             L10n.t("The daemon there speaks protocol {version}. Please bring both to the same version.", ["version": String(daemon)])
+        }
+    }
+
+    /// What happened and the next step. Deck never starts the daemon there itself.
+    static func problemDetail(_ p: RemoteProblem) -> String {
+        switch p {
+        case .noDaemon:
+            L10n.t("Deck is not running there. On a Mac open the app there, on Linux start amiscara-deckd. Deck then connects by itself.")
+        case .forwardingProhibited:
+            L10n.t("The SSH server there does not allow forwarding to the Deck socket. Allow it with AllowStreamLocalForwarding in its sshd_config.")
+        case .authFailed:
+            L10n.t("The sign-in was refused. Check the user name and that your key is known there; with the SSH agent, add it with ssh-add.")
+        case .keyUnusable:
+            L10n.t("Your SSH key could not be used. Check the key file, or whether the SSH agent is running and holds the key (ssh-add -l).")
+        case .timeout:
+            L10n.t("No answer. The machine may be switched off, asleep or not on the network. Deck keeps trying.")
+        case .refused:
+            L10n.t("The machine answers but takes no SSH connection. On a Mac switch on Remote Login in the sharing settings there.")
+        case .unreachable:
+            L10n.t("The machine was not found or cannot be reached. Check the host name and the network. Deck keeps trying.")
         }
     }
 }

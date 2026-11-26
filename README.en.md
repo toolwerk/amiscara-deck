@@ -225,8 +225,8 @@ Deck also shows the agents of other machines and answers their requests. The con
 
 On the other machine Deck's daemon runs and the hooks are installed there:
 
-- **Mac:** install the app and set it up as above.
-- **Linux:** little tested so far. Build the three programs, install the hooks and start the daemon yourself:
+- **Mac:** install the app and set it up as above. Switch on "Remote Login" in System Settings, General, Sharing. The app must run there, best with "Start at login".
+- **Linux:** not tested as the other machine. Build the three programs, install the hooks and start the daemon yourself:
 
 ```sh
 cargo build --release -p deck-daemon -p deck-hook -p deck-cli
@@ -254,6 +254,8 @@ Then add the machine on your Mac in the settings under "Other machines":
 | Socket there | empty: the usual place |
 
 If your Mac does not know the key of the machine yet, Deck shows its fingerprint and waits for your yes. If the key changes later, Deck does not connect.
+
+Deck does not start the daemon on the other machine itself. If it is not running there, Deck says so in the settings and names the next step. As soon as the daemon runs, Deck connects by itself. Deck names a refused sign-in, an unusable key and a machine that does not answer the same way.
 
 ## Command line
 

@@ -47,6 +47,40 @@ pub enum DeckError {
     /// by the app: the user fixes `known_hosts` by hand.
     #[error("host key of {host} changed, it is now {fingerprint}")]
     HostKeyChanged { host: String, fingerprint: String },
+    /// A common reason the other machine could not be reached; the app says
+    /// what to do next. `detail` is the technical text.
+    #[error("{detail}")]
+    Remote {
+        kind: RemoteFailureKind,
+        detail: String,
+    },
+}
+
+/// The common reasons a connection to another machine fails.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+pub enum RemoteFailureKind {
+    NoDaemon,
+    ForwardingProhibited,
+    AuthFailed,
+    KeyUnusable,
+    Timeout,
+    Refused,
+    Unreachable,
+}
+
+impl From<deck_remote::Failure> for RemoteFailureKind {
+    fn from(f: deck_remote::Failure) -> Self {
+        use deck_remote::Failure as F;
+        match f {
+            F::NoDaemon => Self::NoDaemon,
+            F::ForwardingProhibited => Self::ForwardingProhibited,
+            F::AuthFailed => Self::AuthFailed,
+            F::KeyUnusable => Self::KeyUnusable,
+            F::Timeout => Self::Timeout,
+            F::Refused => Self::Refused,
+            F::Unreachable => Self::Unreachable,
+        }
+    }
 }
 
 impl From<deck_client::Error> for DeckError {
@@ -82,8 +116,14 @@ impl From<deck_remote::Error> for DeckError {
             E::Ssh(amiscara_ssh::SshError::HostKeyChanged {
                 host, fingerprint, ..
             }) => DeckError::HostKeyChanged { host, fingerprint },
-            other => DeckError::Failed {
-                message: other.to_string(),
+            other => match other.failure() {
+                Some(kind) => DeckError::Remote {
+                    kind: kind.into(),
+                    detail: other.to_string(),
+                },
+                None => DeckError::Failed {
+                    message: other.to_string(),
+                },
             },
         }
     }

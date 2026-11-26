@@ -7,6 +7,7 @@
 //! with its own name in the state.
 
 use std::path::PathBuf;
+use std::time::Duration;
 
 use amiscara_ssh::{Session, SshError, SshTarget};
 use deck_client::Client;
@@ -23,7 +24,52 @@ pub enum Error {
     /// Neither the given nor the usual socket paths lead to a daemon.
     #[error("no Deck daemon found on the other machine (tried {0})")]
     NoDaemon(String),
+    /// The SSH server there does not allow forwarding to a Unix socket.
+    #[error("the SSH server does not allow forwarding to the Deck socket (tried {0})")]
+    ForwardingProhibited(String),
 }
+
+/// The common reasons a connection fails, each with its own next step in the
+/// app. Rare errors have none and keep their technical text.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Failure {
+    /// Signed in, but no daemon answers there.
+    NoDaemon,
+    /// The SSH server refuses forwarding to a Unix socket.
+    ForwardingProhibited,
+    /// The server refused every offered key.
+    AuthFailed,
+    /// The own key could not be read, or the SSH agent is not reachable.
+    KeyUnusable,
+    /// No answer in time: switched off, asleep, or a firewall drops packets.
+    Timeout,
+    /// The machine answers but nothing listens on the SSH port.
+    Refused,
+    /// Name not found, no route, or another network error.
+    Unreachable,
+}
+
+impl Error {
+    /// Which of the common failures this is, if any.
+    pub fn failure(&self) -> Option<Failure> {
+        match self {
+            Error::NoDaemon(_) => Some(Failure::NoDaemon),
+            Error::ForwardingProhibited(_) => Some(Failure::ForwardingProhibited),
+            Error::Ssh(SshError::AuthFailed(_)) => Some(Failure::AuthFailed),
+            Error::Ssh(SshError::Key(_)) => Some(Failure::KeyUnusable),
+            Error::Ssh(SshError::Timeout(_)) => Some(Failure::Timeout),
+            Error::Ssh(SshError::Io(e)) if e.kind() == std::io::ErrorKind::ConnectionRefused => {
+                Some(Failure::Refused)
+            }
+            Error::Ssh(SshError::Io(_)) => Some(Failure::Unreachable),
+            _ => None,
+        }
+    }
+}
+
+/// How long signing in may take. A machine that is switched off otherwise
+/// keeps the app in "connecting" for about a minute.
+pub const CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// A connection to a daemon on another machine. The SSH connection lives as
 /// long as this value does.
@@ -72,14 +118,23 @@ pub async fn connect(
     socket: Option<&str>,
     name: &str,
 ) -> Result<RemoteClient, Error> {
-    let session = Session::connect(target).await?;
+    let session = tokio::time::timeout(CONNECT_TIMEOUT, Session::connect(target))
+        .await
+        .map_err(|_| {
+            SshError::Timeout(format!("{}@{}:{}", target.user, target.host, target.port))
+        })??;
     let paths = match socket {
         Some(p) => vec![p.to_owned()],
         None => candidate_sockets(&remote_home(&session).await?),
     };
+    let mut prohibited = false;
     for path in &paths {
-        let Ok(channel) = session.direct_streamlocal(path).await else {
-            continue;
+        let channel = match session.direct_streamlocal(path).await {
+            Ok(channel) => channel,
+            Err(e) => {
+                prohibited |= is_prohibited(&e);
+                continue;
+            }
         };
         match Client::over(channel.into_stream(), name).await {
             Ok(client) => {
@@ -94,7 +149,20 @@ pub async fn connect(
             Err(_) => continue,
         }
     }
+    if prohibited {
+        return Err(Error::ForwardingProhibited(paths.join(", ")));
+    }
     Err(Error::NoDaemon(paths.join(", ")))
+}
+
+/// The server said no to the channel itself, not "nothing there".
+fn is_prohibited(e: &SshError) -> bool {
+    matches!(
+        e,
+        SshError::Ssh(russh::Error::ChannelOpenFailure(
+            russh::ChannelOpenFailure::AdministrativelyProhibited
+        ))
+    )
 }
 
 /// For the settings: where the keys and known hosts of the user usually are.
@@ -105,6 +173,58 @@ pub fn default_known_hosts() -> Option<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use std::io;
+
+    fn io(kind: io::ErrorKind) -> Error {
+        Error::Ssh(SshError::Io(io::Error::from(kind)))
+    }
+
+    #[test]
+    fn common_failures_are_named() {
+        let cases = [
+            (Error::NoDaemon("x".into()), Some(Failure::NoDaemon)),
+            (
+                Error::ForwardingProhibited("x".into()),
+                Some(Failure::ForwardingProhibited),
+            ),
+            (
+                Error::Ssh(SshError::AuthFailed("u@h".into())),
+                Some(Failure::AuthFailed),
+            ),
+            (
+                Error::Ssh(SshError::Key("agent".into())),
+                Some(Failure::KeyUnusable),
+            ),
+            (
+                Error::Ssh(SshError::Timeout("u@h:22".into())),
+                Some(Failure::Timeout),
+            ),
+            (io(io::ErrorKind::ConnectionRefused), Some(Failure::Refused)),
+            (io(io::ErrorKind::NotFound), Some(Failure::Unreachable)),
+            (
+                io(io::ErrorKind::HostUnreachable),
+                Some(Failure::Unreachable),
+            ),
+            (Error::Ssh(SshError::Refused("pty".into())), None),
+            (Error::Ssh(SshError::Cancelled("u@h".into())), None),
+        ];
+        for (error, want) in cases {
+            assert_eq!(error.failure(), want, "{error}");
+        }
+    }
+
+    #[test]
+    fn a_prohibited_channel_is_told_apart_from_a_missing_socket() {
+        let prohibited = SshError::Ssh(russh::Error::ChannelOpenFailure(
+            russh::ChannelOpenFailure::AdministrativelyProhibited,
+        ));
+        let failed = SshError::Ssh(russh::Error::ChannelOpenFailure(
+            russh::ChannelOpenFailure::ConnectFailed,
+        ));
+        assert!(is_prohibited(&prohibited));
+        assert!(!is_prohibited(&failed));
+    }
 
     #[test]
     fn the_usual_sockets_are_absolute_paths_under_the_home_folder() {

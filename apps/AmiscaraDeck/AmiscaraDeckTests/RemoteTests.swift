@@ -110,6 +110,36 @@ final class RemoteTests: XCTestCase {
         m.stop()
     }
 
+    func testAMissingDaemonSaysWhatToDoAndConnectsOnceItRuns() async {
+        let remote = ScriptedRemote([.Remote(kind: .noDaemon, detail: "x"), nil])
+        let m = model(local: ScriptedConnector([]), remote: remote)
+        m.addRemote(setting())
+        await waitUntil("no daemon") { m.remotes.first?.link == .problem(.noDaemon) }
+        XCTAssertEqual(RemoteWording.note(m.remotes[0]), "work: Deck läuft dort nicht")
+        let detail = RemoteWording.detail(m.remotes[0])
+        XCTAssertTrue(detail.contains("amiscara-deckd"), detail)
+        XCTAssertTrue(detail.contains("von selbst"), detail)
+        XCTAssertFalse(detail.contains("—"))
+        await waitUntil("retried", timeout: .seconds(12)) { m.remotes.first?.link == .connected }
+        m.stop()
+    }
+
+    func testARefusedSignInIsNamed() async {
+        let remote = ScriptedRemote([.Remote(kind: .authFailed, detail: "ssh authentication failed for frank@work.local")])
+        let m = model(local: ScriptedConnector([]), remote: remote)
+        m.addRemote(setting())
+        await waitUntil("auth failed") { m.remotes.first?.link == .problem(.authFailed) }
+        XCTAssertEqual(RemoteWording.note(m.remotes[0]), "work: Anmeldung abgelehnt")
+        XCTAssertTrue(RemoteWording.detail(m.remotes[0]).contains("ssh-add"))
+        m.stop()
+    }
+
+    func testEveryProblemHasItsOwnNextStep() {
+        let all: [RemoteProblem] = [.noDaemon, .forwardingProhibited, .authFailed, .keyUnusable, .timeout, .refused, .unreachable]
+        let texts = Set(all.map(RemoteWording.problemDetail))
+        XCTAssertEqual(texts.count, all.count)
+    }
+
     func testMachinesAreRememberedAndRemoved() {
         let m = model(local: ScriptedConnector([]), remote: ScriptedRemote([]))
         m.addRemote(setting(), start: false)
