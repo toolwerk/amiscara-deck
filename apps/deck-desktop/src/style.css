@@ -32,6 +32,10 @@ button {
   font: inherit;
   cursor: pointer;
 }
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 button.allow {
   background: var(--accent);
   border-color: var(--accent);

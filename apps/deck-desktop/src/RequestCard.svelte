@@ -4,6 +4,18 @@
   import { answer, deck } from "./store.svelte";
 
   let { request: r, tall = false }: { request: Request; tall?: boolean } = $props();
+
+  /// "Allow" waits a moment after a request appears or opens in full: a click
+  /// meant for "View" or for a card that just moved must not allow another one.
+  const ARM_MS = 800;
+  let armed = $state<string | null>(null);
+  const key = $derived(`${r.id}:${deck.expanded[r.id] ? 1 : 0}`);
+  $effect(() => {
+    const k = key;
+    armed = null;
+    const timer = setTimeout(() => (armed = k), ARM_MS);
+    return () => clearTimeout(timer);
+  });
 </script>
 
 <div class="request">
@@ -14,7 +26,7 @@
       {#if r.truncated && !deck.expanded[r.id]}
         <button onclick={() => (deck.expanded[r.id] = true)}>{t("View")}</button>
       {:else}
-        <button class="allow" onclick={() => answer(r.id, true)}>{t("Allow")}</button>
+        <button class="allow" disabled={armed !== key} onclick={() => answer(r.id, true)}>{t("Allow")}</button>
       {/if}
       <button onclick={() => answer(r.id, false)}>{t("Deny")}</button>
     </div>

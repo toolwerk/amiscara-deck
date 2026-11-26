@@ -35,7 +35,12 @@
 
   const all = $derived(deck.view?.agents ?? []);
   const shown = $derived(all.filter((a) => matches(filter, a.status)));
-  const selected = $derived(shown.find((a) => a.id === selection) ?? shown[0] ?? null);
+  // The selection stays on its agent while the list reorders; only when it
+  // leaves the list does the first one take its place.
+  $effect(() => {
+    if (!shown.some((a) => a.id === selection)) selection = shown[0]?.id ?? null;
+  });
+  const selected = $derived(shown.find((a) => a.id === selection) ?? null);
   const today = $derived(deck.view?.today_micro_usd ?? null);
 </script>
 
