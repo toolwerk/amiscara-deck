@@ -35,6 +35,7 @@ The app speaks English or German, following the language of macOS. You can set a
 - [Other machines](#other-machines)
 - [Linux](#linux)
 - [Windows](#windows)
+- [Interface for Linux and Windows](#interface-for-linux-and-windows)
 - [Command line](#command-line)
 - [Updates](#updates)
 - [Security and privacy](#security-and-privacy)
@@ -245,7 +246,7 @@ Deck does not start the daemon on the other machine itself. If it is not running
 
 ## Linux
 
-There is no interface for Linux yet. The daemon, the hook program and the command line already run. With them your Mac shows the agents of the Linux machine and answers their requests (see [Other machines](#other-machines)).
+The daemon, the hook program and the command line run on Linux. There is a first interface as well, see [Interface for Linux and Windows](#interface-for-linux-and-windows). Your Mac can also show the agents of the Linux machine and answer their requests (see [Other machines](#other-machines)).
 
 Unpack the package for x86_64 or aarch64 and set it up:
 
@@ -271,7 +272,7 @@ The archives are then in `dist/`.
 
 ## Windows
 
-On Windows Deck is at its very beginning. The daemon, the hook program and the command line run, there is no interface yet. Daemon and hook program talk over a named pipe that only your user can open.
+On Windows Deck is at its very beginning. The daemon, the hook program and the command line run, plus a first [interface](#interface-for-linux-and-windows). Daemon and hook program talk over a named pipe that only your user can open.
 
 Unpack the package and set it up in PowerShell:
 
@@ -289,6 +290,22 @@ To build the package yourself, on macOS or Linux with Docker or Podman:
 
 ```sh
 scripts/package-windows.sh
+```
+
+## Interface for Linux and Windows
+
+The first version shows an icon in the tray and a panel. The icon turns orange as soon as an approval waits. The panel lists the agents, waiting approvals are on top with **Allow** and **Deny**. Long requests show **View** first, as on the Mac. Questions and plans are still answered where the agent runs. Main window, notifications and presence follow.
+
+The interface needs the running daemon (see [Linux](#linux) and [Windows](#windows)). The panel opens at start, closing only hides it. A click on the icon (on Linux "Open panel" in the icon menu) opens it again.
+
+Without presence, "Automatic" holds every approval in Deck while the interface runs. If you rather answer in the terminal, quit the interface from the icon menu.
+
+To build it yourself (Node.js and Rust, on Linux also WebKitGTK):
+
+```sh
+cd apps/deck-desktop
+npm ci
+npx tauri build
 ```
 
 ## Command line

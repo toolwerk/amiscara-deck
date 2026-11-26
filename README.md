@@ -35,6 +35,7 @@ Die App spricht Deutsch oder Englisch, je nach Sprache von macOS. Eine eigene Sp
 - [Andere Rechner](#andere-rechner)
 - [Linux](#linux)
 - [Windows](#windows)
+- [Oberfläche für Linux und Windows](#oberfläche-für-linux-und-windows)
 - [Befehlszeile](#befehlszeile)
 - [Updates](#updates)
 - [Sicherheit und Datenschutz](#sicherheit-und-datenschutz)
@@ -245,7 +246,7 @@ Deck startet den Dienst auf dem anderen Rechner nicht selbst. Läuft er dort nic
 
 ## Linux
 
-Für Linux gibt es noch keine Oberfläche. Dienst, Hook-Programm und Befehlszeile laufen aber schon. Ihr Mac zeigt damit die Agenten des Linux-Rechners und beantwortet deren Anfragen (siehe [Andere Rechner](#andere-rechner)).
+Dienst, Hook-Programm und Befehlszeile laufen unter Linux. Eine erste Oberfläche gibt es auch, siehe [Oberfläche für Linux und Windows](#oberfläche-für-linux-und-windows). Ihr Mac kann außerdem die Agenten des Linux-Rechners zeigen und deren Anfragen beantworten (siehe [Andere Rechner](#andere-rechner)).
 
 Das Paket für x86_64 oder aarch64 entpacken und einrichten:
 
@@ -271,7 +272,7 @@ Die Archive liegen danach in `dist/`.
 
 ## Windows
 
-Unter Windows ist Deck ganz am Anfang. Dienst, Hook-Programm und Befehlszeile laufen, eine Oberfläche gibt es noch nicht. Dienst und Hook-Programm sprechen über eine Named Pipe, die nur Ihr Benutzer öffnen kann.
+Unter Windows ist Deck ganz am Anfang. Dienst, Hook-Programm und Befehlszeile laufen, dazu eine erste [Oberfläche](#oberfläche-für-linux-und-windows). Dienst und Hook-Programm sprechen über eine Named Pipe, die nur Ihr Benutzer öffnen kann.
 
 Das Paket entpacken und in PowerShell einrichten:
 
@@ -289,6 +290,22 @@ Das Paket selbst bauen, auf macOS oder Linux mit Docker oder Podman:
 
 ```sh
 scripts/package-windows.sh
+```
+
+## Oberfläche für Linux und Windows
+
+Die erste Fassung zeigt ein Symbol in der Leiste und ein Panel. Das Symbol wird orange, sobald eine Freigabe wartet. Das Panel listet die Agenten, wartende Freigaben stehen oben mit **Erlauben** und **Ablehnen**. Lange Anfragen zeigen erst **Ansehen**, wie auf dem Mac. Fragen und Pläne beantworten Sie weiter dort, wo der Agent läuft. Hauptfenster, Mitteilungen und die Anwesenheit folgen.
+
+Die Oberfläche braucht den laufenden Dienst (siehe [Linux](#linux) und [Windows](#windows)). Beim Start öffnet sich das Panel, Schließen versteckt es nur. Ein Klick auf das Symbol (unter Linux im Menü am Symbol "Panel öffnen") öffnet es wieder.
+
+Ohne Anwesenheit hält die Automatik jede Freigabe in Deck, solange die Oberfläche läuft. Wer lieber im Terminal antwortet, beendet die Oberfläche über das Menü am Symbol.
+
+Selbst bauen (Node.js und Rust, unter Linux zusätzlich WebKitGTK):
+
+```sh
+cd apps/deck-desktop
+npm ci
+npx tauri build
 ```
 
 ## Befehlszeile

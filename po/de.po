@@ -951,3 +951,9 @@ msgstr "Der Dienst ist nicht gestartet. Er startet bei der nächsten Anmeldung."
 
 msgid "reg delete failed."
 msgstr "reg delete ist gescheitert."
+
+msgid "No data folder found."
+msgstr "Kein Datenordner gefunden."
+
+msgid "Open panel"
+msgstr "Panel öffnen"

@@ -259,6 +259,19 @@ fn lookup(lang: Language, msgid: &str) -> Option<&'static Translation> {
     }
 }
 
+/// Every text of `lang` with its translation, for an interface that looks
+/// texts up itself (the desktop app). Empty for English, whose texts are the
+/// ids.
+pub fn catalog(lang: Language) -> std::collections::BTreeMap<String, String> {
+    match lang {
+        Language::En => Default::default(),
+        Language::De => german()
+            .iter()
+            .map(|(k, v)| (k.clone(), v.one.clone()))
+            .collect(),
+    }
+}
+
 /// The text in the language of the user.
 pub fn t(msgid: &str) -> String {
     t_with(msgid, &[])
@@ -290,6 +303,16 @@ mod tests {
 
     fn vars(v: &[Option<&str>]) -> Vec<Option<String>> {
         v.iter().map(|o| o.map(str::to_owned)).collect()
+    }
+
+    #[test]
+    fn the_catalog_holds_the_translations() {
+        assert!(catalog(Language::En).is_empty());
+        let de = catalog(Language::De);
+        assert_eq!(
+            de.get("No agents.").map(String::as_str),
+            Some("Keine Agenten.")
+        );
     }
 
     #[test]

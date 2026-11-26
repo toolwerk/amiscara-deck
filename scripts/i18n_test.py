@@ -106,6 +106,18 @@ class Extract(unittest.TestCase):
         got = [e.msgid for e in i18n.extract(tree(swift=swift, rust=rust, template=False))]
         self.assertEqual(got, ["Kept", "Marked", "Also kept"])
 
+    def test_the_desktop_app_is_read_in_rust_typescript_and_svelte(self):
+        d = tree(swift="", rust="", template=False)
+        (d / "apps/deck-desktop/src-tauri/src").mkdir(parents=True)
+        (d / "apps/deck-desktop/src-tauri/src/main.rs").write_text('let a = deck_i18n::t("Open panel");')
+        (d / "apps/deck-desktop/src").mkdir(parents=True, exist_ok=True)
+        (d / "apps/deck-desktop/src/i18n.ts").write_text(
+            'export function t(msgid: string): string { return msgid; }\nconst x = t("From TS");'
+        )
+        (d / "apps/deck-desktop/src/App.svelte").write_text('<p>{t("From Svelte", { n: 1 })}</p>')
+        got = [e.msgid for e in i18n.extract(d)]
+        self.assertEqual(got, ["Open panel", "From Svelte", "From TS"])
+
     def test_a_call_without_a_literal_fails(self):
         with self.assertRaises(i18n.Failure):
             i18n.extract(tree(swift='let x = L10n.t(key)', template=False))
