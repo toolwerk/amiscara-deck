@@ -6,6 +6,9 @@ struct HooksControl: Sendable {
     var status: @Sendable () throws -> HooksStatus
     var install: @Sendable () throws -> HooksChange
     var uninstall: @Sendable () throws -> HooksChange
+    var profileStatus: @Sendable (String) throws -> HooksStatus = { _ in throw DeckError.Failed(message: "no profile") }
+    var profileInstall: @Sendable (String) throws -> HooksChange = { _ in throw DeckError.Failed(message: "no profile") }
+    var profileUninstall: @Sendable (String) throws -> HooksChange = { _ in throw DeckError.Failed(message: "no profile") }
     var version: @Sendable () -> ClaudeVersionCheck = { checkClaudeVersion() }
     /// Codex is optional: only offered when its folder exists.
     var codexPresent: @Sendable () -> Bool = { false }
@@ -24,11 +27,53 @@ struct HooksControl: Sendable {
             status: { try hooksStatus(settingsPath: nil, programPath: program) },
             install: { try installHooks(settingsPath: nil, programPath: program) },
             uninstall: { try uninstallHooks(settingsPath: nil, programPath: program) },
+            profileStatus: { try hooksStatus(settingsPath: $0, programPath: program) },
+            profileInstall: { try installHooks(settingsPath: $0, programPath: program) },
+            profileUninstall: { try uninstallHooks(settingsPath: $0, programPath: program) },
             codexPresent: { AmiscaraDeck.codexPresent() },
             codexStatus: { try codexHooksStatus(programPath: program) },
             codexInstall: { try installCodexHooks(programPath: program) },
             codexUninstall: { try uninstallCodexHooks(programPath: program) }
         )
+    }
+}
+
+/// Additional Claude configuration folders, stored locally by AppStorage.
+struct ClaudeProfiles: RawRepresentable, Equatable {
+    var paths: [String] = []
+
+    init() {}
+
+    init?(rawValue: String) {
+        guard let paths = try? JSONDecoder().decode([String].self, from: Data(rawValue.utf8)) else { return nil }
+        self.paths = paths
+    }
+
+    var rawValue: String {
+        (try? JSONEncoder().encode(paths)).map { String(decoding: $0, as: UTF8.self) } ?? "[]"
+    }
+
+    static func settingsURL(in folder: URL) -> URL {
+        folder.resolvingSymlinksInPath().standardizedFileURL.appending(path: "settings.json")
+    }
+
+    private static func identity(_ path: String) -> String {
+        URL(fileURLWithPath: path).resolvingSymlinksInPath().standardizedFileURL.path
+    }
+
+    /// Both directory aliases and symlinked settings files can name the same profile.
+    @discardableResult
+    mutating func add(folder: URL, defaultSettingsPath: String?) -> Bool {
+        let path = Self.settingsURL(in: folder).path
+        let identity = Self.identity(path)
+        let existing = paths + (defaultSettingsPath.map { [$0] } ?? [])
+        guard !existing.contains(where: { Self.identity($0) == identity }) else { return false }
+        paths.append(path)
+        return true
+    }
+
+    mutating func remove(_ path: String) {
+        paths.removeAll { $0 == path }
     }
 }
 

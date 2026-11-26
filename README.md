@@ -78,6 +78,8 @@ Laufende Sitzungen erscheinen beim nächsten Ereignis, neue sofort.
 
 Beim Einbauen ergänzt Deck nur seine eigenen Einträge in `~/.claude/settings.json`. Einträge anderer Programme bleiben, wie sie sind. Vor jeder Änderung entsteht daneben eine Sicherung (`settings.json.deck-….bak`), die letzten fünf bleiben erhalten. "Ausbauen" entfernt die Einträge wieder.
 
+Für einen weiteren Konfigurationsordner (zum Beispiel bei Nutzung von `CLAUDE_CONFIG_DIR`) wähle unter „Claude Code“ **Profil hinzufügen …** und baue die Hooks für dieses Profil ein. Rückfragen und Freigaben aus allen eingebundenen Profilen erscheinen in derselben Deck-Instanz.
+
 ## Das Symbol und das Panel
 
 Das Symbol in der Menüleiste zeigt, ob jemand auf Sie wartet. Die Zahl daneben lässt sich abschalten.

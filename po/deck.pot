@@ -460,7 +460,7 @@ msgid "Approvals"
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
-msgid "Status unknown."
+msgid "Approvals for Codex"
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
@@ -472,7 +472,7 @@ msgid "Install"
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
-msgid "Installed."
+msgid "Installed. Please confirm in Codex with /hooks."
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
@@ -481,18 +481,6 @@ msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
 msgid "Uninstalled."
-msgstr ""
-
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
-msgid "Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."
-msgstr ""
-
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
-msgid "Approvals for Codex"
-msgstr ""
-
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
-msgid "Installed. Please confirm in Codex with /hooks."
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
@@ -537,6 +525,42 @@ msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
 msgid "Start at login: {error}"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Default profile"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Add profile …"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Choose the Claude Code configuration folder."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "This profile is already listed."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Status unknown."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Installed."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Remove profile"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift
+msgid "Uninstall the hooks before removing a profile."
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift

@@ -72,8 +72,11 @@ impl Running {
 
     /// A hook program: sends the event and waits for the reply, in a task.
     fn hook(&self, sample: &str, session: &str, tool: Tool) -> JoinHandle<HookReply> {
+        self.send_hook(Self::hook_line(sample, session, tool))
+    }
+
+    fn send_hook(&self, line: String) -> JoinHandle<HookReply> {
         let socket = self.socket.clone();
-        let line = Self::hook_line(sample, session, tool);
         tokio::spawn(async move {
             let mut s = UnixStream::connect(&socket).await.expect("connect");
             s.write_all(line.as_bytes()).await.expect("write");
@@ -211,6 +214,80 @@ async fn a_request_is_held_until_the_ui_allows_it() {
     );
     let a = ui.card(RequestState::Answered).await;
     assert_eq!(a.request.expect("request").deadline_ms, None);
+    d.stop().await;
+}
+
+#[tokio::test]
+async fn a_question_and_an_approval_go_back_to_their_own_claude_sessions() {
+    let d = start().await;
+    let mut ui = Ui::connect(&d.socket).await;
+    let mut approval = d.hook(
+        "PermissionRequest-Bash-addRules",
+        "first-profile",
+        Tool::Claude,
+    );
+    let first = ui.card(RequestState::Held).await;
+    assert_eq!(first.id, "first-profile");
+    let first_id = first.request.expect("approval").id;
+
+    let line = Running::hook_line(
+        "PermissionRequest-Bash-addRules",
+        "second-profile",
+        Tool::Claude,
+    );
+    let mut event: HookMessage = decode_line(&line).expect("hook message");
+    event.input["tool_name"] = json!("AskUserQuestion");
+    event.input["tool_input"] = json!({
+        "questions": [{
+            "question": "Which option?",
+            "options": [{"label": "First"}, {"label": "Second"}]
+        }]
+    });
+    let mut question = d.send_hook(encode_line(&event).expect("question event"));
+    let second = ui.card(RequestState::Held).await;
+    assert_eq!(second.id, "second-profile");
+    let second_id = second.request.expect("question").id;
+    assert_ne!(first_id, second_id);
+
+    ui.answer(
+        &second_id,
+        Decision::Answer {
+            picks: vec![vec![1]],
+        },
+    )
+    .await;
+    let reply = finished(&mut question, Duration::from_secs(5))
+        .await
+        .expect("question answered")
+        .output
+        .expect("answer output");
+    assert_eq!(
+        reply.pointer("/hookSpecificOutput/decision/updatedInput/answers/Which option?"),
+        Some(&json!("Second"))
+    );
+    assert!(
+        finished(&mut approval, Duration::from_millis(150))
+            .await
+            .is_none()
+    );
+
+    ui.answer(
+        &first_id,
+        Decision::Allow {
+            always: None,
+            expanded: true,
+        },
+    )
+    .await;
+    let reply = finished(&mut approval, Duration::from_secs(5))
+        .await
+        .expect("approval answered")
+        .output
+        .expect("approval output");
+    assert_eq!(
+        reply.pointer("/hookSpecificOutput/decision/behavior"),
+        Some(&json!("allow"))
+    );
     d.stop().await;
 }
 
