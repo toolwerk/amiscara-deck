@@ -110,6 +110,22 @@ jobs:
           path: amiscara-deck-windows-x86_64
           retention-days: 14
 
+  wsl:
+    name: Windows with WSL
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - run: cargo build --locked --release -p deck-daemon -p deck-hook -p deck-cli
+      - uses: Vampire/setup-wsl@4c48163d9f981914dd8caa0fc335fe19cca5bff4 # v7.2.0
+        with:
+          distribution: Debian-13
+      - run: pwsh -File scripts/windows/wsl-smoke.ps1 target/release
+
   desktop:
     name: Desktop app (${{ matrix.os }})
     # Hosted: the Linux build needs WebKitGTK, which our runner does not have.

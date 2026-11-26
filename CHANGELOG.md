@@ -7,6 +7,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 ### Added
 
 - Erste Oberfläche für Linux und Windows (Tauri und Svelte, `apps/deck-desktop`): Symbol in der Leiste, Panel mit Agenten, Erlauben und Ablehnen. Die CI baut Installer für beide Systeme
+- Windows: `install.ps1 -Wsl` baut die Hooks auch für Claude Code in WSL ein, die Anfragen landen beim Dienst unter Windows. Die CI prüft das mit einer Debian-Distribution
 - Windows: `amiscara-deck daemon install` startet den Dienst beim Anmelden über den Run-Schlüssel des Benutzers, ohne Fenster, Meldungen in `deckd.log`
 - Windows: Dienst, Hook-Programm und Befehlszeile laufen und sprechen über eine Named Pipe nur für den eigenen Benutzer. `scripts/package-windows.sh` baut ein Paket mit `install.ps1`, die CI prüft Windows und legt das Paket als Artefakt ab
 - Linux: `amiscara-deck daemon install` richtet den Dienst als systemd-Benutzereinheit ein, `scripts/package-linux.sh` baut statische Pakete für x86_64 und aarch64 mit `install.sh`

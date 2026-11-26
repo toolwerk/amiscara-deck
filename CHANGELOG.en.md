@@ -9,6 +9,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 ### Added
 
 - First interface for Linux and Windows (Tauri and Svelte, `apps/deck-desktop`): tray icon, panel with agents, allow and deny. CI builds installers for both systems
+- Windows: `install.ps1 -Wsl` also installs the hooks for Claude Code in WSL, its requests reach the daemon on Windows. CI checks this with a Debian distribution
 - Windows: `amiscara-deck daemon install` starts the daemon at login through the Run key of the user, without a window, messages in `deckd.log`
 - Windows: daemon, hook program and command line run and talk over a named pipe for the own user only. `scripts/package-windows.sh` builds a package with `install.ps1`, CI checks Windows and keeps the package as an artifact
 - Linux: `amiscara-deck daemon install` sets up the daemon as a systemd user unit, `scripts/package-linux.sh` builds static packages for x86_64 and aarch64 with `install.sh`
