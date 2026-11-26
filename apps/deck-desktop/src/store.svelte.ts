@@ -17,12 +17,17 @@ export function follow(): () => void {
   const stop = listen<View>("deck://state", (e) => {
     deck.view = e.payload;
   });
+  // "View" in a notification: the panel opens with the full text.
+  const view = listen<string>("deck://view", (e) => {
+    deck.expanded[e.payload] = true;
+  });
   // What was sent before this page listened.
   invoke<View | null>("current").then((v) => {
     if (v && deck.view === null) deck.view = v;
   });
   return () => {
     stop.then((f) => f());
+    view.then((f) => f());
   };
 }
 
