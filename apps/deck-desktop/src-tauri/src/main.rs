@@ -1,0 +1,310 @@
+//! Amiscara Deck for Linux and Windows: an icon in the tray and a panel.
+//!
+//! No logic of its own: the daemon holds the state, `deck-client` follows it.
+//! This program passes every change to the panel (event `deck://state`) and
+//! the panel's answers back to the daemon. Without a daemon it says so and
+//! tries again; the hook program then never holds a request.
+
+#![cfg_attr(windows, windows_subsystem = "windows")]
+
+use std::collections::BTreeMap;
+use std::time::Duration;
+
+use deck_client::Client;
+use deck_proto::agent::{Agent, RequestState, Status};
+use deck_proto::message::{AnswerVia, Decision};
+use serde::Serialize;
+use tauri::image::Image;
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
+use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
+use tokio::sync::mpsc;
+
+const TRAY_IDLE: &[u8] = include_bytes!("../icons/tray.png");
+const TRAY_WAITING: &[u8] = include_bytes!("../icons/tray-waiting.png");
+const RETRY: Duration = Duration::from_secs(2);
+
+/// What the panel shows.
+#[derive(Debug, Clone, Serialize)]
+struct View {
+    connected: bool,
+    /// Why there is no connection, for the panel.
+    problem: Option<String>,
+    agents: Vec<Agent>,
+}
+
+enum Command {
+    Answer { request_id: String, allow: bool },
+}
+
+struct Link(mpsc::UnboundedSender<Command>);
+
+/// The last view, for a panel that loads after it was sent.
+#[derive(Default)]
+struct Last(std::sync::Mutex<Option<View>>);
+
+/// The current view; `None` before the first contact with the daemon.
+#[tauri::command]
+fn current(last: tauri::State<'_, Last>) -> Option<View> {
+    last.0.lock().ok().and_then(|v| v.clone())
+}
+
+/// The texts of the panel in the language of the system (`locale` as the
+/// webview reports it), msgid to text. Empty for English.
+#[tauri::command]
+fn catalog(locale: String) -> BTreeMap<String, String> {
+    deck_i18n::catalog(deck_i18n::Language::from_locale(&locale))
+}
+
+/// Allow or deny a held request. Only a card shown in full may be allowed:
+/// the panel expands a shortened one before it offers "Allow".
+#[tauri::command]
+fn answer(link: tauri::State<'_, Link>, request_id: String, allow: bool) -> Result<(), String> {
+    link.0
+        .send(Command::Answer { request_id, allow })
+        .map_err(|_| "not connected".to_owned())
+}
+
+/// The agents that wait for an answer in Deck.
+fn waiting(agents: &[Agent]) -> usize {
+    agents
+        .iter()
+        .filter(|a| {
+            a.request
+                .as_ref()
+                .is_some_and(|r| r.state == RequestState::Held)
+        })
+        .count()
+}
+
+/// Waiting first, then working, then the rest; newest change first.
+fn sorted(agents: impl Iterator<Item = Agent>) -> Vec<Agent> {
+    let rank = |a: &Agent| match (&a.request, a.status) {
+        (Some(r), _) if r.state == RequestState::Held => 0,
+        (_, Status::Blocked) => 1,
+        (_, Status::Working) => 2,
+        (_, Status::Error) => 3,
+        (_, Status::Done) => 4,
+        (_, Status::Idle) => 5,
+        (_, Status::Exited) => 6,
+    };
+    let mut list: Vec<Agent> = agents.collect();
+    list.sort_by(|a, b| {
+        rank(a)
+            .cmp(&rank(b))
+            .then(b.status_since_ms.cmp(&a.status_since_ms))
+    });
+    list
+}
+
+fn publish(app: &AppHandle, view: View) {
+    let n = waiting(&view.agents);
+    if let Some(tray) = app.tray_by_id("deck") {
+        update_tray(&tray, n, view.connected);
+    }
+    if let Ok(mut last) = app.state::<Last>().0.lock() {
+        *last = Some(view.clone());
+    }
+    let _ = app.emit("deck://state", view);
+}
+
+fn update_tray(tray: &TrayIcon, waiting: usize, connected: bool) {
+    let bytes = if waiting > 0 { TRAY_WAITING } else { TRAY_IDLE };
+    if let Ok(icon) = Image::from_bytes(bytes) {
+        let _ = tray.set_icon(Some(icon));
+    }
+    let tip = if !connected {
+        deck_i18n::t("No daemon reachable. Start it with amiscara-deckd.")
+    } else if waiting == 0 {
+        format!("Amiscara Deck · {}", deck_i18n::t("Nobody is waiting."))
+    } else if waiting == 1 {
+        deck_i18n::t("Amiscara Deck, one agent waiting")
+    } else {
+        deck_i18n::t_with(
+            "Amiscara Deck, {n} agents waiting",
+            &[("n", &waiting.to_string())],
+        )
+    };
+    let _ = tray.set_tooltip(Some(&tip));
+}
+
+/// Follow the daemon for as long as the program runs.
+async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) {
+    loop {
+        let Some(socket) = deck_proto::paths::default_socket() else {
+            publish(
+                &app,
+                View {
+                    connected: false,
+                    problem: Some(deck_i18n::t("No data folder found.")),
+                    agents: Vec::new(),
+                },
+            );
+            return;
+        };
+        match Client::connect(&socket, "Amiscara Deck (desktop)").await {
+            Ok(mut client) => {
+                let view = |c: &Client| View {
+                    connected: true,
+                    problem: None,
+                    agents: sorted(c.state().agents.values().cloned()),
+                };
+                publish(&app, view(&client));
+                loop {
+                    tokio::select! {
+                        msg = client.next() => match msg {
+                            Ok(_) => publish(&app, view(&client)),
+                            Err(_) => break,
+                        },
+                        cmd = commands.recv() => match cmd {
+                            Some(Command::Answer { request_id, allow }) => {
+                                let decision = if allow {
+                                    // The panel shows the full text before it offers "Allow".
+                                    Decision::Allow { always: None, expanded: true }
+                                } else {
+                                    Decision::Deny { message: None }
+                                };
+                                if client.answer(&request_id, decision, AnswerVia::Panel).await.is_err() {
+                                    break;
+                                }
+                            }
+                            None => return,
+                        },
+                    }
+                }
+                publish(
+                    &app,
+                    View {
+                        connected: false,
+                        problem: Some(deck_i18n::t("The daemon closed the connection.")),
+                        agents: Vec::new(),
+                    },
+                );
+            }
+            Err(e) => publish(
+                &app,
+                View {
+                    connected: false,
+                    problem: Some(match e {
+                        deck_client::Error::NoDaemon(_) => {
+                            deck_i18n::t("No daemon reachable. Start it with amiscara-deckd.")
+                        }
+                        other => other.to_string(),
+                    }),
+                    agents: Vec::new(),
+                },
+            ),
+        }
+        tokio::time::sleep(RETRY).await;
+    }
+}
+
+fn panel(app: &AppHandle) -> Option<WebviewWindow> {
+    app.get_webview_window("panel")
+}
+
+fn toggle_panel(app: &AppHandle) {
+    let Some(w) = panel(app) else { return };
+    if w.is_visible().unwrap_or(false) {
+        let _ = w.hide();
+    } else {
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+}
+
+fn main() {
+    let (tx, rx) = mpsc::unbounded_channel();
+    let result = tauri::Builder::default()
+        .manage(Link(tx))
+        .manage(Last::default())
+        .invoke_handler(tauri::generate_handler![catalog, answer, current])
+        .setup(move |app| {
+            let open =
+                MenuItem::with_id(app, "open", deck_i18n::t("Open panel"), true, None::<&str>)?;
+            let quit = MenuItem::with_id(
+                app,
+                "quit",
+                deck_i18n::t("Quit Amiscara Deck"),
+                true,
+                None::<&str>,
+            )?;
+            let menu = Menu::with_items(app, &[&open, &quit])?;
+            let tray = TrayIconBuilder::with_id("deck")
+                .icon(Image::from_bytes(TRAY_IDLE)?)
+                .menu(&menu)
+                // Left click opens the panel where the system reports it
+                // (Windows); the menu works everywhere, also on Linux.
+                .show_menu_on_left_click(false)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "open" => toggle_panel(app),
+                    "quit" => app.exit(0),
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        toggle_panel(tray.app_handle());
+                    }
+                })
+                .build(app)?;
+            update_tray(&tray, 0, false);
+            // Closing the panel hides it; the program stays in the tray.
+            if let Some(w) = panel(app.handle()) {
+                let hide = w.clone();
+                w.on_window_event(move |e| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = e {
+                        api.prevent_close();
+                        let _ = hide.hide();
+                    }
+                });
+            }
+            // Started by the user: show the panel. A start at login passes
+            // `--hidden` and stays in the tray.
+            if !std::env::args().any(|a| a == "--hidden") {
+                toggle_panel(app.handle());
+            }
+            tauri::async_runtime::spawn(follow(app.handle().clone(), rx));
+            Ok(())
+        })
+        .run(tauri::generate_context!());
+    if let Err(e) = result {
+        eprintln!("amiscara-deck-desktop: {e}");
+        std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn agent(id: &str, status: Status, since: u64) -> Agent {
+        serde_json::from_value(serde_json::json!({
+            "id": id, "host": "h", "tool": "claude", "cwd": null, "project": null,
+            "branch": null, "title": null, "status": status, "paused": false,
+            "status_since_ms": since, "activity": null, "last_prompt": null,
+            "context": null, "turns": null, "subagents": 0,
+            "location": {"kind": "unknown"}, "request": null
+        }))
+        .expect("agent")
+    }
+
+    #[test]
+    fn working_comes_before_idle_and_newer_before_older() {
+        let list = sorted(
+            [
+                agent("idle", Status::Idle, 5),
+                agent("old", Status::Working, 1),
+                agent("new", Status::Working, 9),
+            ]
+            .into_iter(),
+        );
+        let ids: Vec<&str> = list.iter().map(|a| a.id.as_str()).collect();
+        assert_eq!(ids, ["new", "old", "idle"]);
+        assert_eq!(waiting(&list), 0);
+    }
+}

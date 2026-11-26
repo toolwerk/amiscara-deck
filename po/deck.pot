@@ -9,47 +9,47 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "running: {command}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "running a command"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "editing {path}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "editing a file"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "reading {path}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "reading a file"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "searching {pattern}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "searching"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "starting a subagent"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "fetching from the web"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "compacting"
 msgstr ""
 
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Turn ended with an error"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/AmiscaraDeck/AmiscaraDeck/Views/AgentCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Session ended"
 msgstr ""
 
@@ -93,23 +93,23 @@ msgstr ""
 msgid "Question answered"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "further details"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "content"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "old"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "new"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/ActivityText.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "options"
 msgstr ""
 
@@ -153,27 +153,27 @@ msgstr ""
 msgid "paused"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "working"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "waiting"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "done"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "no task"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "error"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/AgentOrder.swift apps/deck-desktop/src/deck.ts crates/deck-cli/src/view.rs
 msgid "ended"
 msgstr ""
 
@@ -363,15 +363,15 @@ msgstr ""
 msgid "The agent is waiting for a new task."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "Allow"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "Deny"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "View"
 msgstr ""
 
@@ -411,11 +411,11 @@ msgstr ""
 msgid "Extra large"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift apps/deck-desktop/src-tauri/src/main.rs
 msgid "Amiscara Deck, {n} agents waiting"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/TrayIcon.swift apps/deck-desktop/src-tauri/src/main.rs
 msgid "Amiscara Deck, one agent waiting"
 msgstr ""
 
@@ -451,7 +451,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/AttentionPopup.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/AttentionPopup.swift apps/deck-desktop/src-tauri/src/main.rs apps/deck-desktop/src/App.svelte
 msgid "Nobody is waiting."
 msgstr ""
 
@@ -519,7 +519,7 @@ msgstr ""
 msgid "Nothing to change."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift crates/deck-cli/src/view.rs
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/DeckSettingsView.swift apps/deck-desktop/src/App.svelte crates/deck-cli/src/view.rs
 msgid "Error: {error}"
 msgstr ""
 
@@ -587,7 +587,7 @@ msgstr ""
 msgid "In the window also with ⌘+, ⌘- and ⌘0."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/MainWindowView.swift apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte
 msgid "No agent yet. Start Claude Code in a terminal."
 msgstr ""
 
@@ -687,7 +687,7 @@ msgstr ""
 msgid "Window, sound and reminder come when Deck would also send a notification: in “Automatic” only when you are not at the terminal."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte
 msgid "{n} waiting"
 msgstr ""
 
@@ -697,7 +697,7 @@ msgid_plural "{n} agents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/PanelView.swift apps/deck-desktop/src/App.svelte
 msgid "Connecting to the daemon …"
 msgstr ""
 
@@ -873,55 +873,55 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to run a command"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to write a file"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to change a file"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to change a notebook"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to read a file"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to fetch a web page"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to search the web"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Has a question for you"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Presents a plan for approval"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/deck.ts
 msgid "Wants to use {tool}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "Answer in the program the agent runs in. Deck does not approve plans."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "Deck does not hold this question. Answer in the program the agent runs in."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/App.svelte
 msgid "Deck does not hold this request. Answer in the terminal."
 msgstr ""
 
@@ -953,7 +953,7 @@ msgstr ""
 msgid "Settings …"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/TrayMenu.swift apps/deck-desktop/src-tauri/src/main.rs
 msgid "Quit Amiscara Deck"
 msgstr ""
 
@@ -1185,7 +1185,7 @@ msgstr ""
 msgid "The daemon speaks protocol {daemon}, this program {ours}. Restart the daemon."
 msgstr ""
 
-#: crates/deck-cli/src/live.rs
+#: apps/deck-desktop/src-tauri/src/main.rs crates/deck-cli/src/live.rs
 msgid "The daemon closed the connection."
 msgstr ""
 
@@ -1217,7 +1217,7 @@ msgstr ""
 msgid "{session}: request goes on without an answer (terminal)"
 msgstr ""
 
-#: crates/deck-cli/src/sim_cmd.rs
+#: apps/deck-desktop/src-tauri/src/main.rs crates/deck-cli/src/sim_cmd.rs
 msgid "No daemon reachable. Start it with amiscara-deckd."
 msgstr ""
 
@@ -1263,4 +1263,12 @@ msgstr ""
 
 #: crates/deck-cli/src/view.rs
 msgid "asks: {summary}"
+msgstr ""
+
+#: apps/deck-desktop/src-tauri/src/main.rs
+msgid "No data folder found."
+msgstr ""
+
+#: apps/deck-desktop/src-tauri/src/main.rs
+msgid "Open panel"
 msgstr ""

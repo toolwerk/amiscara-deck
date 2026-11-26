@@ -1,0 +1,37 @@
+[package]
+name = "deck-desktop"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+authors = ["Frank Neumann-Staude <frank@staude.net>"]
+description = "Amiscara Deck for Linux and Windows"
+
+# Not part of the workspace: Tauri needs WebKitGTK on Linux, which the
+# runners of the workspace jobs do not have.
+[workspace]
+
+[[bin]]
+name = "amiscara-deck-desktop"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+deck-client = { path = "../../../crates/deck-client" }
+deck-i18n = { path = "../../../crates/deck-i18n" }
+deck-proto = { path = "../../../crates/deck-proto" }
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tokio = { version = "1.53.3", features = ["macros", "rt-multi-thread", "sync", "time"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+unwrap_used = "deny"
+dbg_macro = "deny"
+todo = "deny"
+
+[dev-dependencies]
+serde_json = "1.0.154"

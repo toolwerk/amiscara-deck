@@ -35,6 +35,9 @@ SWIFT_DIRS = ["apps/AmiscaraDeck/AmiscaraDeck"]
 RUST_GLOB = "crates/*/src"
 # The crate that reads the catalog: its own tests use texts that are no texts.
 RUST_SKIP = {"deck-i18n"}
+# The desktop app for Linux and Windows: Rust, and t("...") in TypeScript and Svelte.
+DESKTOP_RUST = "apps/deck-desktop/src-tauri/src"
+DESKTOP_WEB = "apps/deck-desktop/src"
 
 PLACEHOLDER = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
@@ -212,7 +215,8 @@ def scan_rust(path, rel, found):
         if _inside(m.start(), strings):
             continue
         before = text[: m.start()].rstrip()
-        if before.endswith("fn"):
+        # A definition, in Rust or in TypeScript.
+        if before.endswith("fn") or before.endswith("function"):
             continue
         msgid, pos = read_literal(text, m.end(), rel, rust=True)
         plural = None
@@ -230,6 +234,10 @@ def source_files(root):
         if src.parent.name in RUST_SKIP:
             continue
         files += [(p, "rust") for p in sorted(src.rglob("*.rs"))]
+    files += [(p, "rust") for p in sorted((root / DESKTOP_RUST).rglob("*.rs"))]
+    web = root / DESKTOP_WEB
+    # TypeScript and Svelte read like Rust here: t("...") with a plain literal.
+    files += [(p, "rust") for p in sorted(list(web.rglob("*.ts")) + list(web.rglob("*.svelte")))]
     return files
 
 
