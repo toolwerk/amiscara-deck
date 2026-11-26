@@ -8,6 +8,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 
 ### Added
 
+- Linux and Windows: setup, deb and AppImage of the interface bring daemon, hook program and command line. At its first start the interface sets up the daemon, the panel connects Claude Code on a click. Removing it on Windows takes daemon and hooks along
 - Linux and Windows: the interface reports frontmost program, idle time and lock, and "Automatic" decides as on the Mac. For this the hook program names the full paths of its parent processes on Linux and Windows
 - Linux and Windows: notifications when an agent waits, with Allow and Deny for short requests and View for long ones. On Linux with buttons where the desktop offers them
 - Linux and Windows: main window with a status filter, the cost of the day and a column with request, last task, key figures and history of the selected agent

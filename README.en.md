@@ -300,7 +300,11 @@ When an agent waits, a notification comes. The daemon decides when, as on the Ma
 
 Open the main window with the link at the bottom of the panel or with "Open main window" in the icon menu. It shows the agents as cards with a status filter and the estimated cost of the day. On the right it shows the request of the selected agent, its last task, key figures such as context and turns, and its history.
 
-The interface needs the running daemon (see [Linux](#linux) and [Windows](#windows)). The panel opens at start, closing only hides it. A click on the icon (on Linux "Open panel" in the icon menu) opens it again.
+To install: on Windows with the setup (`Amiscara Deck_<version>_x64-setup.exe`), on Linux with the deb package (`sudo apt install "./Amiscara Deck_<version>_amd64.deb"`) or as AppImage. Daemon, hook program and command line come with it, you do not need the packages from [Linux](#linux) and [Windows](#windows) then. At its first start the interface sets up the daemon, which from then on starts at every login. If Claude Code does not report to Deck yet, the panel shows **Connect Claude Code**. One click installs the hooks in `~/.claude/settings.json`. For this the AppImage puts its programs in `~/.local/share/amiscara-deck/bin`, because its own place changes at every start.
+
+On Windows, removing it in the settings takes daemon and hooks along. Before removing the deb package or the AppImage, enter `amiscara-deck daemon uninstall` and `amiscara-deck hooks uninstall`.
+
+The panel opens at start, closing only hides it. A click on the icon (on Linux "Open panel" in the icon menu) opens it again.
 
 For "Automatic" the interface tells the daemon where you are: the frontmost program, how long you have not typed and whether the screen is locked. If you sit at the terminal of the agent, Deck stays quiet as on the Mac. On Windows this works with any terminal. On Linux Deck knows the frontmost program with X11, with KDE and with Hyprland. GNOME with Wayland does not tell it. There "Automatic" notifies about every approval, rather once too often. Deck does not recognize the terminal of agents in WSL, so for them "Automatic" always notifies too.
 

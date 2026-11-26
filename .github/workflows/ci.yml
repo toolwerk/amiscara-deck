@@ -160,6 +160,9 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+      # Daemon, hook program and command line go into the packages; Tauri
+      # wants them in place before it builds at all.
+      - run: npm run helpers
       - run: cargo fmt --check
         working-directory: apps/deck-desktop/src-tauri
       - run: cargo clippy --locked --all-targets -- -D warnings
@@ -167,6 +170,28 @@ jobs:
       - run: cargo test --locked
         working-directory: apps/deck-desktop/src-tauri
       - run: npx tauri build
+      - name: The deb carries the helpers
+        if: runner.os == 'Linux'
+        working-directory: apps/deck-desktop/src-tauri/target/release/bundle/deb
+        run: |
+          dpkg -c *.deb | tee contents.txt
+          for p in amiscara-deckd deck-hook amiscara-deck amiscara-deck-desktop; do
+            grep -q "usr/bin/$p\$" contents.txt || { echo "missing: $p"; exit 1; }
+          done
+      - name: The installer installs and removes the helpers
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: apps/deck-desktop/src-tauri/target/release/bundle/nsis
+        run: |
+          $setup = Get-ChildItem *.exe | Select-Object -First 1
+          Start-Process $setup.FullName -ArgumentList '/S' -Wait
+          $dir = Join-Path $env:LOCALAPPDATA 'Amiscara Deck'
+          foreach ($p in 'amiscara-deckd', 'deck-hook', 'amiscara-deck', 'amiscara-deck-desktop') {
+            if (-not (Test-Path (Join-Path $dir "$p.exe"))) { throw "missing: $p.exe" }
+          }
+          Start-Process (Join-Path $dir 'uninstall.exe') -ArgumentList '/S' -Wait
+          Start-Sleep -Seconds 5
+          if (Test-Path (Join-Path $dir 'deck-hook.exe')) { throw 'not removed' }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: amiscara-deck-desktop-${{ matrix.os }}

@@ -10,6 +10,7 @@
 
 mod notes;
 mod presence;
+mod setup;
 mod system_notes;
 
 use std::collections::BTreeMap;
@@ -105,6 +106,23 @@ fn current(last: tauri::State<'_, Last>) -> Option<View> {
 #[tauri::command]
 fn catalog(locale: String) -> BTreeMap<String, String> {
     deck_i18n::catalog(deck_i18n::Language::from_locale(&locale))
+}
+
+/// Does Claude Code report to Deck? For the hint in the panel.
+#[tauri::command]
+async fn hooks_state() -> setup::Hooks {
+    tauri::async_runtime::spawn_blocking(setup::hooks)
+        .await
+        .unwrap_or(setup::Hooks::Unknown)
+}
+
+/// Install the hooks in Claude Code, on a click in the panel.
+#[tauri::command]
+async fn install_hooks() -> Result<(), String> {
+    match tauri::async_runtime::spawn_blocking(setup::install_hooks).await {
+        Ok(true) => Ok(()),
+        _ => Err(deck_i18n::t("Could not install the hooks.")),
+    }
 }
 
 /// Show the main window, for the link in the panel. The panel goes away: it
@@ -275,6 +293,8 @@ async fn follow(
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
     let notifier = system_notes::Notifier::new(&app.config().identifier);
+    // A package sets up its daemon once, when none answers.
+    let mut tried_setup = false;
     // The last presence: a new daemon hears it at once.
     let mut presence: Option<Presence> = None;
     loop {
@@ -338,6 +358,22 @@ async fn follow(
                     View::offline(deck_i18n::t("The daemon closed the connection.")),
                 );
             }
+            Err(deck_client::Error::NoDaemon(_)) if !tried_setup => {
+                tried_setup = true;
+                if tauri::async_runtime::spawn_blocking(setup::install_daemon)
+                    .await
+                    .unwrap_or(false)
+                {
+                    // Started: connect at once.
+                    continue;
+                }
+                publish(
+                    &app,
+                    View::offline(deck_i18n::t(
+                        "No daemon reachable. Start it with amiscara-deckd.",
+                    )),
+                );
+            }
             Err(e) => publish(
                 &app,
                 View::offline(match e {
@@ -382,7 +418,12 @@ fn main() {
         .manage(Link(tx))
         .manage(Last::default())
         .invoke_handler(tauri::generate_handler![
-            catalog, answer, current, open_main
+            catalog,
+            answer,
+            current,
+            open_main,
+            hooks_state,
+            install_hooks
         ])
         .setup(move |app| {
             let open =

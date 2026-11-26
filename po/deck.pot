@@ -1266,6 +1266,10 @@ msgid "asks: {summary}"
 msgstr ""
 
 #: apps/deck-desktop/src-tauri/src/main.rs
+msgid "Could not install the hooks."
+msgstr ""
+
+#: apps/deck-desktop/src-tauri/src/main.rs
 msgid "No data folder found."
 msgstr ""
 
@@ -1275,4 +1279,12 @@ msgstr ""
 
 #: apps/deck-desktop/src-tauri/src/main.rs apps/deck-desktop/src/App.svelte
 msgid "Open main window"
+msgstr ""
+
+#: apps/deck-desktop/src/App.svelte
+msgid "Claude Code does not report to Deck yet."
+msgstr ""
+
+#: apps/deck-desktop/src/App.svelte
+msgid "Connect Claude Code"
 msgstr ""
