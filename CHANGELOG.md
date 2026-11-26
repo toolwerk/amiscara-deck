@@ -23,6 +23,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Fixed
 
+- Erreicht Deck einen anderen Rechner nicht, nennt es den Grund und den nächsten Schritt: Deck läuft dort nicht, Anmeldung abgelehnt, Schlüssel nicht nutzbar, keine Antwort. Deck startet den Dienst dort nicht selbst und verbindet, sobald er läuft. Ein ausgeschalteter Rechner hält Deck höchstens 15 Sekunden im Verbinden
 - Codex: Ändert der Agent eine Datei, zeigt Deck "bearbeitet" mit dem Dateinamen statt des Werkzeugs `apply_patch`. Die Ereignisse einer ganzen Codex-Sitzung sind am echten Programm geprüft
 
 ## [0.1.0] - 2026-11-25

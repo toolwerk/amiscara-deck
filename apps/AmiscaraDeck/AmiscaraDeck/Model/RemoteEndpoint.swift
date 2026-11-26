@@ -27,6 +27,30 @@ struct HostKeyPrompt: Equatable, Sendable {
     let key: String
 }
 
+/// A common reason the other machine could not be reached, each with its own
+/// next step in the settings.
+enum RemoteProblem: Equatable, Sendable {
+    case noDaemon
+    case forwardingProhibited
+    case authFailed
+    case keyUnusable
+    case timeout
+    case refused
+    case unreachable
+
+    init(_ kind: RemoteFailureKind) {
+        switch kind {
+        case .noDaemon: self = .noDaemon
+        case .forwardingProhibited: self = .forwardingProhibited
+        case .authFailed: self = .authFailed
+        case .keyUnusable: self = .keyUnusable
+        case .timeout: self = .timeout
+        case .refused: self = .refused
+        case .unreachable: self = .unreachable
+        }
+    }
+}
+
 typealias RemoteConnector = @Sendable (_ config: RemoteConfig, _ observer: DeckObserver) throws -> DeckLink
 
 /// The daemon of one other machine, followed over SSH. Its agents join those of
@@ -41,6 +65,8 @@ final class RemoteEndpoint: Identifiable {
         case connected
         /// The machine did not answer (off, asleep, no network, no daemon there).
         case unreachable(String)
+        /// A known reason, with a next step for the user.
+        case problem(RemoteProblem)
         /// Waits for the user: trust this key or not.
         case needsTrust(HostKeyPrompt)
         case hostKeyChanged(String)
@@ -151,6 +177,8 @@ final class RemoteEndpoint: Identifiable {
                         link = .versionMismatch(daemon: daemon)
                     case .NoDaemon(let path):
                         link = .unreachable(L10n.t("No daemon at {path}.", ["path": path]))
+                    case .Remote(let kind, _):
+                        link = .problem(RemoteProblem(kind))
                     case .Failed(let message):
                         link = .unreachable(message)
                     }

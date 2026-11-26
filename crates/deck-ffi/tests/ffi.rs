@@ -7,9 +7,9 @@ use std::time::{Duration, Instant};
 use deck_daemon::{Config, Daemon};
 use deck_ffi::{
     ActivityView, AgentStatus, AgentView, AnswerViaKind, ApprovalModeKind, DeckConnection,
-    DeckError, DeckObserver, NotifyKindView, PresenceReport, RemoteConfig, RequestStateKind,
-    SettingsView, default_socket_path, hooks_status, install_hooks, protocol_version,
-    uninstall_hooks,
+    DeckError, DeckObserver, NotifyKindView, PresenceReport, RemoteConfig, RemoteFailureKind,
+    RequestStateKind, SettingsView, default_socket_path, hooks_status, install_hooks,
+    protocol_version, uninstall_hooks,
 };
 use deck_proto::PROTOCOL_VERSION;
 use deck_proto::agent::Tool;
@@ -421,5 +421,15 @@ async fn a_machine_that_is_not_there_is_an_error_not_a_hang() {
     })
     .await
     .expect("join");
-    assert!(r.is_err());
+    assert!(
+        matches!(
+            r,
+            Err(DeckError::Remote {
+                kind: RemoteFailureKind::Refused,
+                ..
+            })
+        ),
+        "{:?}",
+        r.err()
+    );
 }

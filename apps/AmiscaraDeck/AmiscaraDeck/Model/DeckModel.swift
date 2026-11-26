@@ -467,7 +467,7 @@ final class DeckModel {
                         link = .versionMismatch(daemon: daemon)
                     case .Failed(let message):
                         link = .failed(message)
-                    case .UnknownHostKey, .HostKeyChanged:
+                    case .UnknownHostKey, .HostKeyChanged, .Remote:
                         // Only a remote connection reports these.
                         link = .failed(String(describing: e))
                     }

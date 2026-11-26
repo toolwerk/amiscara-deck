@@ -750,6 +750,22 @@ msgid "{name}: machine not reachable"
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: Deck is not running there"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: SSH server does not allow the connection to Deck"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: sign-in refused"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "{name}: SSH key not usable"
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
 msgid "{name}: key must be confirmed (Settings)"
 msgstr ""
 
@@ -779,6 +795,34 @@ msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
 msgid "The daemon there speaks protocol {version}. Please bring both to the same version."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Deck is not running there. On a Mac open the app there, on Linux start amiscara-deckd. Deck then connects by itself."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "The SSH server there does not allow forwarding to the Deck socket. Allow it with AllowStreamLocalForwarding in its sshd_config."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "The sign-in was refused. Check the user name and that your key is known there; with the SSH agent, add it with ssh-add."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "Your SSH key could not be used. Check the key file, or whether the SSH agent is running and holds the key (ssh-add -l)."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "No answer. The machine may be switched off, asleep or not on the network. Deck keeps trying."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "The machine answers but takes no SSH connection. On a Mac switch on Remote Login in the sharing settings there."
+msgstr ""
+
+#: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift
+msgid "The machine was not found or cannot be reached. Check the host name and the network. Deck keeps trying."
 msgstr ""
 
 #: apps/AmiscaraDeck/AmiscaraDeck/Views/RemoteViews.swift

@@ -225,8 +225,8 @@ Deck zeigt auch die Agenten anderer Rechner und beantwortet deren Anfragen. Die 
 
 Auf dem anderen Rechner läuft der Dienst von Deck, und die Hooks sind dort eingebaut:
 
-- **Mac:** die App installieren und wie oben einrichten.
-- **Linux:** noch wenig erprobt. Die drei Programme bauen, die Hooks einbauen und den Dienst selbst starten:
+- **Mac:** die App installieren und wie oben einrichten. Unter Systemeinstellungen, Allgemein, Teilen die "Entfernte Anmeldung" einschalten. Die App muss dort laufen, am besten mit "Beim Anmelden starten".
+- **Linux:** als zweiter Rechner nicht geprüft. Die drei Programme bauen, die Hooks einbauen und den Dienst selbst starten:
 
 ```sh
 cargo build --release -p deck-daemon -p deck-hook -p deck-cli
@@ -254,6 +254,8 @@ Dann auf Ihrem Mac in den Einstellungen unter "Andere Rechner" den Rechner hinzu
 | Socket dort | leer: der übliche Ort |
 
 Kennt Ihr Mac den Schlüssel des Rechners noch nicht, zeigt Deck den Fingerabdruck und wartet auf Ihr Ja. Ändert sich der Schlüssel später, verbindet Deck nicht.
+
+Deck startet den Dienst auf dem anderen Rechner nicht selbst. Läuft er dort nicht, sagt Deck das in den Einstellungen und nennt den nächsten Schritt. Sobald der Dienst läuft, verbindet Deck von selbst. Genauso nennt Deck eine abgelehnte Anmeldung, einen nicht nutzbaren Schlüssel und einen Rechner, der nicht antwortet.
 
 ## Befehlszeile
 

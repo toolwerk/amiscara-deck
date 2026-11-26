@@ -683,6 +683,7 @@ dependencies = [
  "amiscara-ssh",
  "deck-client",
  "deck-proto",
+ "russh",
  "thiserror",
  "tokio",
 ]
