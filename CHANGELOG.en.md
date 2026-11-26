@@ -29,5 +29,6 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 
 ### Fixed
 
+- Answering in Deck while the daemon sends a change no longer loses that change
 - When Deck cannot reach another machine, it names the reason and the next step: Deck not running there, sign-in refused, key not usable, no answer. Deck does not start the daemon there itself and connects as soon as it runs. A machine that is switched off keeps Deck connecting for at most 15 seconds
 - Codex: when the agent changes a file, Deck shows "editing" with the file name instead of the tool `apply_patch`. The events of a whole Codex session are checked against the real program
