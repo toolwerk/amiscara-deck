@@ -1030,7 +1030,7 @@ msgid "No confirmation: the request was already answered or ran out."
 msgstr ""
 
 #: crates/deck-cli/src/daemon_cmd.rs
-msgid "Paths not found: please give --program, --data-dir and --plist."
+msgid "Paths not found: please give --program, --data-dir and --plist (or --unit)."
 msgstr ""
 
 #: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
@@ -1059,6 +1059,10 @@ msgstr ""
 
 #: crates/deck-cli/src/daemon_cmd.rs
 msgid "launchctl bootstrap failed. The file is in place, the daemon starts at the next login."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_cmd.rs
+msgid "systemctl --user failed. The file is in place; start the daemon with: systemctl --user enable --now amiscara-deckd"
 msgstr ""
 
 #: crates/deck-cli/src/daemon_cmd.rs
@@ -1162,7 +1166,7 @@ msgid "Hooks of other programs (left alone): {count}"
 msgstr ""
 
 #: crates/deck-cli/src/lib.rs
-msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
+msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n  amiscara-deck daemon install|uninstall|status [--program <path>] [--data-dir <folder>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
 msgstr ""
 
 #: crates/deck-cli/src/live.rs

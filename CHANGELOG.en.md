@@ -8,6 +8,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 
 ### Added
 
+- Linux: `amiscara-deck daemon install` sets up the daemon as a systemd user unit, `scripts/package-linux.sh` builds static packages for x86_64 and aarch64 with `install.sh`
 - Multiple Claude Code profiles can be connected independently in Settings
 - Text size in four steps in the settings, in the window also with ⌘+, ⌘- and ⌘0
 - Deck speaks English: app, notifications, icon menu, Focus filter and command line follow the language of macOS or of the environment. The texts come from `po/deck.pot` and `po/de.po`, `scripts/i18n.py check` finds missing translations
