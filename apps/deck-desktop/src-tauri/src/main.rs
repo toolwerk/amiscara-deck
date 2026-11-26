@@ -8,12 +8,16 @@
 
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
+mod notes;
+mod system_notes;
+
 use std::collections::BTreeMap;
+use std::sync::Arc;
 use std::time::Duration;
 
 use deck_client::Client;
 use deck_proto::agent::{Agent, RequestState, Status};
-use deck_proto::message::{AnswerVia, Decision};
+use deck_proto::message::{AnswerVia, DaemonMessage, Decision};
 use serde::Serialize;
 use tauri::image::Image;
 use tauri::menu::{Menu, MenuItem};
@@ -48,7 +52,14 @@ impl View {
 }
 
 enum Command {
-    Answer { request_id: String, allow: bool },
+    Answer {
+        request_id: String,
+        allow: bool,
+        /// The user saw the full text (panel and window always show it
+        /// before "Allow"; a notification only offers it for a short one).
+        expanded: bool,
+        via: AnswerVia,
+    },
 }
 
 struct Link(mpsc::UnboundedSender<Command>);
@@ -83,10 +94,89 @@ fn open_main(app: AppHandle) {
 /// Allow or deny a held request. Only a card shown in full may be allowed:
 /// the panel expands a shortened one before it offers "Allow".
 #[tauri::command]
-fn answer(link: tauri::State<'_, Link>, request_id: String, allow: bool) -> Result<(), String> {
+fn answer(
+    window: tauri::Window,
+    link: tauri::State<'_, Link>,
+    request_id: String,
+    allow: bool,
+) -> Result<(), String> {
+    let via = if window.label() == "main" {
+        AnswerVia::Window
+    } else {
+        AnswerVia::Panel
+    };
     link.0
-        .send(Command::Answer { request_id, allow })
+        .send(Command::Answer {
+            request_id,
+            allow,
+            expanded: true,
+            via,
+        })
         .map_err(|_| "not connected".to_owned())
+}
+
+/// What a button of a notification does. "View" and a click on the
+/// notification open the panel with the full text of the request.
+fn on_note(
+    app: &AppHandle,
+    link: &mpsc::UnboundedSender<Command>,
+    request_id: Option<String>,
+    action: Option<notes::Action>,
+) {
+    let answer = |allow| {
+        if let Some(id) = request_id.clone() {
+            let _ = link.send(Command::Answer {
+                request_id: id,
+                allow,
+                // Offered only for a request short enough to read there.
+                expanded: false,
+                via: AnswerVia::Notification,
+            });
+        }
+    };
+    match action {
+        Some(notes::Action::Allow) => answer(true),
+        Some(notes::Action::Deny) => answer(false),
+        Some(notes::Action::View) | None => {
+            show(app, "panel");
+            if let Some(id) = request_id {
+                let _ = app.emit("deck://view", id);
+            }
+        }
+    }
+}
+
+/// Show the notification the daemon asked for, or take one back.
+fn notify(
+    app: &AppHandle,
+    notifier: &system_notes::Notifier,
+    link: &mpsc::UnboundedSender<Command>,
+    client: &Client,
+    msg: &DaemonMessage,
+) {
+    match msg {
+        DaemonMessage::Notify {
+            agent_id,
+            request_id,
+            kind,
+        } => {
+            let Some(agent) = client.state().agents.get(agent_id) else {
+                return;
+            };
+            let Some(note) = notes::make(agent, *kind, request_id.as_deref()) else {
+                return;
+            };
+            let app = app.clone();
+            let link = link.clone();
+            let request = note.request_id.clone();
+            notifier.show(
+                note,
+                Arc::new(move |action| on_note(&app, &link, request.clone(), action)),
+            );
+        }
+        DaemonMessage::Withdraw { request_id } => notifier.withdraw(request_id),
+        _ => {}
+    }
 }
 
 /// The agents that wait for an answer in Deck.
@@ -153,7 +243,12 @@ fn update_tray(tray: &TrayIcon, waiting: usize, connected: bool) {
 }
 
 /// Follow the daemon for as long as the program runs.
-async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) {
+async fn follow(
+    app: AppHandle,
+    link: mpsc::UnboundedSender<Command>,
+    mut commands: mpsc::UnboundedReceiver<Command>,
+) {
+    let notifier = system_notes::Notifier::new(&app.config().identifier);
     loop {
         let Some(socket) = deck_proto::paths::default_socket() else {
             publish(&app, View::offline(deck_i18n::t("No data folder found.")));
@@ -171,18 +266,20 @@ async fn follow(app: AppHandle, mut commands: mpsc::UnboundedReceiver<Command>) 
                 loop {
                     tokio::select! {
                         msg = client.next() => match msg {
-                            Ok(_) => publish(&app, view(&client)),
+                            Ok(msg) => {
+                                publish(&app, view(&client));
+                                notify(&app, &notifier, &link, &client, &msg);
+                            }
                             Err(_) => break,
                         },
                         cmd = commands.recv() => match cmd {
-                            Some(Command::Answer { request_id, allow }) => {
+                            Some(Command::Answer { request_id, allow, expanded, via }) => {
                                 let decision = if allow {
-                                    // The panel shows the full text before it offers "Allow".
-                                    Decision::Allow { always: None, expanded: true }
+                                    Decision::Allow { always: None, expanded }
                                 } else {
                                     Decision::Deny { message: None }
                                 };
-                                if client.answer(&request_id, decision, AnswerVia::Panel).await.is_err() {
+                                if client.answer(&request_id, decision, via).await.is_err() {
                                     break;
                                 }
                             }
@@ -234,6 +331,7 @@ fn toggle_panel(app: &AppHandle) {
 
 fn main() {
     let (tx, rx) = mpsc::unbounded_channel();
+    let link = tx.clone();
     let result = tauri::Builder::default()
         .manage(Link(tx))
         .manage(Last::default())
@@ -299,7 +397,7 @@ fn main() {
             if !std::env::args().any(|a| a == "--hidden") {
                 toggle_panel(app.handle());
             }
-            tauri::async_runtime::spawn(follow(app.handle().clone(), rx));
+            tauri::async_runtime::spawn(follow(app.handle().clone(), link, rx));
             Ok(())
         })
         .run(tauri::generate_context!());

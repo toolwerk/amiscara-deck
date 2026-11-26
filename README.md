@@ -294,7 +294,9 @@ scripts/package-windows.sh
 
 ## Oberfläche für Linux und Windows
 
-Die erste Fassung zeigt ein Symbol in der Leiste und ein Panel. Das Symbol wird orange, sobald eine Freigabe wartet. Das Panel listet die Agenten, wartende Freigaben stehen oben mit **Erlauben** und **Ablehnen**. Lange Anfragen zeigen erst **Ansehen**, wie auf dem Mac. Fragen und Pläne beantworten Sie weiter dort, wo der Agent läuft. Mitteilungen und die Anwesenheit folgen.
+Die erste Fassung zeigt ein Symbol in der Leiste und ein Panel. Das Symbol wird orange, sobald eine Freigabe wartet. Das Panel listet die Agenten, wartende Freigaben stehen oben mit **Erlauben** und **Ablehnen**. Lange Anfragen zeigen erst **Ansehen**, wie auf dem Mac. Fragen und Pläne beantworten Sie weiter dort, wo der Agent läuft. Die Anwesenheit folgt.
+
+Wartet ein Agent, kommt eine Mitteilung. Wann, entscheidet der Dienst wie auf dem Mac. Ist die Anfrage kurz, stehen in der Mitteilung **Erlauben** und **Ablehnen**. Bei einer langen Anfrage steht dort **Ansehen**, das Panel öffnet sich dann mit dem ganzen Text. Unter Windows bleibt die Mitteilung stehen, bis Sie antworten. Unter Linux hängen die Knöpfe vom Desktop ab: GNOME und KDE zeigen sie. Ohne Knöpfe öffnet ein Klick auf die Mitteilung das Panel.
 
 Das Hauptfenster öffnen Sie über den Link unten im Panel oder über "Hauptfenster öffnen" im Menü am Symbol. Es zeigt die Agenten als Karten mit einem Filter nach Status und die geschätzten Kosten des Tages. Rechts steht zum gewählten Agenten die Anfrage, der letzte Auftrag, Kennzahlen wie Kontext und Züge und der Verlauf.
 

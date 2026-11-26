@@ -294,7 +294,9 @@ scripts/package-windows.sh
 
 ## Interface for Linux and Windows
 
-The first version shows an icon in the tray and a panel. The icon turns orange as soon as an approval waits. The panel lists the agents, waiting approvals are on top with **Allow** and **Deny**. Long requests show **View** first, as on the Mac. Questions and plans are still answered where the agent runs. Notifications and presence follow.
+The first version shows an icon in the tray and a panel. The icon turns orange as soon as an approval waits. The panel lists the agents, waiting approvals are on top with **Allow** and **Deny**. Long requests show **View** first, as on the Mac. Questions and plans are still answered where the agent runs. Presence follows.
+
+When an agent waits, a notification comes. The daemon decides when, as on the Mac. For a short request the notification shows **Allow** and **Deny**. For a long one it shows **View**, which opens the panel with the whole text. On Windows the notification stays until you answer. On Linux the buttons depend on the desktop: GNOME and KDE show them. Without buttons a click on the notification opens the panel.
 
 Open the main window with the link at the bottom of the panel or with "Open main window" in the icon menu. It shows the agents as cards with a status filter and the estimated cost of the day. On the right it shows the request of the selected agent, its last task, key figures such as context and turns, and its history.
 

@@ -331,47 +331,47 @@ msgid_plural "{n} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "{name} has a question"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "{name} is waiting for approval"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "{start}…\nLong: view it first, then allow."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "{name} is waiting in the terminal"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "Answer there. Deck does not hold this request."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "{name} is done"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "Branch {branch}"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/deck-desktop/src-tauri/src/notes.rs
 msgid "The agent is waiting for a new task."
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src-tauri/src/notes.rs apps/deck-desktop/src/RequestCard.svelte
 msgid "Allow"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src-tauri/src/notes.rs apps/deck-desktop/src/RequestCard.svelte
 msgid "Deny"
 msgstr ""
 
-#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src/RequestCard.svelte
+#: apps/AmiscaraDeck/AmiscaraDeck/Model/Notifications.swift apps/AmiscaraDeck/AmiscaraDeck/Model/UpdaterController.swift apps/AmiscaraDeck/AmiscaraDeck/Views/RequestCardView.swift apps/deck-desktop/src-tauri/src/notes.rs apps/deck-desktop/src/RequestCard.svelte
 msgid "View"
 msgstr ""
 
@@ -1269,7 +1269,7 @@ msgstr ""
 msgid "No data folder found."
 msgstr ""
 
-#: apps/deck-desktop/src-tauri/src/main.rs
+#: apps/deck-desktop/src-tauri/src/main.rs apps/deck-desktop/src-tauri/src/system_notes.rs
 msgid "Open panel"
 msgstr ""
 
