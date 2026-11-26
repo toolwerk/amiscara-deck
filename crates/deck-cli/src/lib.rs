@@ -8,6 +8,7 @@
 
 mod answer;
 mod daemon_cmd;
+mod daemon_win;
 mod hooks_cmd;
 mod live;
 mod sim_cmd;
@@ -39,7 +40,8 @@ Usage:
   --settings  Settings file of Claude Code (default: ~/.claude/settings.json)
   --program   Path of the hook program (default: deck-hook next to this program)
   --force     Install even if the hook program is missing or not executable
-  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux
+  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux,
+              Run key on Windows
 
 Exit codes: 0 done, 1 failed, 2 wrong usage,
 3 (status) not all hooks installed.

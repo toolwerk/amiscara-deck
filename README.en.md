@@ -279,7 +279,7 @@ Unpack the package and set it up in PowerShell:
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
-`install.ps1` puts the programs into `%LOCALAPPDATA%\Programs\Amiscara Deck`, installs the hooks in `%USERPROFILE%\.claude\settings.json` and starts the daemon. It runs until you log off, starting at login follows. `install.ps1 -Uninstall` removes the hooks and ends the daemon.
+`install.ps1` puts the programs into `%LOCALAPPDATA%\Programs\Amiscara Deck`, installs the hooks in `%USERPROFILE%\.claude\settings.json` and registers the daemon to start at login (Run key of your user, no administrator rights). It starts at once and without a window, its messages are in `deckd.log` in the data folder `%LOCALAPPDATA%\Amiscara Deck`. `install.ps1 -Uninstall` removes hooks and start at login and ends the daemon.
 
 Do not start the daemon as administrator: then the hook program cannot reach it, and Claude Code shows its normal dialog. Claude Code in WSL does not reach the daemon on Windows yet.
 
@@ -303,7 +303,7 @@ The app ships the program `amiscara-deck`:
 | `watch` | print changes as they happen |
 | `answer <request> allow\|deny` | answer a request |
 | `hooks status\|install\|uninstall` | manage the entries in Claude Code |
-| `daemon status\|install\|uninstall` | start the daemon at login, without the app (macOS: LaunchAgent, Linux: systemd) |
+| `daemon status\|install\|uninstall` | start the daemon at login, without the app (macOS: LaunchAgent, Linux: systemd, Windows: Run key) |
 | `sim demo` | play made up agents, to try things out without spending tokens |
 
 `amiscara-deck help` shows the options. Its output is English or German, following the environment: the first value set of `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` counts.

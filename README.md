@@ -279,7 +279,7 @@ Das Paket entpacken und in PowerShell einrichten:
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
-`install.ps1` legt die Programme nach `%LOCALAPPDATA%\Programs\Amiscara Deck`, baut die Hooks in `%USERPROFILE%\.claude\settings.json` ein und startet den Dienst. Er läuft bis zum Abmelden, der Start beim Anmelden folgt. `install.ps1 -Uninstall` baut die Hooks aus und beendet den Dienst.
+`install.ps1` legt die Programme nach `%LOCALAPPDATA%\Programs\Amiscara Deck`, baut die Hooks in `%USERPROFILE%\.claude\settings.json` ein und trägt den Dienst für den Start beim Anmelden ein (Run-Schlüssel Ihres Benutzers, ohne Administratorrechte). Er startet sofort und ohne Fenster, seine Meldungen stehen in `deckd.log` im Datenordner `%LOCALAPPDATA%\Amiscara Deck`. `install.ps1 -Uninstall` baut Hooks und Start beim Anmelden aus und beendet den Dienst.
 
 Den Dienst nicht als Administrator starten: Dann kann das Hook-Programm ihn nicht erreichen, und Claude Code zeigt seinen normalen Dialog. Claude Code in WSL erreicht den Dienst unter Windows noch nicht.
 
@@ -303,7 +303,7 @@ Die App bringt das Programm `amiscara-deck` mit:
 | `watch` | Änderungen laufend ausgeben |
 | `answer <Anfrage> allow\|deny` | eine Anfrage beantworten |
 | `hooks status\|install\|uninstall` | Einträge in Claude Code verwalten |
-| `daemon status\|install\|uninstall` | den Dienst beim Anmelden starten, ohne die App (macOS: LaunchAgent, Linux: systemd) |
+| `daemon status\|install\|uninstall` | den Dienst beim Anmelden starten, ohne die App (macOS: LaunchAgent, Linux: systemd, Windows: Run-Schlüssel) |
 | `sim demo` | erfundene Agenten abspielen, zum Ausprobieren ohne Tokens |
 
 `amiscara-deck help` zeigt alle Optionen. Die Ausgabe ist deutsch oder englisch, je nach Umgebung: Es zählt der erste gesetzte Wert aus `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` und `LANG`.

@@ -14,6 +14,7 @@ mod server;
 mod state;
 pub mod systemd;
 mod tmux;
+pub mod winrun;
 
 pub use deck_proto::paths::default_data_dir;
 pub use server::{Config, Daemon, Error};

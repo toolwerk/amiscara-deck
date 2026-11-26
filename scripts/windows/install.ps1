@@ -1,6 +1,6 @@
 # Installs Amiscara Deck for the current user: copies the programs to
 # %LOCALAPPDATA%\Programs\Amiscara Deck, installs the hooks in Claude Code and
-# starts the daemon.
+# starts the daemon now and at every login.
 #
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -File install.ps1 -Uninstall
@@ -31,6 +31,6 @@ Write-Output "Programs in $bin"
 & $cli daemon install
 if ($LASTEXITCODE -ne 0) {
     Start-Process -FilePath $daemon -WindowStyle Hidden
-    Write-Output 'The daemon is running until you log off.'
+    Write-Output 'Start at login failed; the daemon runs until you log off.'
 }
 & $cli daemon status

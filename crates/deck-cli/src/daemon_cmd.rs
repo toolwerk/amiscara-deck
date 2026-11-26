@@ -1,5 +1,6 @@
 //! `daemon install|uninstall|status`: start the daemon at login. A
-//! LaunchAgent on macOS, a systemd user unit on Linux.
+//! LaunchAgent on macOS, a systemd user unit on Linux, a value in the Run key
+//! on Windows (`daemon_win`).
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -110,16 +111,12 @@ fn launchctl(args: &[&str]) -> bool {
 }
 
 pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
-    if cfg!(windows) {
-        let _ = writeln!(
-            err,
-            "{}",
-            t("Start at login is not available on Windows yet. Start amiscara-deckd yourself.")
-        );
-        return 1;
-    }
     let Some(o) = parse(opts, err) else { return 2 };
+    let windows = cfg!(windows);
     match sub {
+        "install" if windows => crate::daemon_win::install(&o.program, &o.data_dir, out, err),
+        "uninstall" if windows => crate::daemon_win::uninstall(&o.data_dir, out, err),
+        "status" if windows => crate::daemon_win::status(&o.program, &o.data_dir, out),
         "install" => install(&o, out, err),
         "uninstall" => uninstall(&o, out, err),
         "status" => status(&o, out),
