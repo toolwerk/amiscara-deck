@@ -1,11 +1,33 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { invoke } from "@tauri-apps/api/core";
   import { t } from "./i18n";
   import AgentLine from "./AgentLine.svelte";
   import RequestCard from "./RequestCard.svelte";
   import { deck, follow, openMain } from "./store.svelte";
 
   onMount(follow);
+
+  /// Whether Claude Code reports to Deck: "installed", "missing" or "unknown".
+  let hooks = $state("unknown");
+  let installing = $state(false);
+  let hooksError = $state<string | null>(null);
+  onMount(() => {
+    invoke<string>("hooks_state").then((s) => (hooks = s));
+  });
+
+  async function installHooks() {
+    installing = true;
+    try {
+      await invoke("install_hooks");
+      hooksError = null;
+      hooks = await invoke<string>("hooks_state");
+    } catch (e) {
+      hooksError = String(e);
+    } finally {
+      installing = false;
+    }
+  }
 
   const waiting = $derived(
     deck.view?.agents.filter((a) => a.request?.state === "held").length ?? 0,
@@ -21,6 +43,16 @@
       </span>
     {/if}
   </header>
+
+  {#if hooks === "missing"}
+    <div class="setup">
+      <p>{t("Claude Code does not report to Deck yet.")}</p>
+      <button class="allow" disabled={installing} onclick={installHooks}>{t("Connect Claude Code")}</button>
+      {#if hooksError}
+        <p class="warn">{hooksError}</p>
+      {/if}
+    </div>
+  {/if}
 
   {#if deck.view === null}
     <p class="note">{t("Connecting to the daemon …")}</p>
@@ -80,6 +112,16 @@
   }
   .agent.held {
     border-color: var(--wait);
+  }
+  .setup {
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+  }
+  .setup p {
+    margin: 0 0 8px;
   }
   footer {
     margin-top: 12px;

@@ -960,3 +960,12 @@ msgstr "Panel öffnen"
 
 msgid "Open main window"
 msgstr "Hauptfenster öffnen"
+
+msgid "Could not install the hooks."
+msgstr "Die Hooks ließen sich nicht einbauen."
+
+msgid "Claude Code does not report to Deck yet."
+msgstr "Claude Code meldet sich noch nicht bei Deck."
+
+msgid "Connect Claude Code"
+msgstr "Claude Code einbinden"

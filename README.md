@@ -300,7 +300,11 @@ Wartet ein Agent, kommt eine Mitteilung. Wann, entscheidet der Dienst wie auf de
 
 Das Hauptfenster öffnen Sie über den Link unten im Panel oder über "Hauptfenster öffnen" im Menü am Symbol. Es zeigt die Agenten als Karten mit einem Filter nach Status und die geschätzten Kosten des Tages. Rechts steht zum gewählten Agenten die Anfrage, der letzte Auftrag, Kennzahlen wie Kontext und Züge und der Verlauf.
 
-Die Oberfläche braucht den laufenden Dienst (siehe [Linux](#linux) und [Windows](#windows)). Beim Start öffnet sich das Panel, Schließen versteckt es nur. Ein Klick auf das Symbol (unter Linux im Menü am Symbol "Panel öffnen") öffnet es wieder.
+Installieren: unter Windows mit dem Setup (`Amiscara Deck_<Version>_x64-setup.exe`), unter Linux mit dem deb-Paket (`sudo apt install "./Amiscara Deck_<Version>_amd64.deb"`) oder als AppImage. Dienst, Hook-Programm und Befehlszeile sind dabei, die Pakete aus [Linux](#linux) und [Windows](#windows) brauchen Sie dann nicht. Beim ersten Start richtet die Oberfläche den Dienst ein, er startet ab dann bei jeder Anmeldung. Meldet sich Claude Code noch nicht bei Deck, zeigt das Panel **Claude Code einbinden**. Ein Klick baut die Hooks in `~/.claude/settings.json` ein. Das AppImage legt seine Programme dafür nach `~/.local/share/amiscara-deck/bin`, weil sich sein eigener Ort bei jedem Start ändert.
+
+Unter Windows nimmt das Entfernen in den Einstellungen Dienst und Hooks mit. Vor dem Entfernen des deb-Pakets oder des AppImage geben Sie `amiscara-deck daemon uninstall` und `amiscara-deck hooks uninstall` ein.
+
+Beim Start öffnet sich das Panel, Schließen versteckt es nur. Ein Klick auf das Symbol (unter Linux im Menü am Symbol "Panel öffnen") öffnet es wieder.
 
 Für die Automatik meldet die Oberfläche dem Dienst, wo Sie sind: das vordere Programm, wie lange Sie nichts getippt haben und ob der Bildschirm gesperrt ist. Sitzen Sie am Terminal des Agenten, schweigt Deck wie auf dem Mac. Unter Windows klappt das mit jedem Terminal. Unter Linux kennt Deck das vordere Programm mit X11, mit KDE und mit Hyprland. GNOME mit Wayland verrät es nicht. Dort meldet Deck in der Automatik jede Freigabe, lieber einmal zu oft. Agenten in WSL erkennt Deck nicht am Terminal, auch für sie kommt in der Automatik immer eine Mitteilung.
 
