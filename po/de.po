@@ -888,3 +888,21 @@ msgstr "Schriftgröße"
 
 msgid "In the window also with ⌘+, ⌘- and ⌘0."
 msgstr "Im Fenster auch mit ⌘+, ⌘- und ⌘0."
+
+msgid "Default profile"
+msgstr "Standardprofil"
+
+msgid "Add profile …"
+msgstr "Profil hinzufügen …"
+
+msgid "Choose the Claude Code configuration folder."
+msgstr "Wähle den Konfigurationsordner von Claude Code."
+
+msgid "This profile is already listed."
+msgstr "Dieses Profil ist bereits eingetragen."
+
+msgid "Remove profile"
+msgstr "Profil entfernen"
+
+msgid "Uninstall the hooks before removing a profile."
+msgstr "Baue die Hooks aus, bevor du ein Profil entfernst."

@@ -78,6 +78,8 @@ Running sessions appear with their next event, new ones at once.
 
 Installing only adds Deck's own entries to `~/.claude/settings.json`. Entries of other programs stay as they are. Before every change a backup is written next to the file (`settings.json.deck-….bak`), the last five are kept. "Uninstall" takes the entries out again.
 
+For another configuration folder (for example when using `CLAUDE_CONFIG_DIR`), choose **Add profile …** under Claude Code and install that profile’s hooks. Questions and approvals from all connected profiles arrive in the same Deck instance.
+
 ## The symbol and the panel
 
 The symbol in the menu bar shows whether somebody is waiting for you. You can switch off the number next to it.

@@ -1,3 +1,4 @@
+import AppKit
 import ServiceManagement
 import SwiftUI
 
@@ -5,9 +6,7 @@ import SwiftUI
 struct DeckSettingsView: View {
     let model: DeckModel
     let hooks: HooksControl
-    @State private var hooksStatus: HooksStatus?
-    @State private var hooksMessage: String?
-    @State private var claudeVersion: ClaudeVersionCheck?
+    @State private var autostartMessage: String?
     @State private var codexStatus: HooksStatus?
     @State private var codexMessage: String?
     @State private var codexThere = false
@@ -23,35 +22,7 @@ struct DeckSettingsView: View {
                 WaitTimeSlider(model: model)
             }
             AttentionSection(model: model)
-            Section("Claude Code") {
-                if let v = claudeVersion {
-                    Text(HooksText.versionLine(v)).deckFont(12).foregroundStyle(Theme.secondary)
-                    if let w = HooksText.versionWarning(v) {
-                        Text(w).deckFont(12).foregroundStyle(Theme.waiting)
-                    }
-                }
-                if let s = hooksStatus {
-                    Text(HooksText.summary(s)).deckFont(13)
-                    if let f = HooksText.foreign(s) {
-                        Text(f).deckFont(12).foregroundStyle(Theme.secondary)
-                    }
-                    Text(s.settingsPath).deckFont(11).foregroundStyle(Theme.secondary).textSelection(.enabled)
-                } else {
-                    Text(L10n.t("Status unknown.")).foregroundStyle(Theme.secondary)
-                }
-                HStack {
-                    Button(hooksStatus.map(HooksText.isInstalled) == true ? L10n.t("Reinstall") : L10n.t("Install")) {
-                        run(hooks.install, done: L10n.t("Installed."))
-                    }
-                    Button(L10n.t("Uninstall")) { run(hooks.uninstall, done: L10n.t("Uninstalled.")) }
-                        .disabled((hooksStatus?.installed ?? 0) == 0)
-                }
-                if let m = hooksMessage {
-                    Text(m).deckFont(12).foregroundStyle(Theme.secondary)
-                }
-                Text(L10n.t("Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."))
-                    .deckFont(11).foregroundStyle(Theme.secondary)
-            }
+            ClaudeHooksSection(hooks: hooks)
             if codexThere {
                 Section("Codex") {
                     Toggle(L10n.t("Approvals for Codex"), isOn: Binding(
@@ -84,6 +55,9 @@ struct DeckSettingsView: View {
             UpdateSection(updater: .shared)
             Section(L10n.t("Start")) {
                 Toggle(L10n.t("Start at login"), isOn: Binding(get: { autostart }, set: setAutostart))
+                if let autostartMessage {
+                    Text(autostartMessage).deckFont(12).foregroundStyle(Theme.secondary)
+                }
             }
             Section(L10n.t("History")) {
                 Picker(L10n.t("Keep"), selection: Binding(
@@ -107,24 +81,8 @@ struct DeckSettingsView: View {
     }
 
     private func refresh() {
-        hooksStatus = try? hooks.status()
         codexThere = hooks.codexPresent()
         codexStatus = codexThere ? try? hooks.codexStatus() : nil
-        let check = hooks.version
-        Task {
-            let v = await Task.detached { check() }.value
-            claudeVersion = v
-        }
-    }
-
-    private func run(_ action: () throws -> HooksChange, done: String) {
-        do {
-            let change = try action()
-            hooksMessage = change.changed ? done : L10n.t("Nothing to change.")
-        } catch {
-            hooksMessage = L10n.t("Error: {error}", ["error": String(describing: error)])
-        }
-        refresh()
     }
 
     private func runCodex(_ action: () throws -> HooksChange, done: String) {
@@ -140,10 +98,142 @@ struct DeckSettingsView: View {
     private func setAutostart(_ on: Bool) {
         do {
             if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            autostartMessage = nil
         } catch {
-            hooksMessage = L10n.t("Start at login: {error}", ["error": error.localizedDescription])
+            autostartMessage = L10n.t("Start at login: {error}", ["error": error.localizedDescription])
         }
         autostart = SMAppService.mainApp.status == .enabled
+    }
+}
+
+/// Every profile writes only its own Claude Code settings file.
+private struct ClaudeHooksSection: View {
+    let hooks: HooksControl
+    @AppStorage("claudeHookProfiles") private var profiles = ClaudeProfiles()
+    @State private var version: ClaudeVersionCheck?
+    @State private var profileMessage: String?
+
+    var body: some View {
+        Section("Claude Code") {
+            if let version {
+                Text(HooksText.versionLine(version)).deckFont(12).foregroundStyle(Theme.secondary)
+                if let warning = HooksText.versionWarning(version) {
+                    Text(warning).deckFont(12).foregroundStyle(Theme.waiting)
+                }
+            }
+            ClaudeHooksRow(
+                title: L10n.t("Default profile"),
+                status: hooks.status, install: hooks.install, uninstall: hooks.uninstall
+            )
+            ForEach(profiles.paths, id: \.self) { path in
+                ClaudeHooksRow(
+                    title: URL(fileURLWithPath: path).deletingLastPathComponent().lastPathComponent,
+                    path: path,
+                    status: { try hooks.profileStatus(path) },
+                    install: { try hooks.profileInstall(path) },
+                    uninstall: { try hooks.profileUninstall(path) },
+                    remove: { profiles.remove(path) }
+                )
+            }
+            Button(L10n.t("Add profile …"), action: addProfile)
+            if let profileMessage {
+                Text(profileMessage).deckFont(12).foregroundStyle(Theme.secondary)
+            }
+            Text(L10n.t("Before every change Deck makes a backup of the file. Running sessions pick up new hooks with their next event."))
+                .deckFont(11).foregroundStyle(Theme.secondary)
+        }
+        .task {
+            let check = hooks.version
+            version = await Task.detached { check() }.value
+        }
+    }
+
+    private func addProfile() {
+        let panel = NSOpenPanel()
+        panel.message = L10n.t("Choose the Claude Code configuration folder.")
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.showsHiddenFiles = true
+        panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser
+        panel.begin { response in
+            guard response == .OK, let folder = panel.url else { return }
+            let defaultPath = (try? hooks.status())?.settingsPath
+            profileMessage = profiles.add(folder: folder, defaultSettingsPath: defaultPath)
+                ? nil : L10n.t("This profile is already listed.")
+        }
+    }
+}
+
+private struct ClaudeHooksRow: View {
+    let title: String
+    var path: String?
+    let status: () throws -> HooksStatus
+    let install: () throws -> HooksChange
+    let uninstall: () throws -> HooksChange
+    var remove: (() -> Void)?
+
+    @State private var current: HooksStatus?
+    @State private var message: String?
+    @State private var statusError: String?
+
+    private var hasHooks: Bool {
+        (current?.installed ?? 0) > 0 || (current?.outdated ?? 0) > 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title).deckFont(13).bold()
+            if let current {
+                Text(HooksText.summary(current)).deckFont(13)
+                if let foreign = HooksText.foreign(current) {
+                    Text(foreign).deckFont(12).foregroundStyle(Theme.secondary)
+                }
+            } else {
+                Text(statusError ?? L10n.t("Status unknown.")).deckFont(12).foregroundStyle(Theme.secondary)
+            }
+            if let path = current?.settingsPath ?? path {
+                Text(path).deckFont(11).foregroundStyle(Theme.secondary).textSelection(.enabled)
+            }
+            HStack {
+                Button(current.map(HooksText.isInstalled) == true ? L10n.t("Reinstall") : L10n.t("Install")) {
+                    run(install, done: L10n.t("Installed."))
+                }
+                .disabled(current == nil)
+                Button(L10n.t("Uninstall")) { run(uninstall, done: L10n.t("Uninstalled.")) }
+                    .disabled(!hasHooks)
+                if let remove {
+                    Button(L10n.t("Remove profile"), action: remove)
+                        .disabled(hasHooks)
+                        .help(L10n.t("Uninstall the hooks before removing a profile."))
+                }
+            }
+            if let message {
+                Text(message).deckFont(12).foregroundStyle(Theme.secondary)
+            }
+        }
+        .onAppear(perform: refresh)
+    }
+
+    private func refresh() {
+        do {
+            current = try status()
+            statusError = nil
+        } catch {
+            current = nil
+            statusError = L10n.t("Error: {error}", ["error": String(describing: error)])
+        }
+    }
+
+    private func run(_ action: () throws -> HooksChange, done: String) {
+        do {
+            let change = try action()
+            message = change.changed ? done : L10n.t("Nothing to change.")
+        } catch {
+            message = L10n.t("Error: {error}", ["error": String(describing: error)])
+        }
+        refresh()
     }
 }
 
