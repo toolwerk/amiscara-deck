@@ -3,15 +3,15 @@
 # without a daemon. Uses its own data folder.
 $ErrorActionPreference = 'Stop'
 $bin = if ($args.Count -gt 0) { $args[0] } else { 'target\debug' }
-$env:DECK_DATA_DIR = Join-Path $env:RUNNER_TEMP 'deck-smoke'
-if (-not $env:RUNNER_TEMP) { $env:DECK_DATA_DIR = Join-Path $env:TEMP 'deck-smoke' }
+$tmp = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { $env:TEMP }
+$env:DECK_DATA_DIR = Join-Path $tmp 'deck-smoke'
 Remove-Item -Recurse -Force $env:DECK_DATA_DIR -ErrorAction SilentlyContinue
 
 function Fail($msg) { Write-Error $msg; exit 1 }
 
 # No daemon: the hook program prints nothing and ends with 0.
-$event = '{"session_id":"s1","hook_event_name":"PermissionRequest","cwd":"C:\\x","tool_name":"Bash","tool_input":{"command":"ls"}}'
-$out = $event | & "$bin\deck-hook.exe"
+$request = '{"session_id":"s1","hook_event_name":"PermissionRequest","cwd":"C:\\x","tool_name":"Bash","tool_input":{"command":"ls"}}'
+$out = $request | & "$bin\deck-hook.exe"
 if ($LASTEXITCODE -ne 0 -or $out) { Fail "hook without daemon: exit $LASTEXITCODE, output '$out'" }
 
 $daemon = Start-Process -FilePath "$bin\amiscara-deckd.exe" -PassThru -NoNewWindow
@@ -29,7 +29,7 @@ try {
     $out = $start | & "$bin\deck-hook.exe"
     if ($LASTEXITCODE -ne 0 -or $out) { Fail "hook SessionStart: exit $LASTEXITCODE, output '$out'" }
     # No UI is connected: a permission request is not held, no output.
-    $out = $event | & "$bin\deck-hook.exe"
+    $out = $request | & "$bin\deck-hook.exe"
     if ($LASTEXITCODE -ne 0 -or $out) { Fail "hook PermissionRequest: exit $LASTEXITCODE, output '$out'" }
     Start-Sleep -Milliseconds 500
     $json = & "$bin\amiscara-deck.exe" list --json | ConvertFrom-Json

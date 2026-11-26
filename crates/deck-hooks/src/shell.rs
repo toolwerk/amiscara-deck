@@ -12,6 +12,8 @@ pub fn quote(s: &str) -> String {
     }
     if cfg!(windows) {
         // A Windows path holds no `"`; `$` and `` ` `` would expand in bash.
+        // Claude Code runs hooks through Git Bash on Windows, so the escapes
+        // are bash escapes; `cmd` would keep the backslash.
         let escaped: String = s
             .chars()
             .flat_map(|c| match c {

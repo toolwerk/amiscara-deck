@@ -181,14 +181,28 @@ fn exchange(opts: &Options, line: &str, answer: bool) -> Option<String> {
     /// act as that user (std adds `SECURITY_SQOS_PRESENT`).
     const SECURITY_IDENTIFICATION: u32 = 1 << 16;
 
+    /// All instances of the pipe are taken: the daemon is between accepting
+    /// one client and offering the next instance.
+    const ERROR_PIPE_BUSY: i32 = 231;
+
     let name = deck_proto::paths::read_pipe_name(&opts.socket).ok()?;
-    let pipe = within(opts.connect_timeout, move || {
-        std::fs::OpenOptions::new()
-            .read(true)
-            .write(true)
-            .security_qos_flags(SECURITY_IDENTIFICATION)
-            .open(name)
-            .ok()
+    let limit = opts.connect_timeout;
+    let pipe = within(limit, move || {
+        let start = std::time::Instant::now();
+        loop {
+            match std::fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .security_qos_flags(SECURITY_IDENTIFICATION)
+                .open(&name)
+            {
+                Ok(pipe) => return Some(pipe),
+                Err(e) if e.raw_os_error() == Some(ERROR_PIPE_BUSY) && start.elapsed() < limit => {
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                Err(_) => return None,
+            }
+        }
     })?;
     let pipe = std::sync::Arc::new(pipe);
     let writer = pipe.clone();
