@@ -27,6 +27,24 @@ export interface Request {
   questions: unknown[];
 }
 
+export type HistoryEvent =
+  | { event: "session_started" }
+  | { event: "prompt_received" }
+  | ({ event: "activity" } & Activity)
+  | { event: "permission_requested" }
+  | { event: "compacting" }
+  | { event: "turn_ended" }
+  | { event: "turn_failed" }
+  | { event: "session_ended" }
+  | { event: "allowed" }
+  | { event: "denied" }
+  | { event: "answered" };
+
+export interface HistoryEntry {
+  at_ms: number;
+  event: HistoryEvent;
+}
+
 export interface Agent {
   id: string;
   host: string;
@@ -38,13 +56,24 @@ export interface Agent {
   status_since_ms: number;
   activity: Activity | null;
   last_prompt: string | null;
+  context: { used_tokens: number; window_tokens: number } | null;
+  turns: number | null;
+  subagents: number;
   request: Request | null;
+  history: HistoryEntry[];
+  cost_micro_usd: number | null;
 }
 
 export interface View {
   connected: boolean;
   problem: string | null;
   agents: Agent[];
+  /// What today cost on this machine, in millionths of a US dollar (estimate).
+  today_micro_usd: number | null;
+}
+
+export function displayName(a: Agent): string {
+  return a.project ?? a.title ?? a.id;
 }
 
 export function activityText(a: Activity): string {
@@ -174,4 +203,113 @@ export function fullText(r: Request): string {
 /// Only these can be answered here; questions and plans stay where the agent runs.
 export function answerable(r: Request): boolean {
   return r.state === "held" && r.questions.length === 0 && r.tool_name !== "ExitPlanMode";
+}
+
+/// One line of the history, as the Mac app words it.
+export function historyText(e: HistoryEvent): string {
+  switch (e.event) {
+    case "session_started":
+      return t("Session started");
+    case "prompt_received":
+      return t("Task received");
+    case "activity": {
+      const { event: _, ...activity } = e;
+      return activityText(activity as Activity);
+    }
+    case "permission_requested":
+      return t("Approval requested");
+    case "compacting":
+      return t("Compacting context");
+    case "turn_ended":
+      return t("Turn ended");
+    case "turn_failed":
+      return t("Turn ended with an error");
+    case "session_ended":
+      return t("Session ended");
+    case "allowed":
+      return t("Approval allowed");
+    case "denied":
+      return t("Approval denied");
+    case "answered":
+      return t("Question answered");
+  }
+}
+
+/// "5 min" since a moment, as short as the history needs it.
+export function relativeShort(thenMs: number, nowMs: number): string {
+  const seconds = nowMs > thenMs ? Math.floor((nowMs - thenMs) / 1000) : 0;
+  if (seconds < 60) return t("{n} s", { n: seconds });
+  if (seconds < 3600) return t("{n} min", { n: Math.floor(seconds / 60) });
+  if (seconds < 86400) return t("{n} h", { n: Math.floor(seconds / 3600) });
+  return t("{n} d", { n: Math.floor(seconds / 86400) });
+}
+
+/// "128K", "1M", "1.5M".
+export function tokens(n: number): string {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) return t("{n}K", { n: Math.floor(n / 1000) });
+  const m = n / 1_000_000;
+  if (m === Math.round(m)) return t("{n}M", { n: m });
+  const [whole, tenth] = m.toFixed(1).split(".");
+  return t("{whole}.{tenth}M", { whole, tenth: tenth ?? "0" });
+}
+
+export function contextText(a: Agent): string | null {
+  if (!a.context || a.context.window_tokens === 0) return null;
+  return t("{used} of {window}", {
+    used: tokens(a.context.used_tokens),
+    window: tokens(a.context.window_tokens),
+  });
+}
+
+/// How full the context is, 0 to 1, or null when unknown.
+export function contextFill(a: Agent): number | null {
+  if (!a.context || a.context.window_tokens === 0) return null;
+  return Math.min(1, a.context.used_tokens / a.context.window_tokens);
+}
+
+/// "$1.23" from millionths of a US dollar; under a cent "< $0.01".
+export function costAmount(microUsd: number): string {
+  if (microUsd === 0) return t("$0.00");
+  if (microUsd < 10_000) return t("< $0.01");
+  const cents = Math.floor(microUsd / 10_000) + (microUsd % 10_000 >= 5_000 ? 1 : 0);
+  const rest = cents % 100;
+  return t("${dollars}.{cents}", {
+    dollars: Math.floor(cents / 100),
+    cents: (rest < 10 ? "0" : "") + rest,
+  });
+}
+
+/// The status filter of the main window.
+export type Filter = "all" | "waiting" | "working" | "done" | "other";
+export const filters: Filter[] = ["all", "waiting", "working", "done", "other"];
+
+export function filterTitle(f: Filter): string {
+  switch (f) {
+    case "all":
+      return t("All");
+    case "waiting":
+      return t("Waiting");
+    case "working":
+      return t("Working");
+    case "done":
+      return t("Done");
+    case "other":
+      return t("Other");
+  }
+}
+
+export function matches(f: Filter, s: Status): boolean {
+  switch (f) {
+    case "all":
+      return true;
+    case "waiting":
+      return s === "blocked";
+    case "working":
+      return s === "working";
+    case "done":
+      return s === "done";
+    case "other":
+      return s === "idle" || s === "error" || s === "exited";
+  }
 }

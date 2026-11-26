@@ -8,6 +8,7 @@ Version 0.1.0 and older are only listed in the German [CHANGELOG.md](CHANGELOG.m
 
 ### Added
 
+- Linux and Windows: main window with a status filter, the cost of the day and a column with request, last task, key figures and history of the selected agent
 - First interface for Linux and Windows (Tauri and Svelte, `apps/deck-desktop`): tray icon, panel with agents, allow and deny. CI builds installers for both systems
 - Windows: `install.ps1 -Wsl` also installs the hooks for Claude Code in WSL, its requests reach the daemon on Windows. CI checks this with a Debian distribution
 - Windows: `amiscara-deck daemon install` starts the daemon at login through the Run key of the user, without a window, messages in `deckd.log`

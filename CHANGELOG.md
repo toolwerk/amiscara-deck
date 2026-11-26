@@ -6,6 +6,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
+- Linux und Windows: Hauptfenster mit Filter nach Status, Kosten des Tages und einer Spalte mit Anfrage, letztem Auftrag, Kennzahlen und Verlauf des gewählten Agenten
 - Erste Oberfläche für Linux und Windows (Tauri und Svelte, `apps/deck-desktop`): Symbol in der Leiste, Panel mit Agenten, Erlauben und Ablehnen. Die CI baut Installer für beide Systeme
 - Windows: `install.ps1 -Wsl` baut die Hooks auch für Claude Code in WSL ein, die Anfragen landen beim Dienst unter Windows. Die CI prüft das mit einer Debian-Distribution
 - Windows: `amiscara-deck daemon install` startet den Dienst beim Anmelden über den Run-Schlüssel des Benutzers, ohne Fenster, Meldungen in `deckd.log`
