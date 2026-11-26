@@ -6,7 +6,7 @@ Alle nennenswerten Änderungen stehen hier, nach [Keep a Changelog](https://keep
 
 ### Added
 
-- Mehrere Claude-Code-Profile lassen sich in den Einstellungen unabhängig einbinden.
+- Mehrere Claude-Code-Profile lassen sich in den Einstellungen unabhängig einbinden
 - Schriftgröße in vier Stufen in den Einstellungen, im Fenster auch mit ⌘+, ⌘- und ⌘0
 - Deck spricht Englisch: App, Mitteilungen, Menü am Symbol, Fokus-Filter und Befehlszeile folgen der Sprache von macOS bzw. der Umgebung. Die Texte kommen aus `po/deck.pot` und `po/de.po`, `scripts/i18n.py check` findet fehlende Übersetzungen
 - Das englische README zeigt englische Bilder
