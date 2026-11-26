@@ -34,7 +34,30 @@ try {
     Start-Sleep -Milliseconds 500
     $json = & "$bin\amiscara-deck.exe" list --json | ConvertFrom-Json
     if (@($json).Count -lt 1) { Fail "the agent did not arrive: $json" }
-    Write-Output 'smoke test passed'
 } finally {
     Stop-Process -Id $daemon.Id -ErrorAction SilentlyContinue
 }
+
+# Start at login: the Run key of the user, the daemon starts at once and
+# ends again with uninstall.
+Start-Sleep -Seconds 1
+$daemonArgs = @('--program', (Resolve-Path "$bin\amiscara-deckd.exe").Path, '--data-dir', $env:DECK_DATA_DIR)
+& "$bin\amiscara-deck.exe" daemon status @daemonArgs | Out-Null
+if ($LASTEXITCODE -ne 3) { Fail "daemon status before install: exit $LASTEXITCODE" }
+& "$bin\amiscara-deck.exe" daemon install @daemonArgs
+if ($LASTEXITCODE -ne 0) { Fail "daemon install: exit $LASTEXITCODE" }
+$value = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run').'Amiscara Deck'
+if (-not $value -or -not $value.Contains('--data-dir')) { Fail "Run key: '$value'" }
+& "$bin\amiscara-deck.exe" daemon status @daemonArgs
+if ($LASTEXITCODE -ne 0) { Fail "daemon status after install: exit $LASTEXITCODE" }
+& "$bin\amiscara-deck.exe" list | Out-Null
+if ($LASTEXITCODE -ne 0) { Fail "the daemon from install does not answer" }
+if (-not (Test-Path (Join-Path $env:DECK_DATA_DIR 'deckd.log'))) { Fail 'no deckd.log' }
+& "$bin\amiscara-deck.exe" daemon uninstall @daemonArgs
+if ($LASTEXITCODE -ne 0) { Fail "daemon uninstall: exit $LASTEXITCODE" }
+Start-Sleep -Seconds 1
+$value = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue).'Amiscara Deck'
+if ($value) { Fail "Run key still there: '$value'" }
+if (Get-Process amiscara-deckd -ErrorAction SilentlyContinue) { Fail 'the daemon still runs after uninstall' }
+Write-Output 'smoke test passed'
+

@@ -11,6 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 deck-client = { path = "../deck-client" }
+deck-ipc = { path = "../deck-ipc" }
 deck-daemon = { path = "../deck-daemon" }
 deck-proto = { path = "../deck-proto" }
 deck-hooks = { path = "../deck-hooks" }

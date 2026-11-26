@@ -584,6 +584,7 @@ dependencies = [
  "deck-daemon",
  "deck-hooks",
  "deck-i18n",
+ "deck-ipc",
  "deck-proto",
  "deck-sim",
  "serde_json",

@@ -1033,23 +1033,19 @@ msgstr ""
 msgid "Paths not found: please give --program, --data-dir and --plist (or --unit)."
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
-msgid "Start at login is not available on Windows yet. Start amiscara-deckd yourself."
-msgstr ""
-
 #: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
 msgid "Unknown command: {command}"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "The daemon is missing or not executable: {path}\nNothing set up."
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Already set up: {path}"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Written: {path}"
 msgstr ""
 
@@ -1057,7 +1053,7 @@ msgstr ""
 msgid "User id not found, launchctl not called."
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "The daemon now starts at login and is already running."
 msgstr ""
 
@@ -1069,36 +1065,48 @@ msgstr ""
 msgid "systemctl --user failed. The file is in place; start the daemon with: systemctl --user enable --now amiscara-deckd"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Removed: {path}"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Nothing set up, nothing removed."
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "set up"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "set up, but different (install brings it in line)"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "not set up"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Start at login: {state} ({path})"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/hooks_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs crates/deck-cli/src/hooks_cmd.rs
 msgid "(missing)"
 msgstr ""
 
-#: crates/deck-cli/src/daemon_cmd.rs
+#: crates/deck-cli/src/daemon_cmd.rs crates/deck-cli/src/daemon_win.rs
 msgid "Daemon: {path}{missing}"
+msgstr ""
+
+#: crates/deck-cli/src/daemon_win.rs
+msgid "reg add failed. Nothing set up, start amiscara-deckd yourself."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_win.rs
+msgid "The daemon did not start. It starts at the next login."
+msgstr ""
+
+#: crates/deck-cli/src/daemon_win.rs
+msgid "reg delete failed."
 msgstr ""
 
 #: crates/deck-cli/src/hooks_cmd.rs
@@ -1170,7 +1178,7 @@ msgid "Hooks of other programs (left alone): {count}"
 msgstr ""
 
 #: crates/deck-cli/src/lib.rs
-msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n  amiscara-deck daemon install|uninstall|status [--program <path>] [--data-dir <folder>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
+msgid "Amiscara Deck\n\nUsage:\n  amiscara-deck answer <request> allow|deny [--always <no>] [--message <text>] [--seen] [--socket <file>]\n  amiscara-deck sim [scenario] [--speed <factor>] [--wait <seconds>] [--list] [--socket <file>]\n  amiscara-deck list  [--socket <file>] [--json]\n  amiscara-deck watch [--socket <file>] [--json]\n  amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]\n  amiscara-deck hooks uninstall [--settings <file>] [--program <path>]\n  amiscara-deck hooks status    [--settings <file>] [--program <path>]\n  amiscara-deck daemon install|uninstall|status [--program <path>] [--data-dir <folder>]\n\n  --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)\n  --speed     sim: playback speed (1 = real time)\n  --wait      sim: how long a request waits for an answer (default 60)\n  --json      Output as JSON (watch: one line per message)\n  --settings  Settings file of Claude Code (default: ~/.claude/settings.json)\n  --program   Path of the hook program (default: deck-hook next to this program)\n  --force     Install even if the hook program is missing or not executable\n  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux,\n              Run key on Windows\n\nExit codes: 0 done, 1 failed, 2 wrong usage,\n3 (status) not all hooks installed.\n"
 msgstr ""
 
 #: crates/deck-cli/src/live.rs
