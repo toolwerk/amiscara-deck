@@ -942,3 +942,6 @@ msgstr "Der Rechner wurde nicht gefunden oder ist nicht erreichbar. Rechnernamen
 
 msgid "systemctl --user failed. The file is in place; start the daemon with: systemctl --user enable --now amiscara-deckd"
 msgstr "systemctl --user ist gescheitert. Die Datei liegt bereit. Dienst starten mit: systemctl --user enable --now amiscara-deckd"
+
+msgid "Start at login is not available on Windows yet. Start amiscara-deckd yourself."
+msgstr "Der Start beim Anmelden fehlt unter Windows noch. amiscara-deckd selbst starten."

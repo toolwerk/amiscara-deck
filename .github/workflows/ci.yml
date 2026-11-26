@@ -80,3 +80,32 @@ jobs:
         working-directory: apps/AmiscaraDeck
       # Minimal PATH, as Xcode build phases have it. No signing in CI.
       - run: env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" xcodebuild -project apps/AmiscaraDeck/AmiscaraDeck.xcodeproj -scheme AmiscaraDeck -derivedDataPath target/xcode CODE_SIGNING_ALLOWED=NO test
+
+  windows:
+    name: Windows
+    # There is no runner of our own with Windows: hosted for everyone.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      # The crates that run on Windows. The others belong to the Mac app.
+      - run: cargo clippy --locked --all-targets -p deck-proto -p deck-ipc -p deck-hooks -p deck-hook -p deck-client -p deck-daemon -p deck-sim -p deck-cli -- -D warnings
+      - run: cargo test --locked -p deck-proto -p deck-ipc -p deck-hooks -p deck-hook -p deck-client -p deck-daemon -p deck-sim -p deck-cli
+      - run: cargo build --locked --release -p deck-daemon -p deck-hook -p deck-cli
+      - run: pwsh -File scripts/windows/smoke.ps1 target/release
+      - name: Package
+        shell: pwsh
+        run: |
+          $dir = 'amiscara-deck-windows-x86_64'
+          New-Item -ItemType Directory $dir | Out-Null
+          Copy-Item target/release/amiscara-deckd.exe, target/release/deck-hook.exe, target/release/amiscara-deck.exe, scripts/windows/install.ps1, README.md, README.en.md, LICENSE-MIT, LICENSE-APACHE $dir
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: amiscara-deck-windows-x86_64
+          path: amiscara-deck-windows-x86_64
+          retention-days: 14

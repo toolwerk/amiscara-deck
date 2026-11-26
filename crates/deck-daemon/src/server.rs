@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 use std::future::Future;
-use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use deck_ipc::{Listener, ReadHalf, Stream, WriteHalf};
 use deck_proto::PROTOCOL_VERSION;
 use deck_proto::agent::{Location, RequestState, Tool};
+use deck_proto::fsperm;
 use deck_proto::hook::{HookEvent, HookInput};
 use deck_proto::message::{AnswerVia, NotifyKind, Parent, Presence};
 use deck_proto::message::{
@@ -17,7 +18,6 @@ use deck_session::notify::{self, NotifyDecision, Report};
 use deck_session::{Change, Incoming, Store};
 use serde_json::Value;
 use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
-use tokio::net::{UnixListener, UnixStream};
 use tokio::sync::{mpsc, oneshot, watch};
 
 use crate::costs;
@@ -543,7 +543,7 @@ impl Inner {
 
 /// A daemon that has its socket and does not run yet.
 pub struct Daemon {
-    listener: UnixListener,
+    listener: Listener,
     socket: PathBuf,
     shared: Arc<Shared>,
 }
@@ -557,29 +557,28 @@ fn now_ms() -> u64 {
 
 impl Daemon {
     /// Create the folder (0700), take over or refuse the socket, bind it (0600).
+    /// On Windows the socket path names a pipe, see `deck_ipc`.
     pub async fn bind(config: Config) -> Result<Self, Error> {
         let dir = &config.data_dir;
-        std::fs::DirBuilder::new()
-            .recursive(true)
-            .mode(0o700)
-            .create(dir)
+        fsperm::create_dir(dir, fsperm::PRIVATE_DIR)
             .map_err(io(format!("create {}", dir.display())))?;
         // An existing folder may have been made with other rights.
-        std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o700))
+        fsperm::set_path_mode(dir, fsperm::PRIVATE_DIR)
             .map_err(io(format!("chmod {}", dir.display())))?;
 
         let socket = config.socket_path();
+        if deck_ipc::connect(&socket).await.is_ok() {
+            return Err(Error::AlreadyRunning(socket));
+        }
         if socket.exists() {
-            if UnixStream::connect(&socket).await.is_ok() {
-                return Err(Error::AlreadyRunning(socket));
-            }
             // Left behind by a daemon that did not shut down.
             std::fs::remove_file(&socket).map_err(io(format!("remove {}", socket.display())))?;
         }
-        let listener =
-            UnixListener::bind(&socket).map_err(io(format!("bind {}", socket.display())))?;
-        std::fs::set_permissions(&socket, std::fs::Permissions::from_mode(0o600))
-            .map_err(io(format!("chmod {}", socket.display())))?;
+        let listener = Listener::bind(&socket).map_err(io(format!("bind {}", socket.display())))?;
+        if cfg!(unix) {
+            fsperm::set_path_mode(&socket, fsperm::PRIVATE_FILE)
+                .map_err(io(format!("chmod {}", socket.display())))?;
+        }
 
         let state_path = dir.join(state::FILE_NAME);
         let costs_path = dir.join(costs::FILE_NAME);
@@ -641,7 +640,7 @@ impl Daemon {
                     self.shared.save_if_dirty();
                 }
                 accepted = self.listener.accept() => {
-                    let Ok((stream, _)) = accepted else { continue };
+                    let Ok(stream) = accepted else { continue };
                     let shared = self.shared.clone();
                     tokio::spawn(async move { handle(stream, shared).await });
                 }
@@ -656,7 +655,7 @@ impl Daemon {
 
 /// Read one line of at most `MAX_LINE` bytes. `None` on timeout, close,
 /// oversize or invalid UTF-8.
-async fn read_line(reader: &mut BufReader<tokio::net::unix::OwnedReadHalf>) -> Option<String> {
+async fn read_line(reader: &mut BufReader<ReadHalf>) -> Option<String> {
     let mut buf = Vec::new();
     let mut limited = reader.take(MAX_LINE);
     let read = tokio::time::timeout(FIRST_LINE_TIMEOUT, limited.read_until(b'\n', &mut buf))
@@ -669,8 +668,8 @@ async fn read_line(reader: &mut BufReader<tokio::net::unix::OwnedReadHalf>) -> O
     String::from_utf8(buf).ok()
 }
 
-async fn handle(stream: UnixStream, shared: Arc<Shared>) {
-    let (read, mut write) = stream.into_split();
+async fn handle(stream: Stream, shared: Arc<Shared>) {
+    let (read, mut write) = deck_ipc::split(stream);
     let mut reader = BufReader::new(read);
     let Some(line) = read_line(&mut reader).await else {
         return;
@@ -708,8 +707,8 @@ fn ui_message(msg: UiMessage, shared: &Shared, subscriber: u64) {
 async fn ui_session(
     line: &str,
     shared: &Shared,
-    mut reader: BufReader<tokio::net::unix::OwnedReadHalf>,
-    mut write: tokio::net::unix::OwnedWriteHalf,
+    mut reader: BufReader<ReadHalf>,
+    mut write: WriteHalf,
 ) {
     let Ok(UiMessage::Hello { protocol, .. }) = decode_line(line) else {
         return;
@@ -782,7 +781,7 @@ fn location_of(env: &HookEnv) -> Location {
 async fn hook(
     line: &str,
     shared: &Arc<Shared>,
-    reader: &mut BufReader<tokio::net::unix::OwnedReadHalf>,
+    reader: &mut BufReader<ReadHalf>,
 ) -> Option<String> {
     let silent = encode_line(&HookReply { output: None }).ok();
     let Ok(msg) = decode_line::<HookMessage>(line) else {
@@ -856,7 +855,7 @@ async fn hook(
 
 /// Resolves when the other side closes. The hook program sends nothing more
 /// after its line, so anything that arrives is ignored.
-async fn connection_closed(reader: &mut BufReader<tokio::net::unix::OwnedReadHalf>) {
+async fn connection_closed(reader: &mut BufReader<ReadHalf>) {
     let mut buf = [0u8; 256];
     loop {
         match reader.read(&mut buf).await {

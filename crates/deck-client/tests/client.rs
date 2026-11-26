@@ -1,3 +1,4 @@
+#![cfg(unix)]
 use deck_client::{Client, Error, fetch};
 use deck_daemon::{Config, Daemon};
 use deck_proto::PROTOCOL_VERSION;

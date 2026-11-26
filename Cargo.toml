@@ -4,6 +4,7 @@ members = [
     "crates/deck-i18n",
     "crates/deck-session",
     "crates/deck-daemon",
+    "crates/deck-ipc",
     "crates/deck-client",
     "crates/deck-remote",
     "crates/deck-hooks",

@@ -6,6 +6,7 @@ license.workspace = true
 authors.workspace = true
 
 [dependencies]
+deck-proto = { path = "../deck-proto" }
 serde_json = { version = "1", features = ["preserve_order"] }
 serde = "1"
 thiserror = "2"

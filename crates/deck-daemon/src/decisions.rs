@@ -3,8 +3,8 @@
 //! It holds commands, so the file is private (0600) from its first byte.
 //! Lines older than the retention are dropped; the user can clear it.
 
+use deck_proto::fsperm;
 use std::io::Write;
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 
 use deck_proto::message::AnswerVia;
@@ -33,14 +33,14 @@ struct Line {
 
 fn open_private(path: &Path, append: bool) -> std::io::Result<std::fs::File> {
     let mut o = std::fs::OpenOptions::new();
-    o.write(true).create(true).mode(0o600);
+    fsperm::create_mode(o.write(true).create(true), fsperm::PRIVATE_FILE);
     if append {
         o.append(true);
     } else {
         o.truncate(true);
     }
     let f = o.open(path)?;
-    f.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+    fsperm::set_mode(&f, fsperm::PRIVATE_FILE)?;
     Ok(f)
 }
 
@@ -93,12 +93,12 @@ pub fn prune(path: &Path, now_ms: u64, retention_days: u32) -> std::io::Result<(
     }
     let tmp = path.with_extension("jsonl.tmp");
     let _ = std::fs::remove_file(&tmp);
-    let mut f = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(&tmp)?;
-    f.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+    let mut f = fsperm::create_mode(
+        std::fs::OpenOptions::new().write(true).create_new(true),
+        fsperm::PRIVATE_FILE,
+    )
+    .open(&tmp)?;
+    fsperm::set_mode(&f, fsperm::PRIVATE_FILE)?;
     f.write_all(out.as_bytes())?;
     f.sync_all()?;
     std::fs::rename(&tmp, path)

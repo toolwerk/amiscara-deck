@@ -6,9 +6,9 @@
 //! from then on: Deck shows too little rather than too much. All of it is an
 //! estimate of Claude Code.
 
+use deck_proto::fsperm;
 use std::collections::BTreeMap;
 use std::io::Write;
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 
 use chrono::{Local, NaiveTime, TimeZone};
@@ -126,12 +126,12 @@ pub fn save(path: &Path, ledger: &Ledger) -> std::io::Result<()> {
     let json = serde_json::to_vec(ledger).map_err(std::io::Error::other)?;
     let tmp = path.with_extension("json.tmp");
     let _ = std::fs::remove_file(&tmp);
-    let mut f = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(&tmp)?;
-    f.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+    let mut f = fsperm::create_mode(
+        std::fs::OpenOptions::new().write(true).create_new(true),
+        fsperm::PRIVATE_FILE,
+    )
+    .open(&tmp)?;
+    fsperm::set_mode(&f, fsperm::PRIVATE_FILE)?;
     f.write_all(&json)?;
     std::fs::rename(&tmp, path)
 }
@@ -213,7 +213,7 @@ mod tests {
         save(&p, &l).expect("save");
         assert_eq!(load(&p), l);
         assert_eq!(
-            std::fs::metadata(&p).expect("meta").permissions().mode() & 0o777,
+            fsperm::mode(&std::fs::metadata(&p).expect("meta")).unwrap_or(0o600),
             0o600
         );
         assert_eq!(load(&dir.path().join("none")), Ledger::default());

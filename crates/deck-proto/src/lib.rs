@@ -2,6 +2,7 @@
 
 pub mod agent;
 pub mod build;
+pub mod fsperm;
 pub mod hook;
 pub mod message;
 pub mod paths;

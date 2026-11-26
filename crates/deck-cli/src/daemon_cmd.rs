@@ -59,10 +59,13 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
             }
         }
     }
-    let home = std::env::var_os("HOME").map(PathBuf::from);
+    let home = deck_proto::paths::home_dir();
     let program = program.or_else(|| {
-        let exe = std::fs::canonicalize(std::env::current_exe().ok()?).ok()?;
-        Some(exe.parent()?.join("amiscara-deckd"))
+        let exe = deck_proto::paths::canonical(&std::env::current_exe().ok()?).ok()?;
+        Some(
+            exe.parent()?
+                .join(format!("amiscara-deckd{}", std::env::consts::EXE_SUFFIX)),
+        )
     });
     let (Some(program), Some(data_dir), Some(file)) = (
         program,
@@ -107,6 +110,14 @@ fn launchctl(args: &[&str]) -> bool {
 }
 
 pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
+    if cfg!(windows) {
+        let _ = writeln!(
+            err,
+            "{}",
+            t("Start at login is not available on Windows yet. Start amiscara-deckd yourself.")
+        );
+        return 1;
+    }
     let Some(o) = parse(opts, err) else { return 2 };
     match sub {
         "install" => install(&o, out, err),
@@ -127,9 +138,9 @@ pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -
 }
 
 fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
-    let ready = std::fs::metadata(&o.program).ok().is_some_and(|m| {
-        m.is_file() && std::os::unix::fs::PermissionsExt::mode(&m.permissions()) & 0o111 != 0
-    });
+    let ready = std::fs::metadata(&o.program)
+        .ok()
+        .is_some_and(|m| deck_proto::fsperm::is_executable(&m));
     if !ready {
         let _ = writeln!(
             err,

@@ -1,0 +1,20 @@
+[package]
+name = "deck-ipc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+deck-proto = { path = "../deck-proto" }
+tokio = { version = "1.53.3", features = ["io-util", "net", "rt", "time"] }
+
+[target.'cfg(windows)'.dependencies]
+interprocess = { version = "2.4", features = ["tokio"] }
+widestring = "1"
+
+[dev-dependencies]
+tokio = { version = "1.53.3", features = ["io-util", "macros", "net", "rt-multi-thread", "time"] }
+
+[lints]
+workspace = true

@@ -6,8 +6,8 @@
 //! gone, so they come back as "waits in the terminal" (see `Store::restore`).
 //! The file holds prompts and commands, so it is private (0600) like the folder.
 
+use deck_proto::fsperm;
 use std::io::Write;
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 
 use deck_proto::message::Settings;
@@ -81,12 +81,12 @@ pub fn save(path: &Path, store: &Store, settings: &Settings) -> std::io::Result<
     let json = serde_json::to_vec(&file).map_err(std::io::Error::other)?;
     let tmp = path.with_extension("json.tmp");
     let _ = std::fs::remove_file(&tmp);
-    let mut f = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(&tmp)?;
-    f.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+    let mut f = fsperm::create_mode(
+        std::fs::OpenOptions::new().write(true).create_new(true),
+        fsperm::PRIVATE_FILE,
+    )
+    .open(&tmp)?;
+    fsperm::set_mode(&f, fsperm::PRIVATE_FILE)?;
     f.write_all(&json)?;
     f.sync_all()?;
     std::fs::rename(&tmp, path)

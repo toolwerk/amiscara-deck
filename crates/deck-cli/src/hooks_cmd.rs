@@ -56,8 +56,11 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
 /// `deck-hook` next to this program: where the app puts both.
 fn sibling_program() -> Option<PathBuf> {
     let exe = std::env::current_exe().ok()?;
-    let exe = std::fs::canonicalize(exe).ok()?;
-    Some(exe.parent()?.join("deck-hook"))
+    let exe = deck_proto::paths::canonical(&exe).ok()?;
+    Some(
+        exe.parent()?
+            .join(format!("deck-hook{}", std::env::consts::EXE_SUFFIX)),
+    )
 }
 
 pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -> u8 {
@@ -83,9 +86,9 @@ pub fn run(sub: &str, opts: &[&str], out: &mut dyn Write, err: &mut dyn Write) -
 }
 
 fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
-    let ready = std::fs::metadata(&o.program).ok().is_some_and(|m| {
-        m.is_file() && std::os::unix::fs::PermissionsExt::mode(&m.permissions()) & 0o111 != 0
-    });
+    let ready = std::fs::metadata(&o.program)
+        .ok()
+        .is_some_and(|m| deck_proto::fsperm::is_executable(&m));
     if !ready && !o.force {
         let _ = writeln!(
             err,

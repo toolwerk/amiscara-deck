@@ -5,8 +5,6 @@
 //! Every event is a recorded sample with the fields that make it a different
 //! session patched in: session id, working folder, prompt, tool and so on.
 
-#![cfg(unix)]
-
 use std::path::Path;
 use std::time::Duration;
 
@@ -15,7 +13,6 @@ use deck_proto::agent::Tool;
 use deck_proto::message::{HookEnv, HookMessage, HookReply, decode_line, encode_line};
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::UnixStream;
 
 /// One recorded sample, as embedded in the program.
 fn template(name: &str) -> Value {
@@ -301,7 +298,7 @@ async fn play_one(socket: &Path, s: Session, opts: &Options, report: impl Fn(Eve
         let Ok(line) = encode_line(&msg) else {
             continue;
         };
-        let Ok(mut stream) = UnixStream::connect(socket).await else {
+        let Ok(mut stream) = deck_ipc::connect(socket).await else {
             report(Event::NoDaemon);
             return;
         };

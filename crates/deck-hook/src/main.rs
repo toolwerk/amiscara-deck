@@ -1,6 +1,5 @@
 //! `deck-hook`: see the library for the rule that every error ends silently.
 
-#[cfg(unix)]
 fn main() {
     // A panic must not print anything: stay silent, exit 0.
     std::panic::set_hook(Box::new(|_| {}));
@@ -28,10 +27,6 @@ fn main() {
 
 /// Read what is left of the input: the caller must never write into a closed
 /// pipe, whatever made this program do nothing.
-#[cfg(unix)]
 fn drain() {
     let _ = std::io::copy(&mut std::io::stdin().lock(), &mut std::io::sink());
 }
-
-#[cfg(not(unix))]
-fn main() {}

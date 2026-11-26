@@ -1,3 +1,4 @@
+#![cfg(unix)]
 //! PermissionRequest at the daemon while nobody can answer: nothing is held,
 //! the request is shown as "waits in the terminal". Holding is in `holding.rs`.
 
