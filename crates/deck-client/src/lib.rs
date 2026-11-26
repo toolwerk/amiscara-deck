@@ -72,6 +72,9 @@ type Writer = Box<dyn AsyncWrite + Send + Unpin>;
 
 pub struct Client {
     reader: Reader,
+    /// The part of a line read so far. It lives here and not in `next`, so
+    /// `next` can be cancelled (as in `tokio::select!`) without losing it.
+    partial: Vec<u8>,
     writer: Writer,
     state: State,
 }
@@ -117,7 +120,8 @@ impl Client {
             )
             .await?;
         let mut reader = BufReader::new(r);
-        match read_message(&mut reader).await? {
+        let mut partial = Vec::new();
+        match read_message(&mut reader, &mut partial).await? {
             DaemonMessage::Welcome {
                 host,
                 settings,
@@ -127,6 +131,7 @@ impl Client {
                 ..
             } => Ok(Client {
                 reader,
+                partial,
                 writer,
                 state: State {
                     host,
@@ -148,9 +153,10 @@ impl Client {
     }
 
     /// The next message of the daemon, already applied to the state.
-    /// `Error::Closed` when the daemon goes away.
+    /// `Error::Closed` when the daemon goes away. Cancel safe: a line read
+    /// only in part is finished by the next call.
     pub async fn next(&mut self) -> Result<DaemonMessage, Error> {
-        let msg = read_message(&mut self.reader).await?;
+        let msg = read_message(&mut self.reader, &mut self.partial).await?;
         self.state.apply(&msg);
         Ok(msg)
     }
@@ -177,17 +183,71 @@ impl Client {
     }
 }
 
-async fn read_message(reader: &mut Reader) -> Result<DaemonMessage, Error> {
-    let mut buf = Vec::new();
-    let n = reader.take(MAX_LINE).read_until(b'\n', &mut buf).await?;
-    if n == 0 || buf.last() != Some(&b'\n') {
+/// Read one line into `buf`, which keeps what was read when the future is
+/// dropped half way: `read_until` hands over bytes as it consumes them.
+async fn read_message(reader: &mut Reader, buf: &mut Vec<u8>) -> Result<DaemonMessage, Error> {
+    let limit = MAX_LINE.saturating_sub(buf.len() as u64);
+    (&mut *reader).take(limit).read_until(b'\n', buf).await?;
+    // No newline: the daemon went away, or the line is too long.
+    if buf.last() != Some(&b'\n') {
+        buf.clear();
         return Err(Error::Closed);
     }
-    let line = String::from_utf8(buf).map_err(|e| Error::Unexpected(e.to_string()))?;
+    let line =
+        String::from_utf8(std::mem::take(buf)).map_err(|e| Error::Unexpected(e.to_string()))?;
     decode_line(&line).map_err(|e| Error::Unexpected(e.to_string()))
 }
 
 /// The state once, without staying connected.
 pub async fn fetch(socket: &Path, name: &str) -> Result<State, Error> {
     Ok(Client::connect(socket, name).await?.state)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn reader(r: tokio::io::DuplexStream) -> Reader {
+        BufReader::new(Box::new(r))
+    }
+
+    #[tokio::test]
+    async fn a_line_read_in_part_survives_a_cancelled_read() {
+        let (r, mut w) = tokio::io::duplex(1024);
+        let mut reader = reader(r);
+        let mut partial = Vec::new();
+        let line = encode_line(&DaemonMessage::AgentRemoved {
+            id: "a1".to_owned(),
+        })
+        .expect("encode");
+        let (head, tail) = line.split_at(line.len() / 2);
+
+        w.write_all(head.as_bytes()).await.expect("write");
+        // As in `tokio::select!` when a command comes first.
+        let cut = tokio::time::timeout(
+            Duration::from_millis(50),
+            read_message(&mut reader, &mut partial),
+        )
+        .await;
+        assert!(cut.is_err(), "no whole line yet");
+        assert_eq!(partial, head.as_bytes());
+
+        w.write_all(tail.as_bytes()).await.expect("write");
+        let msg = read_message(&mut reader, &mut partial).await.expect("read");
+        assert!(matches!(msg, DaemonMessage::AgentRemoved { id } if id == "a1"));
+        assert!(partial.is_empty());
+    }
+
+    #[tokio::test]
+    async fn a_close_in_the_middle_of_a_line_is_closed() {
+        let (r, mut w) = tokio::io::duplex(1024);
+        let mut reader = reader(r);
+        let mut partial = Vec::new();
+        w.write_all(b"{\"type\":").await.expect("write");
+        drop(w);
+        assert!(matches!(
+            read_message(&mut reader, &mut partial).await,
+            Err(Error::Closed)
+        ));
+    }
 }
