@@ -191,7 +191,7 @@ fn daemon_args<'a>(e: &'a Env, sub: &'a str, plist: &'a str, extra: &[&'a str]) 
 }
 
 #[test]
-fn daemon_install_writes_the_launch_agent_and_uninstall_removes_it() {
+fn daemon_install_writes_the_service_file_and_uninstall_removes_it() {
     let e = env();
     let plist = e
         .dir
@@ -205,10 +205,14 @@ fn daemon_install_writes_the_launch_agent_and_uninstall_removes_it() {
     let (code, out, err) = run(&daemon_args(&e, "install", plist_s, &[]));
     assert_eq!((code, err.as_str()), (Some(0), ""), "{out}");
     let text = std::fs::read_to_string(&plist).expect("plist");
+    let marker = if cfg!(target_os = "macos") {
+        "net.staude.amiscara.deckd"
+    } else {
+        "WantedBy=default.target"
+    };
     assert!(
-        text.contains("net.staude.amiscara.deckd")
-            && text.contains("--data-dir")
-            && text.contains("/x/data")
+        text.contains(marker) && text.contains("--data-dir") && text.contains("/x/data"),
+        "{text}"
     );
     assert!(text.contains(e.program.to_str().expect("utf8")));
 

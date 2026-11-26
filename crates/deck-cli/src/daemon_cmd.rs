@@ -1,32 +1,54 @@
-//! `daemon install|uninstall|status`: start the daemon at login (macOS).
+//! `daemon install|uninstall|status`: start the daemon at login. A
+//! LaunchAgent on macOS, a systemd user unit on Linux.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use deck_daemon::launchd;
+use deck_daemon::{launchd, systemd};
 use deck_i18n::{t, t_with};
 
 struct Opts {
     program: PathBuf,
     data_dir: PathBuf,
-    plist: PathBuf,
-    /// Write or remove the file only, do not call `launchctl`.
-    no_launchctl: bool,
+    /// The LaunchAgent plist (macOS) or the systemd unit (Linux).
+    file: PathBuf,
+    /// Write or remove the file only, do not call `launchctl` or `systemctl`.
+    no_manager: bool,
+}
+
+/// What this system starts the daemon with.
+fn service_text(o: &Opts) -> String {
+    if cfg!(target_os = "macos") {
+        launchd::plist(&o.program, &o.data_dir)
+    } else {
+        systemd::unit(&o.program, &o.data_dir)
+    }
+}
+
+fn default_file(home: &Path) -> PathBuf {
+    if cfg!(target_os = "macos") {
+        launchd::plist_path(home)
+    } else {
+        let config = std::env::var_os("XDG_CONFIG_HOME")
+            .filter(|p| !p.is_empty())
+            .map(PathBuf::from);
+        systemd::unit_path(home, config.as_deref())
+    }
 }
 
 fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
     let mut program = None;
     let mut data_dir = None;
-    let mut plist = None;
-    let mut no_launchctl = false;
+    let mut file = None;
+    let mut no_manager = false;
     let mut it = opts.iter();
     while let Some(o) = it.next() {
         match *o {
             "--program" => program = it.next().map(PathBuf::from),
             "--data-dir" => data_dir = it.next().map(PathBuf::from),
-            "--plist" => plist = it.next().map(PathBuf::from),
-            "--no-launchctl" => no_launchctl = true,
+            "--plist" | "--unit" => file = it.next().map(PathBuf::from),
+            "--no-launchctl" | "--no-systemctl" => no_manager = true,
             other => {
                 let _ = writeln!(
                     err,
@@ -42,23 +64,23 @@ fn parse(opts: &[&str], err: &mut dyn Write) -> Option<Opts> {
         let exe = std::fs::canonicalize(std::env::current_exe().ok()?).ok()?;
         Some(exe.parent()?.join("amiscara-deckd"))
     });
-    let (Some(program), Some(data_dir), Some(plist)) = (
+    let (Some(program), Some(data_dir), Some(file)) = (
         program,
         data_dir.or_else(deck_proto::paths::default_data_dir),
-        plist.or_else(|| home.as_deref().map(launchd::plist_path)),
+        file.or_else(|| home.as_deref().map(default_file)),
     ) else {
         let _ = writeln!(
             err,
             "{}",
-            t("Paths not found: please give --program, --data-dir and --plist.")
+            t("Paths not found: please give --program, --data-dir and --plist (or --unit).")
         );
         return None;
     };
     Some(Opts {
         program,
         data_dir,
-        plist,
-        no_launchctl,
+        file,
+        no_manager,
     })
 }
 
@@ -67,6 +89,14 @@ fn uid() -> Option<String> {
     out.status
         .success()
         .then(|| String::from_utf8_lossy(&out.stdout).trim().to_owned())
+}
+
+fn systemctl(args: &[&str]) -> bool {
+    Command::new("systemctl")
+        .arg("--user")
+        .args(args)
+        .status()
+        .is_ok_and(|s| s.success())
 }
 
 fn launchctl(args: &[&str]) -> bool {
@@ -111,24 +141,25 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
         );
         return 1;
     }
-    let text = launchd::plist(&o.program, &o.data_dir);
-    if std::fs::read_to_string(&o.plist).is_ok_and(|t| t == text) {
+    let text = service_text(o);
+    let unchanged = std::fs::read_to_string(&o.file).is_ok_and(|t| t == text);
+    if unchanged {
         let _ = writeln!(
             out,
             "{}",
             t_with(
                 "Already set up: {path}",
-                &[("path", &o.plist.display().to_string())]
+                &[("path", &o.file.display().to_string())]
             )
         );
     } else {
-        if let Some(dir) = o.plist.parent()
+        if let Some(dir) = o.file.parent()
             && let Err(e) = std::fs::create_dir_all(dir)
         {
             let _ = writeln!(err, "{}", crate::view::error(&e));
             return 1;
         }
-        if let Err(e) = std::fs::write(&o.plist, text) {
+        if let Err(e) = std::fs::write(&o.file, text) {
             let _ = writeln!(err, "{}", crate::view::error(&e));
             return 1;
         }
@@ -137,12 +168,15 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
             "{}",
             t_with(
                 "Written: {path}",
-                &[("path", &o.plist.display().to_string())]
+                &[("path", &o.file.display().to_string())]
             )
         );
     }
-    if o.no_launchctl {
+    if o.no_manager {
         return 0;
+    }
+    if !cfg!(target_os = "macos") {
+        return start_systemd(unchanged, out, err);
     }
     let Some(uid) = uid() else {
         let _ = writeln!(err, "{}", t("User id not found, launchctl not called."));
@@ -151,7 +185,7 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     let domain = format!("gui/{uid}");
     // A loaded job must go before a changed one comes in; an error here only means it was not loaded.
     let _ = launchctl(&["bootout", &format!("{domain}/{}", launchd::LABEL)]);
-    if launchctl(&["bootstrap", &domain, &o.plist.to_string_lossy()]) {
+    if launchctl(&["bootstrap", &domain, &o.file.to_string_lossy()]) {
         let _ = writeln!(
             out,
             "{}",
@@ -170,20 +204,53 @@ fn install(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
     }
 }
 
-fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
-    if !o.no_launchctl
-        && let Some(uid) = uid()
-    {
-        let _ = launchctl(&["bootout", &format!("gui/{uid}/{}", launchd::LABEL)]);
+/// Enable the unit and start it; a changed unit is restarted so the new
+/// file counts.
+fn start_systemd(unchanged: bool, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
+    let started = systemctl(&["daemon-reload"])
+        && systemctl(&["enable", systemd::UNIT])
+        && systemctl(&[if unchanged { "start" } else { "restart" }, systemd::UNIT]);
+    if started {
+        let _ = writeln!(
+            out,
+            "{}",
+            t("The daemon now starts at login and is already running.")
+        );
+        0
+    } else {
+        let _ = writeln!(
+            err,
+            "{}",
+            t(
+                "systemctl --user failed. The file is in place; start the daemon with: systemctl --user enable --now amiscara-deckd"
+            )
+        );
+        1
     }
-    match std::fs::remove_file(&o.plist) {
+}
+
+fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
+    if !o.no_manager {
+        if cfg!(target_os = "macos") {
+            if let Some(uid) = uid() {
+                let _ = launchctl(&["bootout", &format!("gui/{uid}/{}", launchd::LABEL)]);
+            }
+        } else {
+            let _ = systemctl(&["disable", "--now", systemd::UNIT]);
+        }
+    }
+    let removed = std::fs::remove_file(&o.file);
+    if !o.no_manager && !cfg!(target_os = "macos") && removed.is_ok() {
+        let _ = systemctl(&["daemon-reload"]);
+    }
+    match removed {
         Ok(()) => {
             let _ = writeln!(
                 out,
                 "{}",
                 t_with(
                     "Removed: {path}",
-                    &[("path", &o.plist.display().to_string())]
+                    &[("path", &o.file.display().to_string())]
                 )
             );
             0
@@ -200,8 +267,8 @@ fn uninstall(o: &Opts, out: &mut dyn Write, err: &mut dyn Write) -> u8 {
 }
 
 fn status(o: &Opts, out: &mut dyn Write) -> u8 {
-    let want = launchd::plist(&o.program, &o.data_dir);
-    let (ok, state) = match std::fs::read_to_string(&o.plist) {
+    let want = service_text(o);
+    let (ok, state) = match std::fs::read_to_string(&o.file) {
         Ok(text) if text == want => (true, t("set up")),
         Ok(_) => (
             false,
@@ -214,7 +281,7 @@ fn status(o: &Opts, out: &mut dyn Write) -> u8 {
         "{}",
         t_with(
             "Start at login: {state} ({path})",
-            &[("state", &state), ("path", &o.plist.display().to_string())]
+            &[("state", &state), ("path", &o.file.display().to_string())]
         )
     );
     let missing = if Path::new(&o.program).exists() {

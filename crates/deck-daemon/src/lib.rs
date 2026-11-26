@@ -13,6 +13,7 @@ mod git;
 pub mod launchd;
 mod server;
 mod state;
+pub mod systemd;
 mod tmux;
 
 pub use deck_proto::paths::default_data_dir;

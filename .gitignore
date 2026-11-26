@@ -11,3 +11,4 @@ HANDOFF.md
 .claude/settings.local.json
 spikes/m0/out/
 spikes/m5/out/
+/dist/

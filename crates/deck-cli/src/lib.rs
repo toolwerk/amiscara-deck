@@ -30,6 +30,7 @@ Usage:
   amiscara-deck hooks install   [--settings <file>] [--program <path>] [--force]
   amiscara-deck hooks uninstall [--settings <file>] [--program <path>]
   amiscara-deck hooks status    [--settings <file>] [--program <path>]
+  amiscara-deck daemon install|uninstall|status [--program <path>] [--data-dir <folder>]
 
   --socket    Socket of the daemon (default: in the data folder of Amiscara Deck)
   --speed     sim: playback speed (1 = real time)
@@ -38,6 +39,7 @@ Usage:
   --settings  Settings file of Claude Code (default: ~/.claude/settings.json)
   --program   Path of the hook program (default: deck-hook next to this program)
   --force     Install even if the hook program is missing or not executable
+  daemon      Start the daemon at login: LaunchAgent on macOS, systemd user unit on Linux
 
 Exit codes: 0 done, 1 failed, 2 wrong usage,
 3 (status) not all hooks installed.

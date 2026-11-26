@@ -33,6 +33,7 @@ The app speaks English or German, following the language of macOS. You can set a
 - [The window](#the-window)
 - [Codex](#codex)
 - [Other machines](#other-machines)
+- [Linux](#linux)
 - [Command line](#command-line)
 - [Updates](#updates)
 - [Security and privacy](#security-and-privacy)
@@ -226,23 +227,7 @@ Deck also shows the agents of other machines and answers their requests. The con
 On the other machine Deck's daemon runs and the hooks are installed there:
 
 - **Mac:** install the app and set it up as above. Switch on "Remote Login" in System Settings, General, Sharing. The app must run there, best with "Start at login".
-- **Linux:** not tested as the other machine. Build the three programs, install the hooks and start the daemon yourself:
-
-```sh
-cargo build --release -p deck-daemon -p deck-hook -p deck-cli
-```
-
-Install the hooks:
-
-```sh
-target/release/amiscara-deck hooks install
-```
-
-Start the daemon:
-
-```sh
-target/release/amiscara-deckd
-```
+- **Linux:** set it up as under [Linux](#linux). Not tested as the other machine yet.
 
 Then add the machine on your Mac in the settings under "Other machines":
 
@@ -256,6 +241,32 @@ Then add the machine on your Mac in the settings under "Other machines":
 If your Mac does not know the key of the machine yet, Deck shows its fingerprint and waits for your yes. If the key changes later, Deck does not connect.
 
 Deck does not start the daemon on the other machine itself. If it is not running there, Deck says so in the settings and names the next step. As soon as the daemon runs, Deck connects by itself. Deck names a refused sign-in, an unusable key and a machine that does not answer the same way.
+
+## Linux
+
+There is no interface for Linux yet. The daemon, the hook program and the command line already run. With them your Mac shows the agents of the Linux machine and answers their requests (see [Other machines](#other-machines)).
+
+Unpack the package for x86_64 or aarch64 and set it up:
+
+```sh
+tar xzf amiscara-deck-<version>-linux-x86_64.tar.gz
+cd amiscara-deck-<version>-linux-x86_64
+./install.sh
+```
+
+`install.sh` puts the three programs into `~/.local/bin`, installs the hooks in `~/.claude/settings.json` and sets up the daemon as a systemd user unit. It starts at once and at every login. The programs are built statically and run on any distribution with systemd.
+
+Without a connected interface Deck holds no request, and Claude Code shows its dialog as usual. `amiscara-deck watch` in a second terminal shows what the agents are doing.
+
+The daemon logs to the journal (`journalctl --user -u amiscara-deckd`). `./install.sh --uninstall` removes hooks and daemon again.
+
+To build the package yourself, on macOS or Linux with Docker or Podman:
+
+```sh
+scripts/package-linux.sh
+```
+
+The archives are then in `dist/`.
 
 ## Command line
 
@@ -271,7 +282,7 @@ The app ships the program `amiscara-deck`:
 | `watch` | print changes as they happen |
 | `answer <request> allow\|deny` | answer a request |
 | `hooks status\|install\|uninstall` | manage the entries in Claude Code |
-| `daemon status\|install\|uninstall` | start the daemon at login, without the app |
+| `daemon status\|install\|uninstall` | start the daemon at login, without the app (macOS: LaunchAgent, Linux: systemd) |
 | `sim demo` | play made up agents, to try things out without spending tokens |
 
 `amiscara-deck help` shows the options. Its output is English or German, following the environment: the first value set of `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` counts.

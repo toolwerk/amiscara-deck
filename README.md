@@ -33,6 +33,7 @@ Die App spricht Deutsch oder Englisch, je nach Sprache von macOS. Eine eigene Sp
 - [Das Fenster](#das-fenster)
 - [Codex](#codex)
 - [Andere Rechner](#andere-rechner)
+- [Linux](#linux)
 - [Befehlszeile](#befehlszeile)
 - [Updates](#updates)
 - [Sicherheit und Datenschutz](#sicherheit-und-datenschutz)
@@ -226,23 +227,7 @@ Deck zeigt auch die Agenten anderer Rechner und beantwortet deren Anfragen. Die 
 Auf dem anderen Rechner läuft der Dienst von Deck, und die Hooks sind dort eingebaut:
 
 - **Mac:** die App installieren und wie oben einrichten. Unter Systemeinstellungen, Allgemein, Teilen die "Entfernte Anmeldung" einschalten. Die App muss dort laufen, am besten mit "Beim Anmelden starten".
-- **Linux:** als zweiter Rechner nicht geprüft. Die drei Programme bauen, die Hooks einbauen und den Dienst selbst starten:
-
-```sh
-cargo build --release -p deck-daemon -p deck-hook -p deck-cli
-```
-
-Die Hooks einbauen:
-
-```sh
-target/release/amiscara-deck hooks install
-```
-
-Den Dienst starten:
-
-```sh
-target/release/amiscara-deckd
-```
+- **Linux:** wie unter [Linux](#linux) einrichten. Als zweiter Rechner noch nicht geprüft.
 
 Dann auf Ihrem Mac in den Einstellungen unter "Andere Rechner" den Rechner hinzufügen:
 
@@ -256,6 +241,32 @@ Dann auf Ihrem Mac in den Einstellungen unter "Andere Rechner" den Rechner hinzu
 Kennt Ihr Mac den Schlüssel des Rechners noch nicht, zeigt Deck den Fingerabdruck und wartet auf Ihr Ja. Ändert sich der Schlüssel später, verbindet Deck nicht.
 
 Deck startet den Dienst auf dem anderen Rechner nicht selbst. Läuft er dort nicht, sagt Deck das in den Einstellungen und nennt den nächsten Schritt. Sobald der Dienst läuft, verbindet Deck von selbst. Genauso nennt Deck eine abgelehnte Anmeldung, einen nicht nutzbaren Schlüssel und einen Rechner, der nicht antwortet.
+
+## Linux
+
+Für Linux gibt es noch keine Oberfläche. Dienst, Hook-Programm und Befehlszeile laufen aber schon. Ihr Mac zeigt damit die Agenten des Linux-Rechners und beantwortet deren Anfragen (siehe [Andere Rechner](#andere-rechner)).
+
+Das Paket für x86_64 oder aarch64 entpacken und einrichten:
+
+```sh
+tar xzf amiscara-deck-<Version>-linux-x86_64.tar.gz
+cd amiscara-deck-<Version>-linux-x86_64
+./install.sh
+```
+
+`install.sh` legt die drei Programme nach `~/.local/bin`, baut die Hooks in `~/.claude/settings.json` ein und richtet den Dienst als systemd-Benutzereinheit ein. Er startet damit sofort und bei jeder Anmeldung. Die Programme sind statisch gebaut und laufen auf jeder Distribution mit systemd.
+
+Ohne verbundene Oberfläche hält Deck keine Anfrage, Claude Code zeigt dann wie gewohnt seinen Dialog. Was die Agenten gerade tun, zeigt `amiscara-deck watch` in einem zweiten Terminal.
+
+Der Dienst schreibt ins Journal (`journalctl --user -u amiscara-deckd`). `./install.sh --uninstall` baut Hooks und Dienst wieder aus.
+
+Das Paket selbst bauen, auf macOS oder Linux mit Docker oder Podman:
+
+```sh
+scripts/package-linux.sh
+```
+
+Die Archive liegen danach in `dist/`.
 
 ## Befehlszeile
 
@@ -271,7 +282,7 @@ Die App bringt das Programm `amiscara-deck` mit:
 | `watch` | Änderungen laufend ausgeben |
 | `answer <Anfrage> allow\|deny` | eine Anfrage beantworten |
 | `hooks status\|install\|uninstall` | Einträge in Claude Code verwalten |
-| `daemon status\|install\|uninstall` | den Dienst beim Anmelden starten, ohne die App |
+| `daemon status\|install\|uninstall` | den Dienst beim Anmelden starten, ohne die App (macOS: LaunchAgent, Linux: systemd) |
 | `sim demo` | erfundene Agenten abspielen, zum Ausprobieren ohne Tokens |
 
 `amiscara-deck help` zeigt alle Optionen. Die Ausgabe ist deutsch oder englisch, je nach Umgebung: Es zählt der erste gesetzte Wert aus `DECK_LANGUAGE`, `LC_ALL`, `LC_MESSAGES` und `LANG`.
